@@ -6,13 +6,19 @@
 <title>Sergei Mkrtichian — Official Website</title>
 <style>
 html,body{margin:0;padding:0;height:100%;overflow-x:hidden;background:#000;font-family:"Georgia",serif;scroll-behavior:smooth}
+
+/* HEADER */
 header{position:fixed;top:0;left:0;width:100%;height:150px;background:rgba(0,0,0,0);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 40px;z-index:10;box-sizing:border-box;transition:transform .6s ease,opacity .6s ease,background .8s ease}
 header img.logo{height:80px}
 nav{display:flex;gap:35px;font-size:18px}
 nav a{color:#fff;text-decoration:none;font-weight:500;transition:opacity .3s}
+
+/* HERO */
 .hero{position:relative;height:100vh;overflow:hidden;z-index:1}
 .hero img{position:absolute;top:0;left:0;width:100%;height:120%;object-fit:cover;transform-origin:center center;opacity:0;transform:scale(1.05);transition:opacity 1.5s ease,transform 2s ease}
 .hero.loaded img{opacity:1;transform:scale(1)}
+
+/* TEXT BLOCK */
 .text-block{background:#fff;padding:150px 20px 120px;text-align:center}
 .text-block h1{font-size:56px;font-weight:400;color:#05053b;margin:0 0 30px}
 .text-block p{font-size:20px;color:#7a7a7a;max-width:700px;margin:0 auto 40px;line-height:1.6}
@@ -22,38 +28,56 @@ nav a{color:#fff;text-decoration:none;font-weight:500;transition:opacity .3s}
 .socials a.instagram{background:linear-gradient(45deg,#f58529,#dd2a7b,#8134af,#515bd4)}
 .socials a.facebook{background:#1877f2}
 .socials a.youtube{background:#ff0000}
+
+/* PERFORMANCES */
 #performances{background:#111;padding:100px 20px 140px;text-align:center}
 #performances h2{color:#fff;font-size:42px;font-weight:400;margin-bottom:60px}
 .video-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:28px;justify-items:center;width:100%;max-width:1200px;margin:0 auto}
 .video-wrapper {position: relative;width: 100%;padding-bottom: 56.25%;overflow: hidden;border-radius: 14px;box-shadow: 0 10px 30px rgba(0,0,0,.6);}
 .video-wrapper iframe {position: absolute;top: 0;left: 0;width: 100%;height: 100%;border: 0;opacity: 0;transform: translateY(50px);transition: opacity 1.2s ease, transform 1.2s ease;}
 .video-wrapper.visible iframe {opacity: 1;transform: translateY(0);}
+
+/* FOOTER */
 footer {background:#050505;color:#ccc;text-align:center;font-size:15px;padding:40px 20px;border-top:1px solid rgba(255,255,255,0.08);}
 footer a {color:#aaa;text-decoration:none;border-bottom:1px dotted #666;transition:color .3s ease;}
 footer a:hover {color:#fff;}
 
-/* 🔽 LOADER */
+/* LOADER */
 #loader {
   position: fixed; top:0; left:0; width:100%; height:100%;
   display:flex; align-items:center; justify-content:center;
   background:#000; z-index:9999; transition: opacity 0.8s ease;
 }
 #loader.hidden {opacity:0;pointer-events:none;}
+
+.loader-bg {
+  position:absolute; top:0; left:0; width:100%; height:100%;
+  background-size:cover;
+  background-position:center;
+  filter:blur(12px) brightness(0.4);
+  z-index:0;
+}
+
 .loader-content {
+  position:relative; z-index:1;
   display:flex; flex-direction:column; align-items:center; gap:20px;
 }
+
 .loader-logo {
-  font-size:32px; font-weight:bold; color:#fff;
-  text-transform:uppercase; letter-spacing:2px;
+  width:150px; height:auto;
+  object-fit:contain;
   animation: logoPulse 1.5s infinite ease-in-out;
 }
+
 @keyframes logoPulse {0%,100%{transform:scale(1);} 50%{transform:scale(1.05);}}
+
 .spinner {
   width:50px; height:50px; border:6px solid rgba(255,255,255,0.15);
   border-top-color:#fff; border-radius:50%;
   animation: spin 1s linear infinite;
 }
 @keyframes spin {to{transform:rotate(360deg);}}
+
 @media(max-width:768px){
   header{height:120px;padding:0 20px}
   header img.logo{height:60px}
@@ -68,8 +92,9 @@ footer a:hover {color:#fff;}
 
 <!-- LOADER -->
 <div id="loader">
+  <div class="loader-bg" id="loaderBg"></div>
   <div class="loader-content">
-    <div class="loader-logo">Sergei Mkrtichian</div>
+    <img src="logo.jpg" alt="Logo" class="loader-logo">
     <div class="spinner"></div>
   </div>
 </div>
@@ -115,16 +140,20 @@ footer a:hover {color:#fff;}
 </footer>
 
 <script>
-const hero = document.getElementById('hero');
-const img = document.getElementById('heroImg');
-const header = document.getElementById('header');
-const loader = document.getElementById('loader');
-const maxScale = 1.7;
-let currentScale = 1;
+const hero=document.getElementById('hero');
+const img=document.getElementById('heroImg');
+const header=document.getElementById('header');
+const loader=document.getElementById('loader');
+const loaderBg=document.getElementById('loaderBg');
+const maxScale=1.7;
+let currentScale=1;
 
 // Проверка первого визита
 const isFirstVisit = !localStorage.getItem('visited');
 if(isFirstVisit){ localStorage.setItem('visited','true'); loader.style.display='flex'; } else { loader.style.display='none'; }
+
+// Устанавливаем фон для лоадера
+loaderBg.style.backgroundImage = `url('${img.src}')`;
 
 // Когда главное фото загружено
 img.onload = () => {
