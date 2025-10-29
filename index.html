@@ -51,6 +51,25 @@
     transform: translateY(0);
   }
 
+  /* 🔽 Добавляем стиль для блока лицензии */
+  footer {
+    background:#050505;
+    color:#ccc;
+    text-align:center;
+    font-size:15px;
+    padding:40px 20px;
+    border-top:1px solid rgba(255,255,255,0.08);
+  }
+  footer a {
+    color:#aaa;
+    text-decoration:none;
+    border-bottom:1px dotted #666;
+    transition:color .3s ease;
+  }
+  footer a:hover {
+    color:#fff;
+  }
+
   @media(max-width:768px){
     header{height:120px;padding:0 20px}
     header img.logo{height:60px}
@@ -111,8 +130,15 @@
   </div>
 </section>
 
+<!-- 🔽 Лицензия -->
+<footer>
+  © 2025 Sergei Mkrtichian. This website is licensed under the
+  <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener">
+    Apache License 2.0
+  </a>.
+</footer>
+
 <script>
-  // эффект header + hero
   const hero = document.getElementById('hero');
   const img = document.getElementById('heroImg');
   const header = document.getElementById('header');
@@ -150,7 +176,6 @@
   }
   requestAnimationFrame(animate);
 
-  // ✨ плавное появление видео при скролле
   const videos = document.querySelectorAll('.video-wrapper');
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
