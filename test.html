@@ -1,113 +1,116 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Sergei Mkrtichian — Official Website</title>
 <style>
-html,body{margin:0;padding:0;height:100%;overflow-x:hidden;background:#000;font-family:"Georgia",serif;scroll-behavior:smooth}
+  :root{--bg:#000;--muted:rgba(255,255,255,0.15)}
+  html,body{height:100%;margin:0;background:var(--bg);font-family:"Georgia",serif;overflow-x:hidden;scroll-behavior:smooth;color:#fff}
+  /* Header */
+  header{position:fixed;top:0;left:0;width:100%;height:150px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;box-sizing:border-box;z-index:20;transition:transform .6s ease,opacity .6s ease,background .8s ease}
+  header img.logo{height:80px;display:block}
+  nav{display:flex;gap:35px;font-size:18px}
+  nav a{color:#fff;text-decoration:none;font-weight:500}
+  /* Hero */
+  .hero{position:relative;height:100vh;overflow:hidden;z-index:1}
+  .hero img{position:absolute;top:0;left:0;width:100%;height:120%;object-fit:cover;transform-origin:center center;opacity:0;transform:scale(1.05);transition:opacity 1.5s ease,transform 2s ease}
+  .hero.loaded img{opacity:1;transform:scale(1)}
+  /* Content */
+  .text-block{background:#fff;padding:150px 20px 120px;text-align:center;color:#111}
+  .text-block h1{font-size:56px;font-weight:400;margin:0 0 30px}
+  .text-block p{font-size:20px;color:#7a7a7a;max-width:700px;margin:0 auto 40px;line-height:1.6}
+  .text-block em{display:block;margin-top:20px;font-style:normal;color:#444;font-size:22px}
+  .socials{display:flex;flex-direction:column;align-items:center;gap:18px;margin-top:60px}
+  .socials a{display:flex;align-items:center;justify-content:center;gap:12px;text-decoration:none;font-weight:500;font-size:18px;color:#fff;border-radius:50px;padding:14px 48px;width:260px;text-align:center;transition:transform .3s ease,opacity .3s ease}
+  .socials a.instagram{background:linear-gradient(45deg,#f58529,#dd2a7b,#8134af,#515bd4)}
+  .socials a.facebook{background:#1877f2}
+  .socials a.youtube{background:#ff0000}
+  /* Videos */
+  #performances{background:#111;padding:100px 20px 140px;text-align:center}
+  #performances h2{color:#fff;font-size:42px;font-weight:400;margin-bottom:60px}
+  .video-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:28px;justify-items:center;width:100%;max-width:1200px;margin:0 auto}
+  .video-wrapper{position:relative;width:100%;padding-bottom:56.25%;overflow:hidden;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+  .video-wrapper iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0;opacity:0;transform:translateY(50px);transition:opacity 1.2s ease,transform 1.2s ease}
+  .video-wrapper.visible iframe{opacity:1;transform:translateY(0)}
+  /* Footer */
+  footer{background:#050505;color:#ccc;text-align:center;font-size:15px;padding:40px 20px;border-top:1px solid rgba(255,255,255,0.08)}
+  footer a{color:#aaa;text-decoration:none;border-bottom:1px dotted #666}
+  footer a:hover{color:#fff}
 
-/* HEADER */
-header{position:fixed;top:0;left:0;width:100%;height:150px;background:rgba(0,0,0,0);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 40px;z-index:10;box-sizing:border-box;transition:transform .6s ease,opacity .6s ease,background .8s ease}
-header img.logo{height:80px}
-nav{display:flex;gap:35px;font-size:18px}
-nav a{color:#fff;text-decoration:none;font-weight:500;transition:opacity .3s}
+  /* ---------- LOADER ---------- */
+  #loader {
+    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+    z-index:9999;transition:opacity .8s ease,visibility .8s ease;background:transparent;
+  }
+  #loader.hidden{opacity:0;visibility:hidden;pointer-events:none}
+  /* blurred background image behind logo */
+  .loader-bg {
+    position:absolute;inset:0;background-size:cover;background-position:center;
+    filter:blur(14px) brightness(.35);transform:scale(1.04);z-index:0;transition:opacity .6s ease;
+  }
+  .loader-overlay {
+    position:absolute;inset:0;background:linear-gradient(180deg, rgba(0,0,0,.15), rgba(0,0,0,.25));z-index:0;
+  }
+  .loader-content {
+    position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:18px;
+    -webkit-user-select:none;user-select:none;
+  }
+  /* container behind logo so white-square logos still readable */
+  .logo-wrap{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:170px;height:170px;border-radius:999px;background:rgba(0,0,0,0.55);
+    box-shadow:0 8px 30px rgba(0,0,0,.6);padding:18px;box-sizing:border-box;
+    backdrop-filter: blur(2px);
+  }
+  .loader-logo {
+    max-width:100%; max-height:100%; display:block; object-fit:contain;
+    filter: none;
+    transition:transform .35s ease;
+  }
+  .loader-logo[data-fallback="true"]{ /* text fallback styling */
+    width:auto;height:auto;color:#fff;font-weight:700;font-size:20px;letter-spacing:1px;text-transform:uppercase;font-family:Georgia,serif;
+  }
+  .logo-wrap.pulse{animation:logoPulse 1.6s infinite ease-in-out}
+  @keyframes logoPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.04)}}
+  .spinner{width:48px;height:48px;border:6px solid var(--muted);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite;opacity:.95}
+  @keyframes spin{to{transform:rotate(360deg)}}
 
-/* HERO */
-.hero{position:relative;height:100vh;overflow:hidden;z-index:1}
-.hero img{position:absolute;top:0;left:0;width:100%;height:120%;object-fit:cover;transform-origin:center center;opacity:0;transform:scale(1.05);transition:opacity 1.5s ease,transform 2s ease}
-.hero.loaded img{opacity:1;transform:scale(1)}
-
-/* TEXT BLOCK */
-.text-block{background:#fff;padding:150px 20px 120px;text-align:center}
-.text-block h1{font-size:56px;font-weight:400;color:#05053b;margin:0 0 30px}
-.text-block p{font-size:20px;color:#7a7a7a;max-width:700px;margin:0 auto 40px;line-height:1.6}
-.text-block em{display:block;margin-top:20px;font-style:normal;color:#444;font-size:22px}
-.socials{display:flex;flex-direction:column;align-items:center;gap:18px;margin-top:60px}
-.socials a{display:flex;align-items:center;justify-content:center;gap:12px;text-decoration:none;font-weight:500;font-size:18px;color:#fff;border-radius:50px;padding:14px 48px;width:260px;text-align:center;transition:transform .3s ease,opacity .3s ease}
-.socials a.instagram{background:linear-gradient(45deg,#f58529,#dd2a7b,#8134af,#515bd4)}
-.socials a.facebook{background:#1877f2}
-.socials a.youtube{background:#ff0000}
-
-/* PERFORMANCES */
-#performances{background:#111;padding:100px 20px 140px;text-align:center}
-#performances h2{color:#fff;font-size:42px;font-weight:400;margin-bottom:60px}
-.video-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:28px;justify-items:center;width:100%;max-width:1200px;margin:0 auto}
-.video-wrapper {position: relative;width: 100%;padding-bottom: 56.25%;overflow: hidden;border-radius: 14px;box-shadow: 0 10px 30px rgba(0,0,0,.6);}
-.video-wrapper iframe {position: absolute;top: 0;left: 0;width: 100%;height: 100%;border: 0;opacity: 0;transform: translateY(50px);transition: opacity 1.2s ease, transform 1.2s ease;}
-.video-wrapper.visible iframe {opacity: 1;transform: translateY(0);}
-
-/* FOOTER */
-footer {background:#050505;color:#ccc;text-align:center;font-size:15px;padding:40px 20px;border-top:1px solid rgba(255,255,255,0.08);}
-footer a {color:#aaa;text-decoration:none;border-bottom:1px dotted #666;transition:color .3s ease;}
-footer a:hover {color:#fff;}
-
-/* LOADER */
-#loader {
-  position: fixed; top:0; left:0; width:100%; height:100%;
-  display:flex; align-items:center; justify-content:center;
-  background:#000; z-index:9999; transition: opacity 0.8s ease;
-}
-#loader.hidden {opacity:0;pointer-events:none;}
-
-.loader-bg {
-  position:absolute; top:0; left:0; width:100%; height:100%;
-  background-size:cover;
-  background-position:center;
-  filter:blur(12px) brightness(0.4);
-  z-index:0;
-}
-
-.loader-content {
-  position:relative; z-index:1;
-  display:flex; flex-direction:column; align-items:center; gap:20px;
-}
-
-.loader-logo {
-  width:150px; height:auto;
-  object-fit:contain;
-  animation: logoPulse 1.5s infinite ease-in-out;
-}
-
-@keyframes logoPulse {0%,100%{transform:scale(1);} 50%{transform:scale(1.05);}}
-
-.spinner {
-  width:50px; height:50px; border:6px solid rgba(255,255,255,0.15);
-  border-top-color:#fff; border-radius:50%;
-  animation: spin 1s linear infinite;
-}
-@keyframes spin {to{transform:rotate(360deg);}}
-
-@media(max-width:768px){
-  header{height:120px;padding:0 20px}
-  header img.logo{height:60px}
-  .text-block h1{font-size:40px}
-  .socials a{font-size:17px;width:220px}
-  #performances h2{font-size:32px}
-  .video-grid{gap:18px}
-}
+  /* responsive */
+  @media(max-width:768px){
+    header{height:120px;padding:0 20px}
+    header img.logo{height:60px}
+    .logo-wrap{width:130px;height:130px;padding:12px}
+    .spinner{width:40px;height:40px;border-width:5px}
+  }
 </style>
 </head>
 <body>
 
 <!-- LOADER -->
-<div id="loader">
-  <div class="loader-bg" id="loaderBg"></div>
-  <div class="loader-content">
-    <img src="logo.jpg" alt="Logo" class="loader-logo">
-    <div class="spinner"></div>
+<div id="loader" aria-hidden="true">
+  <div class="loader-bg" id="loaderBg" aria-hidden="true"></div>
+  <div class="loader-overlay" aria-hidden="true"></div>
+
+  <div class="loader-content" role="status" aria-live="polite">
+    <div class="logo-wrap" id="logoWrap">
+      <!-- actual image element for logo -->
+      <img src="logo.jpg" alt="Sergei Mkrtichian" id="loaderLogo" class="loader-logo">
+    </div>
+    <div class="spinner" aria-hidden="true"></div>
   </div>
 </div>
 
+<!-- PAGE -->
 <header id="header">
-  <img src="logo.jpg" alt="Логотип" class="logo">
+  <img src="logo.jpg" alt="Логотип" class="logo" id="headerLogo">
   <nav>
     <a href="#performances">Performances</a>
     <a href="#text-block">Contacts</a>
   </nav>
 </header>
 
-<div class="hero" id="hero">
+<div class="hero" id="hero" aria-hidden="false">
   <img id="heroImg" src="s.JPG" alt="Главное фото">
 </div>
 
@@ -115,22 +118,22 @@ footer a:hover {color:#fff;}
   <h1>Dear Friends,</h1>
   <p>I’ve created this site so you can find out more about me, what I’ve done in the past, and what I’m up to currently. I look forward to connecting with you at my concerts.</p>
   <em>- Sergei Mkrtichian</em>
-  <div class="socials">
+  <div class="socials" aria-hidden="false">
     <a class="instagram" href="https://www.instagram.com/sergunchik_mk/" target="_blank" rel="noopener">Instagram</a>
     <a class="facebook" href="https://www.facebook.com/profile.php?id=100095484424565" target="_blank" rel="noopener">Facebook</a>
     <a class="youtube" href="https://youtube.com/@sergei_mkrtichian?si=yijFIbmlZmJFL3BU" target="_blank" rel="noopener">YouTube</a>
   </div>
 </div>
 
-<section id="performances">
+<section id="performances" aria-hidden="false">
   <h2>Recent Performances</h2>
   <div class="video-grid">
-    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/nX7k7yeU0yM" allowfullscreen></iframe></div>
-    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/sCxiMHqT4Gc" allowfullscreen></iframe></div>
-    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/NjxJHLJn62E" allowfullscreen></iframe></div>
-    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/_C4V_rPluoY" allowfullscreen></iframe></div>
-    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/cfmaAXYvh0Q" allowfullscreen></iframe></div>
-    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/ABLt68OznIg" allowfullscreen></iframe></div>
+    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/nX7k7yeU0yM" title="Video 1" allowfullscreen></iframe></div>
+    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/sCxiMHqT4Gc" title="Video 2" allowfullscreen></iframe></div>
+    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/NjxJHLJn62E" title="Video 3" allowfullscreen></iframe></div>
+    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/_C4V_rPluoY" title="Video 4" allowfullscreen></iframe></div>
+    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/cfmaAXYvh0Q" title="Live Performance" allowfullscreen></iframe></div>
+    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/ABLt68OznIg" title="Performance 6" allowfullscreen></iframe></div>
   </div>
 </section>
 
@@ -140,68 +143,124 @@ footer a:hover {color:#fff;}
 </footer>
 
 <script>
-const hero=document.getElementById('hero');
-const img=document.getElementById('heroImg');
-const header=document.getElementById('header');
-const loader=document.getElementById('loader');
-const loaderBg=document.getElementById('loaderBg');
-const maxScale=1.7;
-let currentScale=1;
+/* ---------- logic ---------- */
+const loader = document.getElementById('loader');
+const loaderBg = document.getElementById('loaderBg');
+const loaderLogo = document.getElementById('loaderLogo');
+const logoWrap = document.getElementById('logoWrap');
+const heroImg = document.getElementById('heroImg');
+const header = document.getElementById('header');
 
-// Проверка первого визита
+const maxScale = 1.7;
+let currentScale = 1;
+
+// show loader only on first visit
 const isFirstVisit = !localStorage.getItem('visited');
-if(isFirstVisit){ localStorage.setItem('visited','true'); loader.style.display='flex'; } else { loader.style.display='none'; }
-
-// Устанавливаем фон для лоадера
-loaderBg.style.backgroundImage = `url('${img.src}')`;
-
-// Когда главное фото загружено
-img.onload = () => {
-  hero.classList.add('loaded');
-  if(isFirstVisit){
-    loader.classList.add('hidden');
-    setTimeout(()=>loader.style.display='none',800);
-  }
+if (isFirstVisit) {
+  localStorage.setItem('visited', 'true');
+  loader.style.display = 'flex';
+  logoWrap.classList.add('pulse');
+} else {
+  loader.style.display = 'none';
 }
 
-// Параллакс и анимация шапки
+// set blurred background to hero image (will show even before hero fully loaded)
+function setLoaderBg(url){
+  loaderBg.style.backgroundImage = `url('${url}')`;
+}
+
+// If hero image src exists, set it
+if (heroImg && heroImg.src) setLoaderBg(heroImg.src);
+
+// handle logo load error: fallback to text
+loaderLogo.addEventListener('error', () => {
+  // replace image with text fallback
+  const fallback = document.createElement('div');
+  fallback.className = 'loader-logo';
+  fallback.setAttribute('data-fallback','true');
+  fallback.textContent = 'Sergei Mkrtichian';
+  // remove broken img and insert fallback
+  loaderLogo.replaceWith(fallback);
+});
+
+// If logo loads but is visually problematic (e.g. fully white), we still keep container that gives dark circular background
+loaderLogo.addEventListener('load', () => {
+  // If the image looks like a white square (we can't inspect pixels here), ensure visibility by keeping dark circle behind it.
+  // No-op here because .logo-wrap already provides a dark circular background.
+});
+
+// When hero image fully loads -> reveal page and hide loader
+heroImg.addEventListener('load', () => {
+  // reveal hero image
+  document.getElementById('hero').classList.add('loaded');
+
+  if (isFirstVisit) {
+    // fade out loader
+    loader.classList.add('hidden');
+    // stop pulsing
+    logoWrap.classList.remove('pulse');
+    // remove from DOM after animation
+    setTimeout(() => {
+      if (loader && loader.parentNode) loader.parentNode.removeChild(loader);
+    }, 900);
+  } else {
+    // ensure loader is removed immediately on repeat visits
+    if (loader && loader.parentNode) loader.parentNode.removeChild(loader);
+  }
+});
+
+// If hero image fails to load (network), still hide loader after timeout to avoid stuck loader
+heroImg.addEventListener('error', () => {
+  // try to still show page, hide loader gracefully
+  setTimeout(() => {
+    loader.classList.add('hidden');
+    logoWrap.classList.remove('pulse');
+    setTimeout(() => {
+      if (loader && loader.parentNode) loader.parentNode.removeChild(loader);
+    }, 900);
+  }, 1400);
+});
+
+/* Parallax + header animation (keeps previous behavior) */
 function animate() {
+  const hero = document.getElementById('hero');
+  if (!hero) return requestAnimationFrame(animate);
   const rect = hero.getBoundingClientRect();
   const windowHeight = window.innerHeight;
   const scrollY = window.scrollY;
 
   let progress = 0;
-  if(rect.bottom>0 && rect.top<windowHeight){
-    progress=(windowHeight-rect.top)/(windowHeight+rect.height);
-    progress=Math.min(Math.max(progress,0),1);
+  if (rect.bottom > 0 && rect.top < windowHeight) {
+    progress = (windowHeight - rect.top) / (windowHeight + rect.height);
+    progress = Math.min(Math.max(progress, 0), 1);
   }
-  const targetScale=1+progress*(maxScale-1);
-  currentScale+=(targetScale-currentScale)*0.1;
-  img.style.transform=`scale(${currentScale})`;
+  const targetScale = 1 + progress * (maxScale - 1);
+  currentScale += (targetScale - currentScale) * 0.1;
+  heroImg.style.transform = `scale(${currentScale})`;
 
-  const appearProgress=Math.min(scrollY/300,1);
-  header.style.background=`rgba(0,0,0,${0.35*appearProgress})`;
+  const appearProgress = Math.min(scrollY / 300, 1);
+  header.style.background = `rgba(0,0,0,${0.35 * appearProgress})`;
 
-  let hideProgress=0;
-  if(rect.top<0) hideProgress=Math.min(Math.abs(rect.top)/250,1);
-  header.style.transform=`translateY(${-100*hideProgress}%)`;
-  header.style.opacity=1-hideProgress;
+  let hideProgress = 0;
+  if (rect.top < 0) hideProgress = Math.min(Math.abs(rect.top) / 250, 1);
+  header.style.transform = `translateY(${-100 * hideProgress}%)`;
+  header.style.opacity = 1 - hideProgress;
 
   requestAnimationFrame(animate);
 }
 requestAnimationFrame(animate);
 
-// Анимация видео при прокрутке
-const videos=document.querySelectorAll('.video-wrapper');
-const observer=new IntersectionObserver(entries=>{
-  entries.forEach(entry=>{
-    if(entry.isIntersecting){
+/* Lazy reveal for videos */
+const videos = document.querySelectorAll('.video-wrapper');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
       entry.target.classList.add('visible');
       observer.unobserve(entry.target);
     }
   });
-},{threshold:0.2});
-videos.forEach(v=>observer.observe(v));
+}, { threshold: 0.2 });
+videos.forEach(v => observer.observe(v));
 </script>
 </body>
 </html>
