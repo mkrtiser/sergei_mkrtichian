@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sergei Mkrtichian — Official Website</title>
+<style>
+  html,body{margin:0;padding:0;height:100%;overflow-x:hidden;background:#000;font-family:"Georgia",serif;scroll-behavior:smooth}
+  header{position:fixed;top:0;left:0;width:100%;height:150px;background:rgba(0,0,0,0);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 40px;z-index:10;box-sizing:border-box;transition:transform .6s ease,opacity .6s ease,background .8s ease}
+  header img.logo{height:80px}
+  nav{display:flex;gap:35px;font-size:18px}
+  nav a{color:#fff;text-decoration:none;font-weight:500;transition:opacity .3s}
+  .hero{position:relative;height:100vh;overflow:hidden;z-index:1}
+  .hero img{position:absolute;top:0;left:0;width:100%;height:120%;object-fit:cover;transform-origin:center center;opacity:0;transform:scale(1.05);transition:opacity 1.5s ease,transform 2s ease}
+  .hero.loaded img{opacity:1;transform:scale(1)}
+  .text-block{background:#fff;padding:150px 20px 120px;text-align:center}
+  .text-block h1{font-size:56px;font-weight:400;color:#05053b;margin:0 0 30px}
+  .text-block p{font-size:20px;color:#7a7a7a;max-width:700px;margin:0 auto 40px;line-height:1.6}
+  .text-block em{display:block;margin-top:20px;font-style:normal;color:#444;font-size:22px}
+  .socials{display:flex;flex-direction:column;align-items:center;gap:18px;margin-top:60px}
+  .socials a{display:flex;align-items:center;justify-content:center;gap:12px;text-decoration:none;font-weight:500;font-size:18px;color:#fff;border-radius:50px;padding:14px 48px;width:260px;text-align:center;transition:transform .3s ease,opacity .3s ease}
+  .socials a svg{width:24px;height:24px;fill:currentColor}
+  .socials a.instagram{background:linear-gradient(45deg,#f58529,#dd2a7b,#8134af,#515bd4)}
+  .socials a.facebook{background:#1877f2}
+  .socials a.youtube{background:#ff0000}
+  #performances{background:#111;padding:100px 20px 140px;text-align:center}
+  #performances h2{color:#fff;font-size:42px;font-weight:400;margin-bottom:60px}
+  .video-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:28px;justify-items:center;width:100%;max-width:1200px;margin:0 auto}
+
+  .video-wrapper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%;
+    overflow: hidden;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.6);
+  }
+  .video-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 1.2s ease, transform 1.2s ease;
+  }
+  .video-wrapper.visible iframe {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media(max-width:768px){
+    header{height:120px;padding:0 20px}
+    header img.logo{height:60px}
+    .text-block h1{font-size:40px}
+    .socials a{font-size:17px;width:220px}
+    #performances h2{font-size:32px}
+    .video-grid{gap:18px}
+  }
+</style>
+</head>
+<body>
+
+<header id="header">
+  <img src="logo.jpg" alt="Логотип" class="logo">
+  <nav>
+    <a href="#performances">Performances</a>
+    <a href="#text-block">Contacts</a>
+  </nav>
+</header>
+
+<div class="hero" id="hero">
+  <img id="heroImg" src="s.JPG" alt="Главное фото">
+</div>
+
+<div class="text-block" id="text-block">
+  <h1>Dear Friends,</h1>
+  <p>I’ve created this site so you can find out more about me, what I’ve done in the past, and what I’m up to currently. I look forward to connecting with you at my concerts.</p>
+  <em>- Sergei Mkrtichian</em>
+
+  <div class="socials">
+    <a class="instagram" href="https://www.instagram.com/sergunchik_mk/" target="_blank" rel="noopener">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 2C4.24 2 2 4.24 2 7v10c0 2.76 2.24 5 5 5h10c2.76 0 5-2.24 5-5V7c0-2.76-2.24-5-5-5H7zm10 2c1.65 0 3 1.35 3 3v10c0 1.65-1.35 3-3 3H7c-1.65 0-3-1.35-3-3V7c0-1.65 1.35-3 3-3h10zm-5 3a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 2a3 3 0 1 1 0 6 3 3 0 0 1 0-6zm4.5-2a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg>
+      Instagram
+    </a>
+
+    <a class="facebook" href="https://www.facebook.com/profile.php?id=100095484424565" target="_blank" rel="noopener">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M22 12a10 10 0 1 0-11.5 9.9v-7H8v-3h2.5V9.5c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.3.2 2.3.2v2.6h-1.3c-1.3 0-1.7.8-1.7 1.6V12H17l-.5 3h-2.9v7A10 10 0 0 0 22 12z"/></svg>
+      Facebook
+    </a>
+
+    <a class="youtube" href="https://youtube.com/@sergei_mkrtichian?si=yijFIbmlZmJFL3BU" target="_blank" rel="noopener">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19.6 3.2H4.4A2.4 2.4 0 0 0 2 5.6v12.8a2.4 2.4 0 0 0 2.4 2.4h15.2a2.4 2.4 0 0 0 2.4-2.4V5.6a2.4 2.4 0 0 0-2.4-2.4zM10 16V8l6 4-6 4z"/></svg>
+      YouTube
+    </a>
+  </div>
+</div>
+
+<section id="performances">
+  <h2>Recent Performances</h2>
+
+  <div class="video-grid">
+    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/nX7k7yeU0yM" title="Video 1" allowfullscreen></iframe></div>
+    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/sCxiMHqT4Gc" title="Video 2" allowfullscreen></iframe></div>
+    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/NjxJHLJn62E" title="Video 3" allowfullscreen></iframe></div>
+    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/_C4V_rPluoY" title="Video 4" allowfullscreen></iframe></div>
+    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/cfmaAXYvh0Q" title="Live Performance" allowfullscreen></iframe></div>
+    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/ABLt68OznIg" title="Performance 6" allowfullscreen></iframe></div>
+  </div>
+</section>
+
+<script>
+  // эффект header + hero
+  const hero = document.getElementById('hero');
+  const img = document.getElementById('heroImg');
+  const header = document.getElementById('header');
+  const maxScale = 1.7;
+  let currentScale = 1;
+
+  img.onload = () => hero.classList.add('loaded');
+
+  function animate() {
+    const rect = hero.getBoundingClientRect();
+    const windowHeight = window.innerHeight;
+    const scrollY = window.scrollY;
+
+    let progress = 0;
+    if (rect.bottom > 0 && rect.top < windowHeight) {
+      progress = (windowHeight - rect.top) / (windowHeight + rect.height);
+      progress = Math.min(Math.max(progress, 0), 1);
+    }
+    const targetScale = 1 + progress * (maxScale - 1);
+    currentScale += (targetScale - currentScale) * 0.1;
+    img.style.transform = `scale(${currentScale})`;
+
+    const appearProgress = Math.min(scrollY / 300, 1);
+    const bgOpacity = 0.35 * appearProgress;
+    header.style.background = `rgba(0, 0, 0, ${bgOpacity})`;
+
+    let hideProgress = 0;
+    if (rect.top < 0) hideProgress = Math.min(Math.abs(rect.top) / 250, 1);
+    const translateY = -100 * hideProgress;
+    const finalOpacity = 1 - hideProgress;
+    header.style.transform = `translateY(${translateY}%)`;
+    header.style.opacity = finalOpacity;
+
+    requestAnimationFrame(animate);
+  }
+  requestAnimationFrame(animate);
+
+  // ✨ плавное появление видео при скролле
+  const videos = document.querySelectorAll('.video-wrapper');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.2 });
+
+  videos.forEach(v => observer.observe(v));
+</script>
+</body>
+</html>
