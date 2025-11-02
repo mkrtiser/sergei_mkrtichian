@@ -5,37 +5,28 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Sergei Mkrtichian — Official Website</title>
 <style>
-
-  
-
   :root{
-    /* базовая палитра — можно править в одном месте */
-    --black: #000000;
-    --frame: #1B1A16;        /* цвет фона загрузки / рамки логотипа */
-    --dark-gray: #0b0b0b;    /* тёмные блоки (CV, видео фон) */
-    --light-cream: #fbf8f4;  /* тёплый светлый фон для блока About */
-    --muted: #7a7a7a;
-    --accent: #0078d7;       /* акцентный синий */
-    /* focal point (твоя точка) */
+    --black:#000000;
+    --frame:#1B1A16;
+    --dark-gray:#0b0b0b;
+    --light-cream:#fbf8f4;
+    --muted:#7a7a7a;
+    --accent:#0078d7;
     --hero-fp-x: 33.3%;
     --hero-fp-y: 37.8%;
   }
 
-  html,body{
-    height:100%;margin:0;padding:0;
-    background:var(--black);
-    font-family:"Georgia",serif;color:#fff;
-    scroll-behavior:smooth;
-  }
+  /* базовые стили */
+  html,body{height:100%;margin:0;padding:0;background:var(--black);font-family:"Georgia",serif;color:#fff;scroll-behavior:smooth}
   a{color:inherit}
   button{font-family:inherit}
 
-  /* Header (без соцсетей) */
+  /* Header */
   header{
     position:fixed;top:0;left:0;width:100%;height:80px;
     background:rgba(0,0,0,0);color:#fff;
     display:flex;align-items:center;justify-content:space-between;
-    padding:0 28px;z-index:1100;box-sizing:border-box;
+    padding:0 28px;z-index:1200;box-sizing:border-box;
     transition:transform .6s ease,opacity .6s ease,background .8s ease;
   }
   header img.logo{height:56px}
@@ -43,13 +34,14 @@
   nav a{color:#fff;text-decoration:none;font-weight:500;transition:opacity .25s}
   nav a:hover{opacity:.85}
 
-  /* HERO: full-bleed image filling viewport, centered via object-position */
+  /* HERO: full-bleed image filling viewport */
   .hero{
     display:block;
     background:var(--black);
-    height:100vh; /* fill viewport */
+    height:100vh;
     overflow:hidden;
     position:relative;
+    z-index:0;
   }
   .hero-frame{width:100%;height:100%;position:relative;overflow:hidden;background:#000}
   .hero-frame img{
@@ -58,34 +50,35 @@
     object-fit:cover;
     object-position: var(--hero-fp-x) var(--hero-fp-y);
     transform-origin:center center;
-    transition:transform 1.6s ease,opacity 1.2s ease;
+    transition:transform 1.6s ease,opacity 1s ease;
     display:block;
-    opacity:0; /* будет появляться по загрузке */
+    opacity:0; /* появляется после загрузки */
+    transform:scale(1);
+    will-change:transform,opacity;
   }
+
+  /* пока лоадер видим: лёгкий мат и плавный зум фона */
+  .hero.loading .hero-frame img{
+    animation: heroZoom 3.2s ease-in-out infinite;
+    filter: none;
+    opacity:0; /* если изображение ещё не загрузилось, fade-in при onload */
+  }
+  @keyframes heroZoom{
+    0%{transform:scale(1)}
+    50%{transform:scale(1.06)}
+    100%{transform:scale(1)}
+  }
+
+  /* Когда картинка загрузилась — делаем видимым */
   .hero.loaded .hero-frame img{opacity:1}
 
-  :root{
-  --loader-bg: #1B1A16; /* твой текущий фон */
-  /* по умолчанию — Classic Gold */
-  --logo-main: #C9A34A;
-  --logo-accent: #E6C36B;
-  --logo-contrast: #ffffff;
-  --button-bg: linear-gradient(45deg, #E6C36B, #B98F30);
-}
-
-/* Пример использования */
-.loader-logo { filter: none; }
-.header-logo { color: var(--logo-main); }
-.btn-accent { background: var(--button-bg); color: var(--logo-contrast); }
-
-
-  /* About / light cream block */
+  /* About / white block */
   .text-block{background:var(--light-cream);color:#05053b;padding:120px 20px 60px;text-align:center}
   .text-block h1{font-size:42px;font-weight:400;margin:0 0 14px}
   .text-block p{font-size:18px;color:var(--muted);max-width:900px;margin:0 auto 16px;line-height:1.6}
   .text-block em{display:block;margin-top:14px;font-style:normal;color:#444;font-size:17px}
 
-  /* social buttons block under About (kept) */
+  /* Socials */
   .socials{display:flex;flex-direction:column;align-items:center;gap:16px;margin-top:46px}
   .socials a{display:flex;align-items:center;justify-content:center;gap:12px;text-decoration:none;font-weight:500;font-size:18px;color:#fff;border-radius:50px;padding:14px 48px;width:260px;text-align:center;transition:transform .25s ease,opacity .25s}
   .socials a svg{width:22px;height:22px;fill:currentColor}
@@ -95,13 +88,13 @@
   .socials a.email{background:linear-gradient(45deg,#0078d7,#00a1f1)}
   .socials a:hover{transform:scale(1.04);opacity:.95}
 
-  /* thumbnails inside About */
+  /* thumbnails */
   .bio-photos{margin-top:34px;display:flex;flex-wrap:wrap;gap:14px;justify-content:center}
   .bio-photos button{background:transparent;border:0;padding:0;cursor:pointer;border-radius:10px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.6);transition:transform .25s ease,opacity .25s}
   .bio-photos button img{display:block;width:180px;height:120px;object-fit:cover;background:var(--black)}
   .bio-photos button:hover{transform:scale(1.03);opacity:.95}
 
-  /* CV section — тёмный, чтобы фото/видео на чёрном фоне не выглядели вырывшимися */
+  /* CV section */
   #cv{background:var(--dark-gray);padding:90px 20px 120px;color:#fff;text-align:center;border-top:1px solid rgba(255,255,255,0.04)}
   #cv h2{font-size:38px;font-weight:400;margin-bottom:12px}
   #cv p.lead{max-width:900px;margin:0 auto 20px;color:#ccc;font-size:18px;line-height:1.6}
@@ -115,69 +108,82 @@
   .cv-block h3{color:#fff;margin-top:0;margin-bottom:8px;font-size:18px;font-weight:500}
   .cv-block ul{margin:0;padding-left:20px;color:#cfcfcf;line-height:1.6}
 
-  /* Performances — фон полностью чёрный для естественного встраивания видео/фото */
+  /* Performances */
   #performances{background:var(--black);padding:100px 20px 140px;text-align:center}
   #performances h2{color:#fff;font-size:42px;font-weight:400;margin-bottom:60px}
   .video-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:28px;justify-items:center;width:100%;max-width:1200px;margin:0 auto}
-  .video-wrapper {
-    position: relative;width: 100%;padding-bottom: 56.25%;overflow: hidden;border-radius: 14px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.6);
-    background: #000; /* чёрный фон вокруг ролика (твои фото на чёрном фоне) */
-    border: 1px solid rgba(255,255,255,0.03);
-  }
+  .video-wrapper {position: relative;width: 100%;padding-bottom: 56.25%;overflow: hidden;border-radius: 14px;box-shadow: 0 10px 30px rgba(0,0,0,.6);background:#000;border:1px solid rgba(255,255,255,0.03)}
   .video-wrapper iframe {position: absolute;top: 0;left: 0;width: 100%;height: 100%;border: 0;opacity: 0;transform: translateY(50px);transition: opacity 1.2s ease, transform 1.2s ease;}
   .video-wrapper.visible iframe {opacity: 1;transform: translateY(0);}
 
-  /* Contacts — лёгкий кремовый, чтобы выглядело дружелюбно */
+  /* Contacts */
   #contacts{background:var(--light-cream);color:#05053b;padding:80px 20px;text-align:center}
   #contacts h2{font-size:30px;margin-bottom:12px}
   .contact-inner{max-width:800px;margin:0 auto}
   .contact-inner p{color:#333;margin-bottom:18px}
   .contact-actions{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
-  .contact-actions a.email-btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:#fff;border-radius:50px;padding:12px 36px;font-weight:500;background:linear-gradient(45deg,var(--accent),#00a1f1)}
+  .contact-actions a.email-btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:#fff;border-radius:50px;padding:12px 36px;font-weight:500;background:linear-gradient(45deg,#0078d7,#00a1f1)}
   .contact-actions a.email-btn svg{width:20px;height:20px;fill:currentColor}
 
   /* Footer */
   footer {background:var(--frame);color:#ccc;text-align:center;font-size:15px;padding:34px 20px;border-top:1px solid rgba(255,255,255,0.06)}
 
-  /* Loader (восстановлен) */
+  /* --- LOADER styles (матовый прозрачный фон) --- */
   #loader {
-    position:fixed;top:0;left:0;width:100%;height:100%;
-    background:var(--frame); /* #1B1A16 как ты просил */
-    display:flex;align-items:center;justify-content:center;z-index:9999;
-    transition:opacity 0.8s ease;
+    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+    z-index:2000;
+    /* матовый полупрозрачный фон, чтобы было видно фото сзади */
+    background:rgba(27,26,22,0.45);
+    backdrop-filter: blur(4px) saturate(.9);
+    transition:opacity .6s ease,visibility .6s;
   }
-  #loader.hidden {opacity:0;pointer-events:none;}
-  .loader-content {display:flex; flex-direction:column; align-items:center; gap:20px;}
-  .loader-logo {
-    width:120px;
-    height:auto;
-    background:var(--frame); /* на случай, если логотип не грузится — фон совпадает */
-    display:block;
-    object-fit:contain;
-    filter:none;
+  #loader.hidden{opacity:0;visibility:hidden;pointer-events:none}
+  .loader-inner{display:flex;flex-direction:column;align-items:center;gap:18px;padding:24px;box-sizing:border-box}
+  .loader-logo{
+    width:140px;height:auto;display:block;object-fit:contain;
+    transform-origin:center center;
+    animation: logoPulse 1.6s ease-in-out infinite;
+    will-change:transform,opacity;
+    border-radius:6px;
+    background:transparent;
   }
-  .spinner {width:50px; height:50px; border:6px solid rgba(255,255,255,0.15); border-top-color:#fff; border-radius:50%; animation: spin 1s linear infinite;}
-  @keyframes spin {to{transform:rotate(360deg)}}
+  @keyframes logoPulse{
+    0%{transform:scale(1) translateY(0)}
+    45%{transform:scale(1.08) translateY(-6px)}
+    100%{transform:scale(1) translateY(0)}
+  }
+  .loader-caption{color:#ddd;font-size:14px}
+  .loader-spinner{width:48px;height:48px;border-radius:50%;border:6px solid rgba(255,255,255,0.12);border-top-color:rgba(255,255,255,0.95);animation:spin 1s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* если логотип не загрузился — показываем fallback с градиентом */
+  .loader-fallback{width:140px;height:72px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;color:#fff;background:linear-gradient(90deg,#E6C36B,#B98F30);box-shadow:0 18px 40px rgba(0,0,0,.6)}
 
   /* Modal */
-  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.85);display:none;align-items:center;justify-content:center;z-index:2000;padding:20px}
+  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.85);display:none;align-items:center;justify-content:center;z-index:3000;padding:20px}
   .modal-backdrop.visible{display:flex}
   .modal-content{max-width:1200px;max-height:90vh;overflow:auto;border-radius:8px;position:relative}
   .modal-content img{display:block;max-width:100%;height:auto;border-radius:6px}
   .modal-close{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.5);border:0;color:#fff;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:16px}
   .modal-caption{color:#ddd;margin-top:8px;text-align:center}
   .pdf-frame{width:95vw;height:85vh;border:0;border-radius:6px;background:#fff}
+
+  /* responsive tweaks */
+  @media (max-width:640px){
+    .loader-logo{width:110px}
+    .loader-fallback{width:110px;height:56px;font-size:14px}
+  }
 </style>
 </head>
 <body>
 
-<!-- LOADER (восстановлен) -->
-<div id="loader">
-  <div class="loader-content">
-    <!-- если logo.jpg имеет фон #1B1A16 — он будет совпадать с фоном загрузки -->
-    <img src="logo.jpg" alt="Logo" class="loader-logo">
-    <div class="spinner" aria-hidden="true"></div>
+<!-- LOADER: полупрозрачный мат поверх hero; логотип пульсирует -->
+<div id="loader" role="status" aria-hidden="false">
+  <div class="loader-inner" aria-hidden="false">
+    <img id="loaderLogo" src="logo.jpg" alt="Logo" class="loader-logo">
+    <div id="loaderFallback" class="loader-fallback" style="display:none">SERGEI</div>
+    <div class="loader-spinner" aria-hidden="true"></div>
+    <div class="loader-caption">Загрузка сайта…</div>
   </div>
 </div>
 
@@ -189,23 +195,19 @@
     <a href="#text-block">About</a>
     <a href="#contacts">Contacts</a>
   </nav>
-  <!-- social icons removed from header as requested -->
 </header>
 
-<!-- HERO (s.JPG fills viewport, centered by object-position) -->
 <div class="hero" id="hero">
   <div class="hero-frame" aria-hidden="false">
     <img id="heroImg" src="s.JPG" alt="Sergei Mkrtichian — portrait">
   </div>
 </div>
 
-<!-- ABOUT / Dear Friends -->
 <div class="text-block" id="text-block">
   <h1>Dear Friends,</h1>
   <p>I’ve created this site so you can find out more about me, what I’ve done in the past, and what I’m up to currently. I look forward to connecting with you at my concerts.</p>
   <em>- Sergei Mkrtichian</em>
 
-  <!-- social buttons block (kept here) -->
   <div class="socials" aria-hidden="false">
     <a class="instagram" href="https://www.instagram.com/sergunchik_mk/" target="_blank" rel="noopener">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2Zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5A4.25 4.25 0 0 0 20.5 16.25v-8.5A4.25 4.25 0 0 0 16.25 3.5h-8.5Zm8.75 2.25a.75.75 0 1 1 0 1.5h-.01a.75.75 0 1 1 0-1.5h.01ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 1.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"/></svg>
@@ -227,19 +229,8 @@
       E-mail
     </a>
   </div>
-
-<!--   
-  <div class="bio-photos" aria-hidden="false">
-    <button data-full="photo1.jpg" data-caption="Performance, 2023"><img src="photo1-thumb.jpg" alt="Performance 1"></button>
-    <button data-full="photo2.jpg" data-caption="Portrait, 2022"><img src="photo2-thumb.jpg" alt="Portrait 1"></button>
-    <button data-full="photo3.jpg" data-caption="Rehearsal"><img src="photo3-thumb.jpg" alt="Rehearsal"></button>
-    <button data-full="photo4.jpg" data-caption="On stage"><img src="photo4-thumb.jpg" alt="On stage"></button>
-    <button data-full="photo5.jpg" data-caption="Backstage"><img src="photo5-thumb.jpg" alt="Backstage"></button>
-    <button data-full="photo6.jpg" data-caption="Portrait"><img src="photo6-thumb.jpg" alt="Portrait 2"></button>
-  </div> -->
 </div>
 
-<!-- CV -->
 <section id="cv" aria-labelledby="cv-heading">
   <h2 id="cv-heading">Curriculum Vitae</h2>
   <p class="lead">Sergei Mkrtichian — concert violinist. Educated at leading conservatories, prize-winner of international competitions, performer in major halls across Europe and beyond.</p>
@@ -260,9 +251,8 @@
     <div class="cv-block">
       <h3>Education</h3>
       <ul>
-        <li>Conservatory of the Italian Switzerland 2024 - Present Time.  </li>
-        <li>Academic Music College of Moscow State Conservatory named after P.I. Tchaikovsky 2015 - Present time.  
-</li>
+        <li>Conservatory of the Italian Switzerland 2024 - Present Time.</li>
+        <li>Academic Music College of Moscow State Conservatory named after P.I. Tchaikovsky 2015 - Present time.</li>
       </ul>
     </div>
 
@@ -270,7 +260,7 @@
       <h3>Competitions & Awards</h3>
       <ul>
         <li>2024 – Second prize at the 20th Khachaturian International Competition</li>
-        <li>2023 – Third Prize at the Tchaikovsky Youth International Competition. </li>
+        <li>2023 – Third Prize at the Tchaikovsky Youth International Competition.</li>
       </ul>
     </div>
 
@@ -285,7 +275,6 @@
   </div>
 </section>
 
-<!-- Performances -->
 <section id="performances">
   <h2>Recent Performances</h2>
   <div class="video-grid">
@@ -296,7 +285,6 @@
   </div>
 </section>
 
-<!-- Contacts -->
 <section id="contacts">
   <h2>Contact</h2>
   <div class="contact-inner">
@@ -325,33 +313,78 @@
 </div>
 
 <script>
-/* Loader & hero behavior (восстановлен) */
+/* Loader + hero behaviour: матовый прозрачный лоадер с анимированным логотипом.
+   Логика: показываем loader при первом визите (localStorage), затем скрываем при onload.
+   Если logo.jpg не загрузился — используем fallback-блок. */
+
 const hero = document.getElementById('hero');
-const img = document.getElementById('heroImg');
+const heroImg = document.getElementById('heroImg');
 const header = document.getElementById('header');
 const loader = document.getElementById('loader');
+const loaderLogo = document.getElementById('loaderLogo');
+const loaderFallback = document.getElementById('loaderFallback');
+let firstVisit = !localStorage.getItem('siteVisited');
+
+// Показать/спрятать лоадер
+function showLoader(){
+  loader.style.display = 'flex';
+  setTimeout(()=>loader.classList.remove('hidden'),20);
+  hero.classList.add('loading');
+  loader.setAttribute('aria-hidden','false');
+}
+function hideLoader(){
+  loader.classList.add('hidden');
+  loader.setAttribute('aria-hidden','true');
+  hero.classList.remove('loading');
+  setTimeout(()=>{ loader.style.display = 'none'; }, 620);
+}
+
+// Если логотип не загружается — показываем графику-заглушку
+loaderLogo.addEventListener('error', ()=>{
+  loaderLogo.style.display = 'none';
+  loaderFallback.style.display = 'flex';
+});
+loaderLogo.addEventListener('load', ()=>{
+  loaderLogo.style.display = 'block';
+  loaderFallback.style.display = 'none';
+});
+
+// если первый визит — показываем лоадер; иначе скрываем сразу
+if(firstVisit){
+  localStorage.setItem('siteVisited','1');
+  showLoader();
+} else {
+  // не показываем лоадер: сразу отмечаем, что герой можно отобразить
+  loader.style.display = 'none';
+  loader.classList.add('hidden');
+  hero.classList.add('loaded');
+}
+
+// Когда фон (герой) загрузился — плавно показываем картинку и скрываем лоадер (если он виден)
+heroImg.addEventListener('load', ()=>{
+  // показываем hero изображение
+  hero.classList.add('loaded');
+  hero.classList.remove('loading');
+
+  // если лоадер виден (обычно при первом визите) — скрываем его с анимацией
+  if(!loader.classList.contains('hidden')){
+    // маленькая задержка для того, чтобы пользователь увидел проявление фона под матом
+    setTimeout(()=>{ hideLoader(); }, 450);
+  }
+});
+
+// Защитный таймаут: если изображение долго не загрузится, скрываем лоадер через 7 секунд
+const loaderTimeout = setTimeout(()=>{
+  if(!hero.classList.contains('loaded')){
+    // покажем фон как есть и скроем лоадер, чтобы пользователь не зависал слишком долго
+    hero.classList.add('loaded');
+    hideLoader();
+  }
+}, 7000);
+
+/* Parallax + header animation (как было) */
 const maxScale = 1.7;
 let currentScale = 1;
-
-const isFirstVisit = !localStorage.getItem('visited');
-if(isFirstVisit){
-  localStorage.setItem('visited', 'true');
-  loader.style.display = 'flex';
-} else {
-  loader.style.display = 'none';
-}
-
-img.onload = () => {
-  hero.classList.add('loaded');
-  if(isFirstVisit){
-    loader.classList.add('hidden');
-    setTimeout(()=>loader.style.display='none',800);
-  } else {
-    // просто показать изображение сразу, loader уже скрыт
-  }
-}
-
-/* Parallax + header animation */
 function animate() {
   const rect = hero.getBoundingClientRect();
   const windowHeight = window.innerHeight;
@@ -364,7 +397,11 @@ function animate() {
   }
   const targetScale = 1 + progress * (maxScale - 1);
   currentScale += (targetScale - currentScale) * 0.1;
-  img.style.transform = `scale(${currentScale})`;
+
+  // если лоадер видим — позволим CSS анимации heroZoom работать, не насильно менять transform.
+  if(!hero.classList.contains('loading')){
+    heroImg.style.transform = `scale(${currentScale})`;
+  }
 
   const appearProgress = Math.min(scrollY / 300, 1);
   const bgOpacity = 0.35 * appearProgress;
@@ -454,6 +491,10 @@ viewPdfBtn && viewPdfBtn.addEventListener('click', (e)=>{
 modalClose.addEventListener('click', closeModal);
 modal.addEventListener('click', (e)=>{ if(e.target === modal) closeModal(); });
 document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeModal(); });
+
+/* Экспорт функций для возможной ручной интеграции */
+window.hideSiteLoader = hideLoader;
+window.showSiteLoader = showLoader;
 </script>
 </body>
 </html>
