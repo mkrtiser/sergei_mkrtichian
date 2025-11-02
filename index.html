@@ -1,192 +1,491 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Sergei Mkrtichian — Official Website</title>
 <style>
-  html,body{margin:0;padding:0;height:100%;overflow-x:hidden;background:#000;font-family:"Georgia",serif;scroll-behavior:smooth}
-  header{position:fixed;top:0;left:0;width:100%;height:150px;background:rgba(0,0,0,0);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 40px;z-index:10;box-sizing:border-box;transition:transform .6s ease,opacity .6s ease,background .8s ease}
-  header img.logo{height:80px}
-  nav{display:flex;gap:35px;font-size:18px}
-  nav a{color:#fff;text-decoration:none;font-weight:500;transition:opacity .3s}
-  .hero{position:relative;height:100vh;overflow:hidden;z-index:1}
-  .hero img{position:absolute;top:0;left:0;width:100%;height:120%;object-fit:cover;transform-origin:center center;opacity:0;transform:scale(1.05);transition:opacity 1.5s ease,transform 2s ease}
-  .hero.loaded img{opacity:1;transform:scale(1)}
-  .text-block{background:#fff;padding:150px 20px 120px;text-align:center}
-  .text-block h1{font-size:56px;font-weight:400;color:#05053b;margin:0 0 30px}
-  .text-block p{font-size:20px;color:#7a7a7a;max-width:700px;margin:0 auto 40px;line-height:1.6}
-  .text-block em{display:block;margin-top:20px;font-style:normal;color:#444;font-size:22px}
-  .socials{display:flex;flex-direction:column;align-items:center;gap:18px;margin-top:60px}
-  .socials a{display:flex;align-items:center;justify-content:center;gap:12px;text-decoration:none;font-weight:500;font-size:18px;color:#fff;border-radius:50px;padding:14px 48px;width:260px;text-align:center;transition:transform .3s ease,opacity .3s ease}
-  .socials a svg{width:24px;height:24px;fill:currentColor}
-  .socials a.instagram{background:linear-gradient(45deg,#f58529,#dd2a7b,#8134af,#515bd4)}
-  .socials a.facebook{background:#1877f2}
-  .socials a.youtube{background:#ff0000}
-  #performances{background:#111;padding:100px 20px 140px;text-align:center}
-  #performances h2{color:#fff;font-size:42px;font-weight:400;margin-bottom:60px}
-  .video-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:28px;justify-items:center;width:100%;max-width:1200px;margin:0 auto}
 
-  .video-wrapper {
-    position: relative;
-    width: 100%;
-    padding-bottom: 56.25%;
-    overflow: hidden;
-    border-radius: 14px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.6);
+  
+
+  :root{
+    /* базовая палитра — можно править в одном месте */
+    --black: #000000;
+    --frame: #1B1A16;        /* цвет фона загрузки / рамки логотипа */
+    --dark-gray: #0b0b0b;    /* тёмные блоки (CV, видео фон) */
+    --light-cream: #fbf8f4;  /* тёплый светлый фон для блока About */
+    --muted: #7a7a7a;
+    --accent: #0078d7;       /* акцентный синий */
+    /* focal point (твоя точка) */
+    --hero-fp-x: 33.3%;
+    --hero-fp-y: 37.8%;
   }
-  .video-wrapper iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border: 0;
+
+  html,body{
+    height:100%;margin:0;padding:0;
+    background:var(--black);
+    font-family:"Georgia",serif;color:#fff;
+    scroll-behavior:smooth;
+  }
+  a{color:inherit}
+  button{font-family:inherit}
+
+  /* Header (без соцсетей) */
+  header{
+    position:fixed;top:0;left:0;width:100%;height:80px;
+    background:rgba(0,0,0,0);color:#fff;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 28px;z-index:1100;box-sizing:border-box;
+    transition:transform .6s ease,opacity .6s ease,background .8s ease;
+  }
+  header img.logo{height:56px}
+  nav{display:flex;gap:18px;font-size:16px;align-items:center}
+  nav a{color:#fff;text-decoration:none;font-weight:500;transition:opacity .25s}
+  nav a:hover{opacity:.85}
+
+  /* ADDED: make header logo & nav links animate exactly like the YouTube iframe (fade + translateY) */
+  header img.logo,
+  nav a {
     opacity: 0;
-    transform: translateY(50px);
-    transition: opacity 1.2s ease, transform 1.2s ease;
+    transform: translateY(50px); /* match .video-wrapper iframe initial transform */
+    transition: opacity 1.2s ease, transform 1.2s ease; /* same timing as videos */
+    will-change: opacity, transform;
   }
-  .video-wrapper.visible iframe {
+  header img.logo.visible,
+  nav a.visible {
     opacity: 1;
     transform: translateY(0);
   }
+  /* end ADDED */
 
-  /* 🔽 Добавляем стиль для блока лицензии */
-  footer {
-    background:#050505;
-    color:#ccc;
-    text-align:center;
-    font-size:15px;
-    padding:40px 20px;
-    border-top:1px solid rgba(255,255,255,0.08);
+  /* HERO: full-bleed image filling viewport, centered via object-position */
+  .hero{
+    display:block;
+    background:var(--black);
+    height:100vh; /* fill viewport */
+    overflow:hidden;
+    position:relative;
   }
-  footer a {
-    color:#aaa;
-    text-decoration:none;
-    border-bottom:1px dotted #666;
-    transition:color .3s ease;
+  .hero-frame{width:100%;height:100%;position:relative;overflow:hidden;background:#000}
+  .hero-frame img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position: var(--hero-fp-x) var(--hero-fp-y);
+    transform-origin:center center;
+    transition:transform 1.6s ease,opacity 1.2s ease;
+    display:block;
+    opacity:0; /* будет появляться по загрузке */
   }
-  footer a:hover {
-    color:#fff;
-  }
+  .hero.loaded .hero-frame img{opacity:1}
 
-  @media(max-width:768px){
-    header{height:120px;padding:0 20px}
-    header img.logo{height:60px}
-    .text-block h1{font-size:40px}
-    .socials a{font-size:17px;width:220px}
-    #performances h2{font-size:32px}
-    .video-grid{gap:18px}
+  :root{
+  --loader-bg: #1B1A16; /* твой текущий фон */
+  /* по умолчанию — Classic Gold */
+  --logo-main: #C9A34A;
+  --logo-accent: #E6C36B;
+  --logo-contrast: #ffffff;
+  --button-bg: linear-gradient(45deg, #E6C36B, #B98F30);
+}
+
+/* Пример использования */
+.loader-logo { filter: none; }
+.header-logo { color: var(--logo-main); }
+.btn-accent { background: var(--button-bg); color: var(--logo-contrast); }
+
+
+  /* About / light cream block */
+  .text-block{background:var(--light-cream);color:#05053b;padding:120px 20px 60px;text-align:center}
+  .text-block h1{font-size:42px;font-weight:400;margin:0 0 14px}
+  .text-block p{font-size:18px;color:var(--muted);max-width:900px;margin:0 auto 16px;line-height:1.6}
+  .text-block em{display:block;margin-top:14px;font-style:normal;color:#444;font-size:17px}
+
+  /* social buttons block under About (kept) */
+  .socials{display:flex;flex-direction:column;align-items:center;gap:16px;margin-top:46px}
+  .socials a{display:flex;align-items:center;justify-content:center;gap:12px;text-decoration:none;font-weight:500;font-size:18px;color:#fff;border-radius:50px;padding:14px 48px;width:260px;text-align:center;transition:transform .25s ease,opacity .25s}
+  .socials a svg{width:22px;height:22px;fill:currentColor}
+  .socials a.instagram{background:linear-gradient(45deg,#f58529,#dd2a7b,#8134af,#515bd4)}
+  .socials a.facebook{background:#1877f2}
+  .socials a.youtube{background:#ff0000}
+  .socials a.email{background:linear-gradient(45deg,#0078d7,#00a1f1)}
+  .socials a:hover{transform:scale(1.04);opacity:.95}
+
+  /* thumbnails inside About */
+  .bio-photos{margin-top:34px;display:flex;flex-wrap:wrap;gap:14px;justify-content:center}
+  .bio-photos button{background:transparent;border:0;padding:0;cursor:pointer;border-radius:10px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.6);transition:transform .25s ease,opacity .25s}
+  .bio-photos button img{display:block;width:180px;height:120px;object-fit:cover;background:var(--black)}
+  .bio-photos button:hover{transform:scale(1.03);opacity:.95}
+
+  /* CV section — тёмный, чтобы фото/видео на чёрном фоне не выглядели вырывшимися */
+  #cv{background:var(--dark-gray);padding:90px 20px 120px;color:#fff;text-align:center;border-top:1px solid rgba(255,255,255,0.04)}
+  #cv h2{font-size:38px;font-weight:400;margin-bottom:12px}
+  #cv p.lead{max-width:900px;margin:0 auto 20px;color:#ccc;font-size:18px;line-height:1.6}
+  .cv-actions{display:flex;gap:16px;justify-content:center;margin:18px 0 34px}
+  .cv-actions a.btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:#fff;border-radius:50px;padding:12px 36px;font-weight:500;font-size:16px}
+  .cv-actions a.btn.download{background:linear-gradient(45deg,#1b1b1b,#2b2b2b);border:1px solid rgba(255,255,255,0.06)}
+  .cv-actions a.btn.view{background:linear-gradient(45deg,var(--accent),#00a1f1)}
+  .cv-actions a.btn svg{width:20px;height:20px;fill:currentColor}
+
+  .cv-details{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:26px;max-width:1100px;margin:0 auto;text-align:left}
+  .cv-block h3{color:#fff;margin-top:0;margin-bottom:8px;font-size:18px;font-weight:500}
+  .cv-block ul{margin:0;padding-left:20px;color:#cfcfcf;line-height:1.6}
+
+  /* Performances — фон полностью чёрный для естественного встраивания видео/фото */
+  #performances{background:var(--black);padding:100px 20px 140px;text-align:center}
+  #performances h2{color:#fff;font-size:42px;font-weight:400;margin-bottom:60px}
+  .video-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:28px;justify-items:center;width:100%;max-width:1200px;margin:0 auto}
+  .video-wrapper {
+    position: relative;width: 100%;padding-bottom: 56.25%;overflow: hidden;border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.6);
+    background: #000; /* чёрный фон вокруг ролика (твои фото на чёрном фоне) */
+    border: 1px solid rgba(255,255,255,0.03);
   }
+  .video-wrapper iframe {position: absolute;top: 0;left: 0;width: 100%;height: 100%;border: 0;opacity: 0;transform: translateY(50px);transition: opacity 1.2s ease, transform 1.2s ease;}
+  .video-wrapper.visible iframe {opacity: 1;transform: translateY(0);}
+
+  /* Contacts — лёгкий кремовый, чтобы выглядело дружелюбно */
+  #contacts{background:var(--light-cream);color:#05053b;padding:80px 20px;text-align:center}
+  #contacts h2{font-size:30px;margin-bottom:12px}
+  .contact-inner{max-width:800px;margin:0 auto}
+  .contact-inner p{color:#333;margin-bottom:18px}
+  .contact-actions{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+  .contact-actions a.email-btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:#fff;border-radius:50px;padding:12px 36px;font-weight:500;background:linear-gradient(45deg,var(--accent),#00a1f1)}
+  .contact-actions a.email-btn svg{width:20px;height:20px;fill:currentColor}
+
+  /* Footer */
+  footer {background:var(--frame);color:#ccc;text-align:center;font-size:15px;padding:34px 20px;border-top:1px solid rgba(255,255,255,0.06)}
+
+  /* Loader (восстановлен) */
+  #loader {
+    position:fixed;top:0;left:0;width:100%;height:100%;
+    background:var(--frame); /* #1B1A16 как ты просил */
+    display:flex;align-items:center;justify-content:center;z-index:9999;
+    transition:opacity 0.8s ease;
+  }
+  #loader.hidden {opacity:0;pointer-events:none;}
+  .loader-content {display:flex; flex-direction:column; align-items:center; gap:20px;}
+  .loader-logo {
+    width:120px;
+    height:auto;
+    background:var(--frame); /* на случай, если логотип не грузится — фон совпадает */
+    display:block;
+    object-fit:contain;
+    filter:none;
+  }
+  .spinner {width:50px; height:50px; border:6px solid rgba(255,255,255,0.15); border-top-color:#fff; border-radius:50%; animation: spin 1s linear infinite;}
+  @keyframes spin {to{transform:rotate(360deg)}}
+
+  /* Modal */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.85);display:none;align-items:center;justify-content:center;z-index:2000;padding:20px}
+  .modal-backdrop.visible{display:flex}
+  .modal-content{max-width:1200px;max-height:90vh;overflow:auto;border-radius:8px;position:relative}
+  .modal-content img{display:block;max-width:100%;height:auto;border-radius:6px}
+  .modal-close{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.5);border:0;color:#fff;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:16px}
+  .modal-caption{color:#ddd;margin-top:8px;text-align:center}
+  .pdf-frame{width:95vw;height:85vh;border:0;border-radius:6px;background:#fff}
 </style>
 </head>
 <body>
+
+<!-- LOADER (восстановлен) -->
+<div id="loader">
+  <div class="loader-content">
+    <!-- если logo.jpg имеет фон #1B1A16 — он будет совпадать с фоном загрузки -->
+    <img src="logo.jpg" alt="Logo" class="loader-logo">
+    <div class="spinner" aria-hidden="true"></div>
+  </div>
+</div>
 
 <header id="header">
   <img src="logo.jpg" alt="Логотип" class="logo">
   <nav>
     <a href="#performances">Performances</a>
-    <a href="#text-block">Contacts</a>
+    <a href="#cv">CV</a>
+    <a href="#text-block">About</a>
+    <a href="#contacts">Contacts</a>
   </nav>
+  <!-- social icons removed from header as requested -->
 </header>
 
+<!-- HERO (s.JPG fills viewport, centered by object-position) -->
 <div class="hero" id="hero">
-  <img id="heroImg" src="s.JPG" alt="Главное фото">
+  <div class="hero-frame" aria-hidden="false">
+    <img id="heroImg" src="s.JPG" alt="Sergei Mkrtichian — portrait">
+  </div>
 </div>
 
+<!-- ABOUT / Dear Friends -->
 <div class="text-block" id="text-block">
   <h1>Dear Friends,</h1>
   <p>I’ve created this site so you can find out more about me, what I’ve done in the past, and what I’m up to currently. I look forward to connecting with you at my concerts.</p>
   <em>- Sergei Mkrtichian</em>
 
-  <div class="socials">
+  <!-- social buttons block (kept here) -->
+  <div class="socials" aria-hidden="false">
     <a class="instagram" href="https://www.instagram.com/sergunchik_mk/" target="_blank" rel="noopener">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 2C4.24 2 2 4.24 2 7v10c0 2.76 2.24 5 5 5h10c2.76 0 5-2.24 5-5V7c0-2.76-2.24-5-5-5H7zm10 2c1.65 0 3 1.35 3 3v10c0 1.65-1.35 3-3 3H7c-1.65 0-3-1.35-3-3V7c0-1.65 1.35-3 3-3h10zm-5 3a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 2a3 3 0 1 1 0 6 3 3 0 0 1 0-6zm4.5-2a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2Zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5A4.25 4.25 0 0 0 20.5 16.25v-8.5A4.25 4.25 0 0 0 16.25 3.5h-8.5Zm8.75 2.25a.75.75 0 1 1 0 1.5h-.01a.75.75 0 1 1 0-1.5h.01ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 1.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"/></svg>
       Instagram
     </a>
 
     <a class="facebook" href="https://www.facebook.com/profile.php?id=100095484424565" target="_blank" rel="noopener">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M22 12a10 10 0 1 0-11.5 9.9v-7H8v-3h2.5V9.5c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.3.2 2.3.2v2.6h-1.3c-1.3 0-1.7.8-1.7 1.6V12H17l-.5 3h-2.9v7A10 10 0 0 0 22 12z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M22 12a10 10 0 1 0-11.5 9.9v-7H8v-3h2.5V9.5c0-2.4 1.4-3.8 3.6-3.8 1 0 2 .2 2 .2v2.2H15c-1.2 0-1.6.8-1.6 1.5V12H17l-.5 3h-3v7A10 10 0 0 0 22 12Z"/></svg>
       Facebook
     </a>
 
     <a class="youtube" href="https://youtube.com/@sergei_mkrtichian?si=yijFIbmlZmJFL3BU" target="_blank" rel="noopener">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19.6 3.2H4.4A2.4 2.4 0 0 0 2 5.6v12.8a2.4 2.4 0 0 0 2.4 2.4h15.2a2.4 2.4 0 0 0 2.4-2.4V5.6a2.4 2.4 0 0 0-2.4-2.4zM10 16V8l6 4-6 4z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21.8 8s-.2-1.4-.8-2c-.8-.8-1.7-.8-2.2-.9C16.2 4.9 12 4.9 12 4.9h-.1s-4.2 0-6.8.2c-.5 0-1.5.1-2.2.9-.6.6-.8 2-.8 2S2 9.6 2 11.2v1.6c0 1.6.2 3.2.2 3.2s.2 1.4.8 2c.8.8 1.8.8 2.3.9 1.7.2 7 .2 7 .2s4.2 0 6.8-.2c.5 0 1.5-.1 2.2-.9.6-.6.8-2 .8-2s.2-1.6.2-3.2v-1.6c0-1.6-.2-3.2-.2-3.2ZM10 14.7V9.3l5.2 2.7L10 14.7Z"/></svg>
       YouTube
     </a>
+
+<!--     <a class="email" href="mailto:mkrtiart1959@gmail.com" rel="noopener">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm0 2v.01l8 5 8-5V6H4Zm16 12V8.24l-8 5-8-5V18h16Z"/></svg>
+      E-mail
+    </a> -->
   </div>
+
+<!--   
+  <div class="bio-photos" aria-hidden="false">
+    <button data-full="photo1.jpg" data-caption="Performance, 2023"><img src="photo1-thumb.jpg" alt="Performance 1"></button>
+    <button data-full="photo2.jpg" data-caption="Portrait, 2022"><img src="photo2-thumb.jpg" alt="Portrait 1"></button>
+    <button data-full="photo3.jpg" data-caption="Rehearsal"><img src="photo3-thumb.jpg" alt="Rehearsal"></button>
+    <button data-full="photo4.jpg" data-caption="On stage"><img src="photo4-thumb.jpg" alt="On stage"></button>
+    <button data-full="photo5.jpg" data-caption="Backstage"><img src="photo5-thumb.jpg" alt="Backstage"></button>
+    <button data-full="photo6.jpg" data-caption="Portrait"><img src="photo6-thumb.jpg" alt="Portrait 2"></button>
+  </div> -->
 </div>
 
-<section id="performances">
-  <h2>Recent Performances</h2>
+<!-- CV -->
+<section id="cv" aria-labelledby="cv-heading">
+  <h2 id="cv-heading">Curriculum Vitae</h2>
+  <p class="lead">Sergei Mkrtichian — concert violinist. Educated at leading conservatories, prize-winner of international competitions, performer in major halls across Europe and beyond.</p>
 
-  <div class="video-grid">
-    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/nX7k7yeU0yM" title="Video 1" allowfullscreen></iframe></div>
-    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/sCxiMHqT4Gc" title="Video 2" allowfullscreen></iframe></div>
-    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/NjxJHLJn62E" title="Video 3" allowfullscreen></iframe></div>
-    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/_C4V_rPluoY" title="Video 4" allowfullscreen></iframe></div>
-    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/cfmaAXYvh0Q" title="Live Performance" allowfullscreen></iframe></div>
-    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/ABLt68OznIg" title="Performance 6" allowfullscreen></iframe></div>
+  <div class="cv-actions">
+    <a class="btn download" href="Sergei_Mkrtichian_CV.pdf" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 3v10m0 0 4-4m-4 4-4-4M4 21h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+      Download CV (PDF)
+    </a>
+
+    <a class="btn view" href="#" id="viewPdfBtn" title="View CV in browser">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21 12v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+      View CV
+    </a>
+  </div>
+
+  <div class="cv-details">
+    <div class="cv-block">
+      <h3>Education</h3>
+      <ul>
+        <li>Conservatory of the Italian Switzerland 2024 - Present Time.  </li>
+        <li>Academic Music College of Moscow State Conservatory named after P.I. Tchaikovsky 2015 - Present time.  
+</li>
+      </ul>
+    </div>
+
+    <div class="cv-block">
+      <h3>Competitions & Awards</h3>
+      <ul>
+        <li>2024 – Second prize at the 20th Khachaturian International Competition</li>
+        <li>2023 – Third Prize at the Tchaikovsky Youth International Competition. </li>
+      </ul>
+    </div>
+
+    <div class="cv-block">
+      <h3>Concert Highlights</h3>
+      <ul>
+        <li>Moscow State Kremlin Palace</li>
+        <li>Wiener Konzerthaus</li>
+        <li>Moscow Bolshoy Theatre</li>
+      </ul>
+    </div>
   </div>
 </section>
 
-<!-- 🔽 Лицензия -->
+<!-- Performances -->
+<section id="performances">
+  <h2>Recent Performances</h2>
+  <div class="video-grid">
+    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/nX7k7yeU0yM" allowfullscreen></iframe></div>
+    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/sCxiMHqT4Gc" allowfullscreen></iframe></div>
+    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/NjxJHLJn62E" allowfullscreen></iframe></div>
+    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/_C4V_rPluoY" allowfullscreen></iframe></div>
+  </div>
+</section>
+
+<!-- Contacts -->
+<section id="contacts">
+  <h2>Contact</h2>
+  <div class="contact-inner">
+    <p>For concert bookings, masterclasses, and collaborations please contact:</p>
+    <div class="contact-actions">
+      <a class="email-btn" href="mailto:mkrtiart1959@gmail.com" rel="noopener">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm0 2v.01l8 5 8-5V6H4Zm16 12V8.24l-8 5-8-5V18h16Z"/></svg>
+        mkrtiart1959@gmail.com
+      </a>
+    </div>
+  </div>
+</section>
+
 <footer>
   © 2025 Sergei Mkrtichian. This website is licensed under the
-  <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener">
-    Apache License 2.0
-  </a>.
+  <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener">Apache License 2.0</a>.
 </footer>
 
+<!-- Modal -->
+<div id="modal" class="modal-backdrop" role="dialog" aria-hidden="true">
+  <div class="modal-content" role="document">
+    <button class="modal-close" id="modalClose">✕</button>
+    <div id="modalInner" style="text-align:center;"></div>
+    <div class="modal-caption" id="modalCaption"></div>
+  </div>
+</div>
+
 <script>
-  const hero = document.getElementById('hero');
-  const img = document.getElementById('heroImg');
-  const header = document.getElementById('header');
-  const maxScale = 1.7;
-  let currentScale = 1;
+/* Loader & hero behavior (восстановлен) */
+const hero = document.getElementById('hero');
+const img = document.getElementById('heroImg');
+const header = document.getElementById('header');
+const loader = document.getElementById('loader');
+const maxScale = 1.7;
+let currentScale = 1;
 
-  img.onload = () => hero.classList.add('loaded');
+const isFirstVisit = !localStorage.getItem('visited');
+if(isFirstVisit){
+  localStorage.setItem('visited', 'true');
+  loader.style.display = 'flex';
+} else {
+  loader.style.display = 'none';
+}
 
-  function animate() {
-    const rect = hero.getBoundingClientRect();
-    const windowHeight = window.innerHeight;
-    const scrollY = window.scrollY;
-
-    let progress = 0;
-    if (rect.bottom > 0 && rect.top < windowHeight) {
-      progress = (windowHeight - rect.top) / (windowHeight + rect.height);
-      progress = Math.min(Math.max(progress, 0), 1);
-    }
-    const targetScale = 1 + progress * (maxScale - 1);
-    currentScale += (targetScale - currentScale) * 0.1;
-    img.style.transform = `scale(${currentScale})`;
-
-    const appearProgress = Math.min(scrollY / 300, 1);
-    const bgOpacity = 0.35 * appearProgress;
-    header.style.background = `rgba(0, 0, 0, ${bgOpacity})`;
-
-    let hideProgress = 0;
-    if (rect.top < 0) hideProgress = Math.min(Math.abs(rect.top) / 250, 1);
-    const translateY = -100 * hideProgress;
-    const finalOpacity = 1 - hideProgress;
-    header.style.transform = `translateY(${translateY}%)`;
-    header.style.opacity = finalOpacity;
-
-    requestAnimationFrame(animate);
+img.onload = () => {
+  hero.classList.add('loaded');
+  if(isFirstVisit){
+    loader.classList.add('hidden');
+    setTimeout(()=>loader.style.display='none',800);
+  } else {
+    // просто показать изображение сразу, loader уже скрыт
   }
+}
+
+/* Parallax + header animation */
+function animate() {
+  const rect = hero.getBoundingClientRect();
+  const windowHeight = window.innerHeight;
+  const scrollY = window.scrollY;
+
+  let progress = 0;
+  if (rect.bottom > 0 && rect.top < windowHeight) {
+    progress = (windowHeight - rect.top) / (windowHeight + rect.height);
+    progress = Math.min(Math.max(progress, 0), 1);
+  }
+  const targetScale = 1 + progress * (maxScale - 1);
+  currentScale += (targetScale - currentScale) * 0.1;
+  img.style.transform = `scale(${currentScale})`;
+
+  const appearProgress = Math.min(scrollY / 300, 1);
+  const bgOpacity = 0.35 * appearProgress;
+  header.style.background = `rgba(0, 0, 0, ${bgOpacity})`;
+
+  let hideProgress = 0;
+  if (rect.top < 0) hideProgress = Math.min(Math.abs(rect.top) / 250, 1);
+  const translateY = -100 * hideProgress;
+  const finalOpacity = 1 - hideProgress;
+  header.style.transform = `translateY(${translateY}%)`;
+  header.style.opacity = finalOpacity;
+
   requestAnimationFrame(animate);
+}
+requestAnimationFrame(animate);
 
-  const videos = document.querySelectorAll('.video-wrapper');
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-        observer.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.2 });
+/* Video reveal on scroll */
+const videos = document.querySelectorAll('.video-wrapper');
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      entry.target.classList.add('visible');
+      observer.unobserve(entry.target);
+    }
+  });
+},{threshold:0.2});
+videos.forEach(v=>observer.observe(v));
 
-  videos.forEach(v => observer.observe(v));
+/* Modal (image + PDF) */
+const modal = document.getElementById('modal');
+const modalInner = document.getElementById('modalInner');
+const modalCaption = document.getElementById('modalCaption');
+const modalClose = document.getElementById('modalClose');
+
+function openImage(url, caption=''){
+  modalInner.innerHTML = '';
+  const img = document.createElement('img');
+  img.src = url;
+  img.alt = caption || '';
+  modalInner.appendChild(img);
+  modalCaption.textContent = caption;
+  showModal();
+}
+
+function openPDF(url, caption=''){
+  modalInner.innerHTML = '';
+  const iframe = document.createElement('iframe');
+  iframe.className = 'pdf-frame';
+  iframe.src = url;
+  iframe.title = caption || 'CV';
+  iframe.setAttribute('aria-label','PDF viewer');
+  modalInner.appendChild(iframe);
+  modalCaption.textContent = caption;
+  showModal();
+}
+
+function showModal(){
+  modal.classList.add('visible');
+  modal.setAttribute('aria-hidden','false');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(){
+  modal.classList.remove('visible');
+  modal.setAttribute('aria-hidden','true');
+  modalInner.innerHTML = '';
+  modalCaption.textContent = '';
+  document.body.style.overflow = '';
+}
+
+/* thumbnails click */
+document.querySelectorAll('.bio-photos button').forEach(btn=>{
+  btn.addEventListener('click', (e)=>{
+    const full = btn.getAttribute('data-full');
+    const caption = btn.getAttribute('data-caption') || '';
+    if(full) openImage(full, caption);
+  });
+});
+
+/* open CV view */
+const viewPdfBtn = document.getElementById('viewPdfBtn');
+viewPdfBtn && viewPdfBtn.addEventListener('click', (e)=>{
+  e.preventDefault();
+  openPDF('Sergei_Mkrtichian_CV.pdf', 'CV — Sergei Mkrtichian');
+});
+
+/* modal close / backdrop / ESC */
+modalClose.addEventListener('click', closeModal);
+modal.addEventListener('click', (e)=>{ if(e.target === modal) closeModal(); });
+document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeModal(); });
+
+/* ADDED: trigger header animation exactly like video reveal (fade + translateY) */
+/* minimal, non-intrusive: adds `.visible` to logo and nav links on DOMContentLoaded */
+document.addEventListener('DOMContentLoaded', () => {
+  const logo = document.querySelector('header img.logo');
+  const links = Array.from(document.querySelectorAll('header nav a'));
+  if (logo) {
+    // show logo with same timing as video (no delay)
+    logo.classList.add('visible');
+  }
+  // stagger links slightly (keeps YouTube-like feel)
+  links.forEach((link, i) => {
+    setTimeout(() => link.classList.add('visible'), i * 80);
+  });
+});
+/* end ADDED */
+
 </script>
 </body>
 </html>
