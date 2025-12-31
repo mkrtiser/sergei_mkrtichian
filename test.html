@@ -15,6 +15,21 @@
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 <link rel="manifest" href="/site.webmanifest">
 <title>Sergei Mkrtichian — Official Website</title>
+
+<!-- Ранняя установка --vh чтобы CSS уже имел корректную высоту до загрузки JS -->
+<script>
+  (function(){
+    function setVh(){
+      // --vh = 1vh в пикселях
+      document.documentElement.style.setProperty('--vh', (window.innerHeight * 0.01) + 'px');
+    }
+    setVh();
+    // Обновляем при изменении размеров/ориентации
+    window.addEventListener('resize', setVh, {passive:true});
+    window.addEventListener('orientationchange', setVh, {passive:true});
+  })();
+</script>
+
 <style>
   :root{
     --black: #000000;
@@ -22,52 +37,53 @@
     --dark-gray: #0b0b0b;
     --light-cream: #fbf8f4;
     --muted: #7a7a7a;
-    --accent: #B8860B; /* Скрипичный золотистый вместо синего */
-    --accent-light: #DAA520; /* Более светлый золотистый */
+    --accent: #B8860B;
+    --accent-light: #DAA520;
     --hero-fp-x: 33.3%;
     --hero-fp-y: 37.8%;
   }
 
-  /* Исправляем 100vh для мобильных устройств */
+  /* Исправляем 100vh для мобильных устройств — используем переменную --vh */
   html {
     height: -webkit-fill-available;
   }
-  
+
   html,body{
-    height:100%;margin:0;padding:0;
+    height:100%; margin:0; padding:0;
     background:var(--black);
     font-family:"Georgia",serif;color:#fff;
     scroll-behavior:smooth;
     overflow-x: hidden;
-    /* Убираем полосу прокрутки на iOS */
     -webkit-overflow-scrolling: touch;
-    overscroll-behavior-y: none;
+    /* Разрешаем стандартное поведение overscroll чтобы адресная строка скрывалась */
+    overscroll-behavior-y: auto;
+    /* Разрешаем вертикальный pan (лучше для мобильного скролла) */
+    touch-action: pan-y;
   }
-  
-  /* Динамическая высота viewport для мобильных */
+
+  /* HERO: используем вычисляемую высоту через --vh */
   .hero {
-    height: 100vh;
-    /* Для мобильных браузеров */
-    height: -webkit-fill-available;
-    height: 100dvh;
+    display:block;
+    background:var(--black);
+    overflow:hidden;
+    position:relative;
+    height: calc(var(--vh, 1vh) * 100);
+    min-height: 100vh; /* страховка для старых браузеров */
   }
-  
-  /* Скрываем адресную строку при скролле */
+
+  /* Скрываем адресную строку при скролле — дополнительные улучшения в JS ниже */
   body {
-    /* Для iOS Safari */
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
   }
-  
-  /* Предотвращаем масштабирование */
+
   * {
     -webkit-text-size-adjust: 100%;
   }
-  
+
   a{color:inherit; text-decoration: none;}
   button{font-family:inherit; cursor: pointer;}
 
-  /* Общие анимационные стили для текста */
   .text-reveal {
     opacity: 0;
     transform: translateY(30px);
@@ -79,16 +95,15 @@
     transform: translateY(0);
   }
 
-  /* Header */
   header{
     position:fixed;top:0;left:0;width:100%;height:80px;
     background:rgba(0,0,0,0);color:#fff;
     display:flex;align-items:center;justify-content:space-between;
     padding:0 28px;z-index:1100;box-sizing:border-box;
-    transition:transform .6s ease,opacity .6s ease,background .8s ease;
-    /* Учитываем безопасные зоны на iOS */
+    transition:transform .45s ease,opacity .45s ease,background .6s ease;
     padding-top: env(safe-area-inset-top);
     height: calc(80px + env(safe-area-inset-top));
+    pointer-events:auto;
   }
   header img.logo{
     height:56px;
@@ -103,7 +118,6 @@
   nav{display:flex;gap:18px;font-size:16px;align-items:center}
   nav a{
     color:#fff;text-decoration:none;font-weight:500;
-    transition:opacity .25s;
     opacity: 0;
     transform: translateY(-20px);
     transition: opacity 1s ease .1s, transform 1s ease .1s, color .25s;
@@ -114,15 +128,8 @@
   }
   nav a:hover{opacity:.85}
 
-  /* HERO */
-  .hero{
-    display:block;
-    background:var(--black);
-    overflow:hidden;
-    position:relative;
-  }
   .hero-frame{
-    width:100%;height:100%;position:relative;overflow:hidden;background:#000
+    width:100%;height:100%;position:relative;overflow:hidden;background:#000;
   }
   .hero-frame img{
     width:100%;
@@ -138,7 +145,6 @@
     opacity: 1;
   }
 
-  /* About - с разделительной линией сверху */
   .text-block{
     background:var(--light-cream);color:#05053b;padding:120px 20px 60px;text-align:center;
     position: relative;
@@ -152,21 +158,11 @@
     height: 4px;
     background: linear-gradient(90deg, var(--accent), var(--accent-light));
   }
-  .text-block h1{
-    font-size:42px;font-weight:400;margin:0 0 14px;
-  }
-  .text-block p{
-    font-size:18px;color:var(--muted);max-width:900px;
-    margin:0 auto 16px;line-height:1.6;
-  }
-  .text-block em{
-    display:block;margin-top:14px;font-style:normal;color:#444;font-size:17px
-  }
+  .text-block h1{ font-size:42px;font-weight:400;margin:0 0 14px; }
+  .text-block p{ font-size:18px;color:var(--muted);max-width:900px;margin:0 auto 16px;line-height:1.6; }
+  .text-block em{ display:block;margin-top:14px;font-style:normal;color:#444;font-size:17px }
 
-  /* Social buttons */
-  .socials{
-    display:flex;flex-direction:column;align-items:center;gap:16px;margin-top:46px
-  }
+  .socials{ display:flex;flex-direction:column;align-items:center;gap:16px;margin-top:46px }
   .socials a{
     display:flex;align-items:center;justify-content:center;gap:12px;
     text-decoration:none;font-weight:500;font-size:18px;color:#fff;
@@ -176,10 +172,7 @@
     transform: translateY(20px);
     transition: opacity 0.8s ease, transform 0.8s ease, background .25s;
   }
-  .socials a.visible{
-    opacity: 1;
-    transform: translateY(0);
-  }
+  .socials a.visible{ opacity:1; transform:translateY(0); }
   .socials a svg{width:22px;height:22px;fill:currentColor}
   .socials a.instagram{background:linear-gradient(45deg,#f58529,#dd2a7b,#8134af,#515bd4)}
   .socials a.facebook{background:#1877f2}
@@ -187,27 +180,12 @@
   .socials a.email{background:linear-gradient(45deg,var(--accent),var(--accent-light))}
   .socials a:hover{transform:scale(1.04);opacity:.95}
 
-  /* Bio photos */
-  .bio-photos{
-    margin-top:34px;display:flex;flex-wrap:wrap;gap:14px;justify-content:center
-  }
-  .bio-photos button{
-    background:transparent;border:0;padding:0;cursor:pointer;
-    border-radius:10px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.6);
-    transition:transform .25s ease,opacity .25s;
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  .bio-photos button.visible{
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .bio-photos button img{
-    display:block;width:180px;height:120px;object-fit:cover;background:var(--black)
-  }
-  .bio-photos button:hover{transform:scale(1.03);opacity:.95}
+  .bio-photos{ margin-top:34px;display:flex;flex-wrap:wrap;gap:14px;justify-content:center }
+  .bio-photos button{ background:transparent;border:0;padding:0;cursor:pointer;border-radius:10px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.6); transition:transform .25s ease,opacity .25s; opacity:0; transform:translateY(20px) }
+  .bio-photos button.visible{ opacity:1; transform:translateY(0) }
+  .bio-photos button img{ display:block;width:180px;height:120px;object-fit:cover;background:var(--black) }
+  .bio-photos button:hover{ transform:scale(1.03); opacity:.95 }
 
-  /* МОЙ КОД ДЛЯ CV SECTION */
   #cv{
     background:var(--dark-gray);
     padding:90px 20px 120px;
@@ -224,333 +202,69 @@
     height: 4px;
     background: linear-gradient(90deg, var(--accent), var(--accent-light));
   }
-  #cv h2{
-    font-size:38px;
-    font-weight:400;
-    margin-bottom:12px;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.8s ease, transform 0.8s ease;
-  }
-  #cv h2.visible{
-    opacity: 1;
-    transform: translateY(0);
-  }
-  #cv p.lead{
-    max-width:900px;
-    margin:0 auto 20px;
-    color:#ccc;
-    font-size:18px;
-    line-height:1.6;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.8s ease 0.1s, transform 0.8s ease 0.1s;
-  }
-  #cv p.lead.visible{
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .cv-actions{
-    display:flex;
-    gap:16px;
-    justify-content:center;
-    margin:30px 0 50px;
-    flex-wrap: wrap;
-  }
-  .cv-actions a.btn{
-    display:inline-flex;
-    align-items:center;
-    gap:10px;
-    text-decoration:none;
-    color:#fff;
-    border-radius:50px;
-    padding:14px 36px;
-    font-weight:500;
-    font-size:16px;
-    transition: all 0.3s ease;
-    opacity: 0;
-    transform: translateY(15px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-  }
-  .cv-actions a.btn.visible{
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .cv-actions a.btn.download{
-    background:var(--dark-gray);
-    border:1px solid rgba(255,255,255,0.1);
-  }
-  .cv-actions a.btn.view{
-    background:linear-gradient(45deg,var(--accent),var(--accent-light));
-  }
-  .cv-actions a.btn:hover{
-    transform:translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-  }
-  .cv-actions a.btn svg{width:20px;height:20px;fill:currentColor}
+  #cv h2{ font-size:38px; font-weight:400; margin-bottom:12px; opacity:0; transform:translateY(20px); transition: opacity 0.8s ease, transform 0.8s ease; }
+  #cv h2.visible{ opacity:1; transform:translateY(0); }
+  #cv p.lead{ max-width:900px; margin:0 auto 20px; color:#ccc; font-size:18px; line-height:1.6; opacity:0; transform:translateY(20px); transition: opacity 0.8s ease 0.1s, transform 0.8s ease 0.1s; }
+  #cv p.lead.visible{ opacity:1; transform:translateY(0); }
 
-  .cv-details{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-    gap:40px;
-    max-width:1100px;
-    margin:0 auto;
-    text-align:left
-  }
-  .cv-block{
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.8s ease, transform 0.8s ease;
-    padding: 30px;
-    background: rgba(255,255,255,0.03);
-    border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.05);
-  }
-  .cv-block.visible{
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .cv-block h3{
-    color:#fff;
-    margin-top:0;
-    margin-bottom:15px;
-    font-size:20px;
-    font-weight:600;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .cv-block h3:before {
-    content: '';
-    width: 4px;
-    height: 20px;
-    background: var(--accent);
-    border-radius: 2px;
-  }
-  .cv-block ul{
-    margin:0;
-    padding-left:20px;
-    color:#cfcfcf;
-    line-height:1.8;
-    font-size: 16px;
-  }
-  .cv-block ul li {
-    margin-bottom: 8px;
-    position: relative;
-  }
+  .cv-actions{ display:flex; gap:16px; justify-content:center; margin:30px 0 50px; flex-wrap: wrap; }
+  .cv-actions a.btn{ display:inline-flex; align-items:center; gap:10px; text-decoration:none; color:#fff; border-radius:50px; padding:14px 36px; font-weight:500; font-size:16px; transition: all 0.3s ease; opacity:0; transform:translateY(15px); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+  .cv-actions a.btn.visible{ opacity:1; transform:translateY(0); }
+  .cv-actions a.btn.download{ background:var(--dark-gray); border:1px solid rgba(255,255,255,0.1); }
+  .cv-actions a.btn.view{ background:linear-gradient(45deg,var(--accent),var(--accent-light)); }
+  .cv-actions a.btn:hover{ transform:translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+  .cv-actions a.btn svg{ width:20px; height:20px; fill:currentColor }
 
-  /* Performances - с разделительной линией сверху */
-  #performances{
-    background:var(--black);padding:100px 20px 140px;text-align:center;
-    position: relative;
-  }
-  #performances:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--accent), var(--accent-light));
-  }
-  #performances h2{
-    color:#fff;font-size:42px;font-weight:400;margin-bottom:60px;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.8s ease, transform 0.8s ease;
-  }
-  #performances h2.visible{
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .video-grid{
-    display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-    gap:28px;justify-items:center;width:100%;max-width:1200px;margin:0 auto
-  }
-  .video-wrapper {
-    position: relative;width: 100%;padding-bottom: 56.25%;overflow: hidden;border-radius: 14px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.6);
-    background: #000;
-    border: 1px solid rgba(255,255,255,0.03);
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 1s ease, transform 1s ease; /* Ускорил с 1s до 0.8s */
-  }
-  .video-wrapper.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .video-wrapper iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border: 0;
-    opacity: 0;
-    transition: opacity 0.3s ease 0.1s; /* Ускорил: была задержка 0.3s, теперь 0.1s */
-  }
-  .video-wrapper.visible iframe {
-    opacity: 1;
-  }
+  .cv-details{ display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:40px; max-width:1100px; margin:0 auto; text-align:left }
+  .cv-block{ opacity:0; transform:translateY(20px); transition: opacity 0.8s ease, transform 0.8s ease; padding:30px; background: rgba(255,255,255,0.03); border-radius:12px; border:1px solid rgba(255,255,255,0.05); }
+  .cv-block.visible{ opacity:1; transform:translateY(0); }
+  .cv-block h3{ color:#fff; margin-top:0; margin-bottom:15px; font-size:20px; font-weight:600; display:flex; align-items:center; gap:10px; }
+  .cv-block h3:before { content:''; width:4px; height:20px; background:var(--accent); border-radius:2px; }
+  .cv-block ul{ margin:0; padding-left:20px; color:#cfcfcf; line-height:1.8; font-size:16px; }
 
-  /* МОЙ КОД ДЛЯ CONTACTS */
-  #contacts{
-    background:var(--light-cream);
-    color:#05053b;
-    padding:80px 20px;
-    text-align:center;
-    position: relative;
-  }
-  #contacts:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--accent), var(--accent-light));
-  }
-  #contacts h2{
-    font-size:30px;
-    margin-bottom:12px;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.8s ease, transform 0.8s ease;
-  }
-  #contacts h2.visible{
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .contact-inner{
-    max-width:800px;
-    margin:0 auto
-  }
-  .contact-inner p{
-    color:#333;
-    margin-bottom:18px;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.8s ease 0.1s, transform 0.8s ease 0.1s;
-  }
-  .contact-inner p.visible{
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .contact-actions{
-    display:flex;
-    gap:16px;
-    justify-content:center;
-    flex-wrap:wrap
-  }
-  .contact-actions a.email-btn{
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    gap:10px;
-    text-decoration:none;
-    color:#fff;
-    border-radius:50px;
-    padding:14px 36px;
-    font-weight:500;
-    background:linear-gradient(45deg,var(--accent),var(--accent-light));
-    transition: all 0.3s ease;
-    opacity: 0;
-    transform: translateY(15px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-  }
-  .contact-actions a.email-btn.visible{
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .contact-actions a.email-btn:hover{
-    transform:translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-  }
-  .contact-actions a.email-btn svg{
-    width:20px;
-    height:20px;
-    fill:currentColor
-  }
+  #performances{ background:var(--black); padding:100px 20px 140px; text-align:center; position: relative; }
+  #performances:before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background: linear-gradient(90deg, var(--accent), var(--accent-light)); }
+  #performances h2{ color:#fff; font-size:42px; font-weight:400; margin-bottom:60px; opacity:0; transform:translateY(20px); transition: opacity 0.8s ease, transform 0.8s ease; }
+  #performances h2.visible{ opacity:1; transform:translateY(0); }
 
-  /* МОЙ КОД ДЛЯ FOOTER */
-  footer {
-    background:var(--frame);
-    color:#ccc;
-    text-align:center;
-    font-size:15px;
-    padding:40px 20px;
-    border-top:1px solid rgba(255,255,255,0.05);
-    position: relative;
-    /* Учитываем безопасную зону снизу */
-    padding-bottom: calc(40px + env(safe-area-inset-bottom));
-  }
-  footer:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--accent), var(--accent-light));
-  }
-  footer a {
-    color: var(--accent);
-    transition: color 0.3s ease;
-  }
-  footer a:hover {
-    color: var(--accent-light);
-  }
+  .video-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:28px; justify-items:center; width:100%; max-width:1200px; margin:0 auto }
+  .video-wrapper { position: relative; width: 100%; padding-bottom: 56.25%; overflow: hidden; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.6); background:#000; border: 1px solid rgba(255,255,255,0.03); opacity:0; transform:translateY(30px); transition: opacity 1s ease, transform 1s ease; }
+  .video-wrapper.visible { opacity:1; transform:translateY(0); }
+  .video-wrapper iframe { position:absolute; top:0; left:0; width:100%; height:100%; border:0; opacity:0; transition: opacity 0.3s ease 0.1s; }
+  .video-wrapper.visible iframe { opacity:1; }
 
-  /* Loader */
-  #loader {
-    position:fixed;top:0;left:0;width:100%;height:100%;
-    background:var(--frame);
-    display:flex;align-items:center;justify-content:center;z-index:9999;
-    transition:opacity 0.8s ease;
-    /* Учитываем безопасные зоны */
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
-    height: calc(100% + env(safe-area-inset-top) + env(safe-area-inset-bottom));
-  }
-  #loader.hidden {
-    opacity:0;
-    pointer-events:none;
-  }
-  .loader-content {
-    display:flex; flex-direction:column; align-items:center; gap:20px;
-  }
-  .loader-logo {
-    width:120px;
-    height:auto;
-    background:var(--frame);
-    display:block;
-    object-fit:contain;
-    filter:none;
-  }
-  .spinner {
-    width:50px; height:50px; border:6px solid rgba(201, 163, 74, 0.15); /* Золотистый вместо белого */
-    border-top-color:var(--accent); border-radius:50%; animation: spin 1s linear infinite;
-  }
-  @keyframes spin {to{transform:rotate(360deg)}}
+  #contacts{ background:var(--light-cream); color:#05053b; padding:80px 20px; text-align:center; position: relative; }
+  #contacts:before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background: linear-gradient(90deg, var(--accent), var(--accent-light)); }
+  #contacts h2{ font-size:30px; margin-bottom:12px; opacity:0; transform:translateY(20px); transition: opacity 0.8s ease, transform 0.8s ease; }
+  #contacts h2.visible{ opacity:1; transform:translateY(0); }
+  .contact-inner{ max-width:800px; margin:0 auto }
+  .contact-inner p{ color:#333; margin-bottom:18px; opacity:0; transform:translateY(20px); transition: opacity 0.8s ease 0.1s, transform 0.8s ease 0.1s; }
+  .contact-inner p.visible{ opacity:1; transform:translateY(0); }
+  .contact-actions{ display:flex; gap:16px; justify-content:center; flex-wrap:wrap }
+  .contact-actions a.email-btn{ display:inline-flex; align-items:center; justify-content:center; gap:10px; text-decoration:none; color:#fff; border-radius:50px; padding:14px 36px; font-weight:500; background:linear-gradient(45deg,var(--accent),var(--accent-light)); transition: all 0.3s ease; opacity:0; transform:translateY(15px); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+  .contact-actions a.email-btn.visible{ opacity:1; transform:translateY(0); }
+  .contact-actions a.email-btn:hover{ transform:translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+  .contact-actions a.email-btn svg{ width:20px; height:20px; fill:currentColor }
 
-  /* Modal */
-  .modal-backdrop{
-    position:fixed;inset:0;background:rgba(0,0,0,0.85);
-    display:none;align-items:center;justify-content:center;z-index:2000;padding:20px
-  }
-  .modal-backdrop.visible{display:flex}
-  .modal-content{
-    max-width:1200px;max-height:90vh;overflow:auto;
-    border-radius:8px;position:relative
-  }
-  .modal-content img{display:block;max-width:100%;height:auto;border-radius:6px}
-  .modal-close{
-    position:absolute;top:10px;right:10px;background:rgba(0,0,0,.5);
-    border:0;color:#fff;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:16px
-  }
-  .modal-caption{color:#ddd;margin-top:8px;text-align:center}
-  .pdf-frame{width:95vw;height:85vh;border:0;border-radius:6px;background:#fff}
+  footer { background:var(--frame); color:#ccc; text-align:center; font-size:15px; padding:40px 20px; border-top:1px solid rgba(255,255,255,0.05); position: relative; padding-bottom: calc(40px + env(safe-area-inset-bottom)); }
+  footer:before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background: linear-gradient(90deg, var(--accent), var(--accent-light)); }
+  footer a { color: var(--accent); transition: color 0.3s ease; }
+  footer a:hover { color: var(--accent-light); }
+
+  #loader { position:fixed; top:0; left:0; width:100%; height:100%; background:var(--frame); display:flex; align-items:center; justify-content:center; z-index:9999; transition:opacity 0.8s ease; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); height: calc(100% + env(safe-area-inset-top) + env(safe-area-inset-bottom)); }
+  #loader.hidden { opacity:0; pointer-events:none; }
+  .loader-content { display:flex; flex-direction:column; align-items:center; gap:20px; }
+  .loader-logo { width:120px; height:auto; background:var(--frame); display:block; object-fit:contain; filter:none; }
+  .spinner { width:50px; height:50px; border:6px solid rgba(201, 163, 74, 0.15); border-top-color:var(--accent); border-radius:50%; animation: spin 1s linear infinite; }
+  @keyframes spin { to{transform:rotate(360deg)} }
+
+  .modal-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; align-items:center; justify-content:center; z-index:2000; padding:20px }
+  .modal-backdrop.visible{ display:flex }
+  .modal-content{ max-width:1200px; max-height:90vh; overflow:auto; border-radius:8px; position:relative }
+  .modal-content img{ display:block; max-width:100%; height:auto; border-radius:6px }
+  .modal-close{ position:absolute; top:10px; right:10px; background:rgba(0,0,0,.5); border:0; color:#fff; padding:8px 12px; border-radius:8px; cursor:pointer; font-size:16px }
+  .modal-caption{ color:#ddd; margin-top:8px; text-align:center }
+  .pdf-frame{ width:95vw; height:85vh; border:0; border-radius:6px; background:#fff }
 </style>
 </head>
 <body>
@@ -605,7 +319,7 @@
   </div>
 </div>
 
-<!-- CV - МОЯ ВЕРСИЯ -->
+<!-- CV -->
 <section id="cv" aria-labelledby="cv-heading">
   <h2 id="cv-heading" class="text-reveal">Curriculum Vitae</h2>
   <p class="lead text-reveal">Sergei Mkrtichian — concert violinist. Educated at leading conservatories, prize-winner of international competitions, performer in major halls across Europe and beyond.</p>
@@ -615,11 +329,6 @@
       <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 3v10m0 0 4-4m-4 4-4-4M4 21h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
       Download CV (PDF)
     </a>
-
-<!--     <a class="btn view text-reveal" href="#" id="viewPdfBtn" title="View CV in browser">
-      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21 12v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
-      View CV
-    </a> -->
   </div>
 
   <div class="cv-details">
@@ -661,7 +370,7 @@
   </div>
 </section>
 
-<!-- Contacts - МОЯ ВЕРСИЯ -->
+<!-- Contacts -->
 <section id="contacts">
   <h2 class="text-reveal">Contact</h2>
   <div class="contact-inner">
@@ -675,7 +384,6 @@
   </div>
 </section>
 
-<!-- Footer - МОЯ ВЕРСИЯ -->
 <footer>
   © 2025 Sergei Mkrtichian. This website is licensed under the
   <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener">Apache License 2.0</a>.
@@ -691,78 +399,80 @@
 </div>
 
 <script>
-/* Loader & hero behavior */
+/* --- Общие переменные --- */
 const hero = document.getElementById('hero');
 const heroImg = document.getElementById('heroImg');
 const header = document.getElementById('header');
 const loader = document.getElementById('loader');
-// ИСПРАВЛЕНО: уменьшил масштаб с 1.7 до 1.4 - теперь увеличение будет более умеренным
+const modal = document.getElementById('modal');
+const modalInner = document.getElementById('modalInner');
+const modalCaption = document.getElementById('modalCaption');
+const modalClose = document.getElementById('modalClose');
+
+// плавная параллакс-увеличение
 const maxScale = 1.4;
 let currentScale = 1;
 
-// Убеждаемся, что изображение всегда загружается правильно
+/* --- Инициализация hero изображения --- */
 function initHeroImage() {
-  // Проверяем, загружено ли изображение
+  if (!heroImg) return;
   if (heroImg.complete) {
     heroImg.classList.add('loaded');
   } else {
-    heroImg.onload = () => {
-      heroImg.classList.add('loaded');
-    };
+    heroImg.onload = () => heroImg.classList.add('loaded');
     heroImg.onerror = () => {
       console.error('Hero image failed to load');
-      heroImg.classList.add('loaded'); // Все равно показываем фон
+      heroImg.classList.add('loaded');
     };
   }
 }
 
-// Показываем/скрываем лоадер
+/* --- Loader: показываем только при первом визите --- */
 const isFirstVisit = !localStorage.getItem('visited');
 if(isFirstVisit){
-  localStorage.setItem('visited', 'true');
-  loader.style.display = 'flex';
+  try { localStorage.setItem('visited','true'); } catch(e){}
+  if (loader) loader.style.display = 'flex';
 } else {
-  loader.style.display = 'none';
+  if (loader) loader.style.display = 'none';
 }
 
-// Инициализируем главное изображение
-initHeroImage();
-
-// Скрываем лоадер после полной загрузки страницы
+/* --- После полной загрузки страницы --- */
 window.addEventListener('load', () => {
   setTimeout(() => {
-    loader.classList.add('hidden');
+    if (loader) loader.classList.add('hidden');
     setTimeout(() => {
-      loader.style.display = 'none';
-      
-      // Анимация элементов header
+      if (loader) loader.style.display = 'none';
+
+      // Анимация header
       const logo = document.querySelector('header img.logo');
       const navLinks = document.querySelectorAll('nav a');
-      
       if (logo) logo.classList.add('visible');
       navLinks.forEach((link, index) => {
-        setTimeout(() => {
-          link.classList.add('visible');
-        }, index * 100);
+        setTimeout(() => link.classList.add('visible'), index * 100);
       });
-      
-      // Инициируем анимацию при скролле
+
       initScrollAnimations();
     }, 800);
   }, 500);
 });
 
-/* Parallax + header animation */
+/* --- Запуск параллакса и анимации header --- */
 function animate() {
+  if (!hero || !heroImg || !header) {
+    requestAnimationFrame(animate);
+    return;
+  }
+
   const rect = hero.getBoundingClientRect();
   const windowHeight = window.innerHeight;
-  const scrollY = window.scrollY;
+  const scrollY = window.scrollY || window.pageYOffset;
 
   let progress = 0;
   if (rect.bottom > 0 && rect.top < windowHeight) {
     progress = (windowHeight - rect.top) / (windowHeight + rect.height);
     progress = Math.min(Math.max(progress, 0), 1);
   }
+
   const targetScale = 1 + progress * (maxScale - 1);
   currentScale += (targetScale - currentScale) * 0.1;
   heroImg.style.transform = `scale(${currentScale})`;
@@ -782,9 +492,8 @@ function animate() {
 }
 requestAnimationFrame(animate);
 
-/* Анимация при скролле для всех элементов */
+/* --- Анимации при скролле через IntersectionObserver --- */
 function initScrollAnimations() {
-  // Элементы для анимации
   const animatedElements = [
     ...document.querySelectorAll('.text-reveal'),
     ...document.querySelectorAll('.socials a'),
@@ -798,24 +507,16 @@ function initScrollAnimations() {
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        // ИСПРАВЛЕНО: для видео уменьшил задержку с 400 до 150ms
         const delay = entry.target.classList.contains('video-wrapper') ? 150 : 100;
-        
         setTimeout(() => {
           entry.target.classList.add('visible');
-          
-          // Для видео дополнительно запускаем анимацию появления самого iframe
           if (entry.target.classList.contains('video-wrapper')) {
             const iframe = entry.target.querySelector('iframe');
             if (iframe) {
-              // Даем немного времени для загрузки iframe (уменьшил с 300 до 100ms)
-              setTimeout(() => {
-                iframe.style.opacity = '1';
-              }, 100);
+              setTimeout(() => iframe.style.opacity = '1', 100);
             }
           }
         }, delay);
-        
         observer.unobserve(entry.target);
       }
     });
@@ -824,29 +525,23 @@ function initScrollAnimations() {
     rootMargin: '0px 0px -50px 0px'
   });
 
-  // Наблюдаем за всеми элементами
-  animatedElements.forEach(el => {
-    if (el) observer.observe(el);
-  });
+  animatedElements.forEach(el => { if (el) observer.observe(el); });
 }
 
-/* Modal (image + PDF) */
-const modal = document.getElementById('modal');
-const modalInner = document.getElementById('modalInner');
-const modalCaption = document.getElementById('modalCaption');
-const modalClose = document.getElementById('modalClose');
-
+/* --- Модальные окна (картинки / PDF) --- */
 function openImage(url, caption=''){
+  if (!modal || !modalInner) return;
   modalInner.innerHTML = '';
   const img = document.createElement('img');
   img.src = url;
   img.alt = caption || '';
   modalInner.appendChild(img);
-  modalCaption.textContent = caption;
+  if (modalCaption) modalCaption.textContent = caption;
   showModal();
 }
 
 function openPDF(url, caption=''){
+  if (!modal || !modalInner) return;
   modalInner.innerHTML = '';
   const iframe = document.createElement('iframe');
   iframe.className = 'pdf-frame';
@@ -854,25 +549,27 @@ function openPDF(url, caption=''){
   iframe.title = caption || 'CV';
   iframe.setAttribute('aria-label','PDF viewer');
   modalInner.appendChild(iframe);
-  modalCaption.textContent = caption;
+  if (modalCaption) modalCaption.textContent = caption;
   showModal();
 }
 
 function showModal(){
+  if (!modal) return;
   modal.classList.add('visible');
   modal.setAttribute('aria-hidden','false');
   document.body.style.overflow = 'hidden';
 }
 
 function closeModal(){
+  if (!modal) return;
   modal.classList.remove('visible');
   modal.setAttribute('aria-hidden','true');
-  modalInner.innerHTML = '';
-  modalCaption.textContent = '';
+  if (modalInner) modalInner.innerHTML = '';
+  if (modalCaption) modalCaption.textContent = '';
   document.body.style.overflow = '';
 }
 
-/* thumbnails click */
+/* --- Клики по превью фотографий --- */
 document.querySelectorAll('.bio-photos button').forEach(btn=>{
   btn.addEventListener('click', (e)=>{
     const full = btn.getAttribute('data-full');
@@ -881,29 +578,31 @@ document.querySelectorAll('.bio-photos button').forEach(btn=>{
   });
 });
 
-/* open CV view */
+/* --- Кнопка просмотра CV (если используется) --- */
 const viewPdfBtn = document.getElementById('viewPdfBtn');
-viewPdfBtn && viewPdfBtn.addEventListener('click', (e)=>{
-  e.preventDefault();
-  openPDF('Sergei_Mkrtichian_CV.pdf', 'CV — Sergei Mkrtichian');
-});
+if (viewPdfBtn) {
+  viewPdfBtn.addEventListener('click', (e)=>{
+    e.preventDefault();
+    openPDF('Sergei_Mkrtichian_CV.pdf', 'CV — Sergei Mkrtichian');
+  });
+}
 
-/* modal close / backdrop / ESC */
-modalClose.addEventListener('click', closeModal);
-modal.addEventListener('click', (e)=>{ if(e.target === modal) closeModal(); });
+/* --- Закрытие модалки / backdrop / ESC --- */
+if (modalClose) modalClose.addEventListener('click', closeModal);
+if (modal) {
+  modal.addEventListener('click', (e)=>{ if(e.target === modal) closeModal(); });
+}
 document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeModal(); });
 
-/* Предотвращаем проблемы с изображением героя */
+/* --- pageshow для корректной работы bfcache --- */
 window.addEventListener('pageshow', function(event) {
-  if (event.persisted) {
+  if (event.persisted && heroImg) {
     heroImg.classList.remove('loaded');
-    setTimeout(() => {
-      heroImg.classList.add('loaded');
-    }, 50);
+    setTimeout(() => heroImg.classList.add('loaded'), 50);
   }
 });
 
-/* Предзагрузка изображений для лучшей производительности */
+/* --- Предзагрузка изображений --- */
 document.addEventListener('DOMContentLoaded', () => {
   const preloadImages = ['s.JPG', 'logo.jpg'];
   preloadImages.forEach(src => {
@@ -912,19 +611,9 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-/* JavaScript для улучшения работы на мобильных */
+/* --- Мобильные улучшения (установка --vh уже сделана в <head>) --- */
 document.addEventListener('DOMContentLoaded', function() {
-  // Функция для установки правильной высоты на мобильных
-  function setVH() {
-    let vh = window.innerHeight * 0.01;
-    document.documentElement.style.setProperty('--vh', `${vh}px`);
-  }
-  
-  setVH();
-  window.addEventListener('resize', setVH);
-  window.addEventListener('orientationchange', setVH);
-  
-  // Предотвращаем масштабирование при двойном тапе на мобильных
+  // предотвращаем двойной тап-zoom
   let lastTouchEnd = 0;
   document.addEventListener('touchend', function(event) {
     const now = (new Date()).getTime();
@@ -933,13 +622,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     lastTouchEnd = now;
   }, false);
-  
-  // Убираем выделение при тапе на кнопках
+
+  // убираем подсветку при касании
   document.querySelectorAll('button, a').forEach(el => {
     el.addEventListener('touchstart', function() {
       this.style.webkitTapHighlightColor = 'transparent';
-    });
+    }, {passive:true});
   });
+
+  initHeroImage();
 });
 </script>
 </body>
