@@ -5,18 +5,14 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Sergei Mkrtichian — Official Website</title>
 <style>
-
-  
-
   :root{
-    /* базовая палитра — можно править в одном месте */
     --black: #000000;
-    --frame: #1B1A16;        /* цвет фона загрузки / рамки логотипа */
-    --dark-gray: #0b0b0b;    /* тёмные блоки (CV, видео фон) */
-    --light-cream: #fbf8f4;  /* тёплый светлый фон для блока About */
+    --frame: #1B1A16;
+    --dark-gray: #0b0b0b;
+    --light-cream: #fbf8f4;
     --muted: #7a7a7a;
-    --accent: #0078d7;       /* акцентный синий */
-    /* focal point (твоя точка) */
+    --accent: #B8860B; /* Скрипичный золотистый вместо синего */
+    --accent-light: #DAA520; /* Более светлый золотистый */
     --hero-fp-x: 33.3%;
     --hero-fp-y: 37.8%;
   }
@@ -26,11 +22,24 @@
     background:var(--black);
     font-family:"Georgia",serif;color:#fff;
     scroll-behavior:smooth;
+    overflow-x: hidden;
   }
-  a{color:inherit}
-  button{font-family:inherit}
+  a{color:inherit; text-decoration: none;}
+  button{font-family:inherit; cursor: pointer;}
 
-  /* Header (без соцсетей) */
+  /* Общие анимационные стили для текста */
+  .text-reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+    will-change: opacity, transform;
+  }
+  .text-reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Header */
   header{
     position:fixed;top:0;left:0;width:100%;height:80px;
     background:rgba(0,0,0,0);color:#fff;
@@ -38,35 +47,41 @@
     padding:0 28px;z-index:1100;box-sizing:border-box;
     transition:transform .6s ease,opacity .6s ease,background .8s ease;
   }
-  header img.logo{height:56px}
-  nav{display:flex;gap:18px;font-size:16px;align-items:center}
-  nav a{color:#fff;text-decoration:none;font-weight:500;transition:opacity .25s}
-  nav a:hover{opacity:.85}
-
-  /* ADDED: make header logo & nav links animate exactly like the YouTube iframe (fade + translateY) */
-  header img.logo,
-  nav a {
+  header img.logo{
+    height:56px;
     opacity: 0;
-    transform: translateY(50px); /* match .video-wrapper iframe initial transform */
-    transition: opacity 1.2s ease, transform 1.2s ease; /* same timing as videos */
-    will-change: opacity, transform;
+    transform: translateY(-20px);
+    transition: opacity 1s ease, transform 1s ease;
   }
-  header img.logo.visible,
-  nav a.visible {
+  header img.logo.visible{
     opacity: 1;
     transform: translateY(0);
   }
-  /* end ADDED */
+  nav{display:flex;gap:18px;font-size:16px;align-items:center}
+  nav a{
+    color:#fff;text-decoration:none;font-weight:500;
+    transition:opacity .25s;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 1s ease .1s, transform 1s ease .1s, color .25s;
+  }
+  nav a.visible{
+    opacity: 1;
+    transform: translateY(0);
+  }
+  nav a:hover{opacity:.85}
 
-  /* HERO: full-bleed image filling viewport, centered via object-position */
+  /* HERO */
   .hero{
     display:block;
     background:var(--black);
-    height:100vh; /* fill viewport */
+    height:100vh;
     overflow:hidden;
     position:relative;
   }
-  .hero-frame{width:100%;height:100%;position:relative;overflow:hidden;background:#000}
+  .hero-frame{
+    width:100%;height:100%;position:relative;overflow:hidden;background:#000
+  }
   .hero-frame img{
     width:100%;
     height:100%;
@@ -75,122 +90,426 @@
     transform-origin:center center;
     transition:transform 1.6s ease,opacity 1.2s ease;
     display:block;
-    opacity:0; /* будет появляться по загрузке */
+    opacity: 0;
   }
-  .hero.loaded .hero-frame img{opacity:1}
+  .hero-frame img.loaded{
+    opacity: 1;
+  }
 
-  :root{
-  --loader-bg: #1B1A16; /* твой текущий фон */
-  /* по умолчанию — Classic Gold */
-  --logo-main: #C9A34A;
-  --logo-accent: #E6C36B;
-  --logo-contrast: #ffffff;
-  --button-bg: linear-gradient(45deg, #E6C36B, #B98F30);
-}
+  /* About - с разделительной линией сверху */
+  .text-block{
+    background:var(--light-cream);color:#05053b;padding:120px 20px 60px;text-align:center;
+    position: relative;
+  }
+  .text-block:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-light));
+  }
+  .text-block h1{
+    font-size:42px;font-weight:400;margin:0 0 14px;
+  }
+  .text-block p{
+    font-size:18px;color:var(--muted);max-width:900px;
+    margin:0 auto 16px;line-height:1.6;
+  }
+  .text-block em{
+    display:block;margin-top:14px;font-style:normal;color:#444;font-size:17px
+  }
 
-/* Пример использования */
-.loader-logo { filter: none; }
-.header-logo { color: var(--logo-main); }
-.btn-accent { background: var(--button-bg); color: var(--logo-contrast); }
-
-
-  /* About / light cream block */
-  .text-block{background:var(--light-cream);color:#05053b;padding:120px 20px 60px;text-align:center}
-  .text-block h1{font-size:42px;font-weight:400;margin:0 0 14px}
-  .text-block p{font-size:18px;color:var(--muted);max-width:900px;margin:0 auto 16px;line-height:1.6}
-  .text-block em{display:block;margin-top:14px;font-style:normal;color:#444;font-size:17px}
-
-  /* social buttons block under About (kept) */
-  .socials{display:flex;flex-direction:column;align-items:center;gap:16px;margin-top:46px}
-  .socials a{display:flex;align-items:center;justify-content:center;gap:12px;text-decoration:none;font-weight:500;font-size:18px;color:#fff;border-radius:50px;padding:14px 48px;width:260px;text-align:center;transition:transform .25s ease,opacity .25s}
+  /* Social buttons */
+  .socials{
+    display:flex;flex-direction:column;align-items:center;gap:16px;margin-top:46px
+  }
+  .socials a{
+    display:flex;align-items:center;justify-content:center;gap:12px;
+    text-decoration:none;font-weight:500;font-size:18px;color:#fff;
+    border-radius:50px;padding:14px 48px;width:260px;text-align:center;
+    transition:transform .25s ease,opacity .25s;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease, transform 0.8s ease, background .25s;
+  }
+  .socials a.visible{
+    opacity: 1;
+    transform: translateY(0);
+  }
   .socials a svg{width:22px;height:22px;fill:currentColor}
   .socials a.instagram{background:linear-gradient(45deg,#f58529,#dd2a7b,#8134af,#515bd4)}
   .socials a.facebook{background:#1877f2}
   .socials a.youtube{background:#ff0000}
-  .socials a.email{background:linear-gradient(45deg,#0078d7,#00a1f1)}
+  .socials a.email{background:linear-gradient(45deg,var(--accent),var(--accent-light))}
   .socials a:hover{transform:scale(1.04);opacity:.95}
 
-  /* thumbnails inside About */
-  .bio-photos{margin-top:34px;display:flex;flex-wrap:wrap;gap:14px;justify-content:center}
-  .bio-photos button{background:transparent;border:0;padding:0;cursor:pointer;border-radius:10px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.6);transition:transform .25s ease,opacity .25s}
-  .bio-photos button img{display:block;width:180px;height:120px;object-fit:cover;background:var(--black)}
+  /* Bio photos */
+  .bio-photos{
+    margin-top:34px;display:flex;flex-wrap:wrap;gap:14px;justify-content:center
+  }
+  .bio-photos button{
+    background:transparent;border:0;padding:0;cursor:pointer;
+    border-radius:10px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.6);
+    transition:transform .25s ease,opacity .25s;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  .bio-photos button.visible{
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .bio-photos button img{
+    display:block;width:180px;height:120px;object-fit:cover;background:var(--black)
+  }
   .bio-photos button:hover{transform:scale(1.03);opacity:.95}
 
-  /* CV section — тёмный, чтобы фото/видео на чёрном фоне не выглядели вырывшимися */
-  #cv{background:var(--dark-gray);padding:90px 20px 120px;color:#fff;text-align:center;border-top:1px solid rgba(255,255,255,0.04)}
-  #cv h2{font-size:38px;font-weight:400;margin-bottom:12px}
-  #cv p.lead{max-width:900px;margin:0 auto 20px;color:#ccc;font-size:18px;line-height:1.6}
-  .cv-actions{display:flex;gap:16px;justify-content:center;margin:18px 0 34px}
-  .cv-actions a.btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:#fff;border-radius:50px;padding:12px 36px;font-weight:500;font-size:16px}
-  .cv-actions a.btn.download{background:linear-gradient(45deg,#1b1b1b,#2b2b2b);border:1px solid rgba(255,255,255,0.06)}
-  .cv-actions a.btn.view{background:linear-gradient(45deg,var(--accent),#00a1f1)}
+  /* МОЙ КОД ДЛЯ CV SECTION */
+  #cv{
+    background:var(--dark-gray);
+    padding:90px 20px 120px;
+    color:#fff;
+    text-align:center;
+    position: relative;
+  }
+  #cv:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-light));
+  }
+  #cv h2{
+    font-size:38px;
+    font-weight:400;
+    margin-bottom:12px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  #cv h2.visible{
+    opacity: 1;
+    transform: translateY(0);
+  }
+  #cv p.lead{
+    max-width:900px;
+    margin:0 auto 20px;
+    color:#ccc;
+    font-size:18px;
+    line-height:1.6;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease 0.1s, transform 0.8s ease 0.1s;
+  }
+  #cv p.lead.visible{
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .cv-actions{
+    display:flex;
+    gap:16px;
+    justify-content:center;
+    margin:30px 0 50px;
+    flex-wrap: wrap;
+  }
+  .cv-actions a.btn{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    text-decoration:none;
+    color:#fff;
+    border-radius:50px;
+    padding:14px 36px;
+    font-weight:500;
+    font-size:16px;
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateY(15px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  }
+  .cv-actions a.btn.visible{
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .cv-actions a.btn.download{
+    background:var(--dark-gray);
+    border:1px solid rgba(255,255,255,0.1);
+  }
+  .cv-actions a.btn.view{
+    background:linear-gradient(45deg,var(--accent),var(--accent-light));
+  }
+  .cv-actions a.btn:hover{
+    transform:translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  }
   .cv-actions a.btn svg{width:20px;height:20px;fill:currentColor}
 
-  .cv-details{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:26px;max-width:1100px;margin:0 auto;text-align:left}
-  .cv-block h3{color:#fff;margin-top:0;margin-bottom:8px;font-size:18px;font-weight:500}
-  .cv-block ul{margin:0;padding-left:20px;color:#cfcfcf;line-height:1.6}
+  .cv-details{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:40px;
+    max-width:1100px;
+    margin:0 auto;
+    text-align:left
+  }
+  .cv-block{
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+    padding: 30px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  .cv-block.visible{
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .cv-block h3{
+    color:#fff;
+    margin-top:0;
+    margin-bottom:15px;
+    font-size:20px;
+    font-weight:600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .cv-block h3:before {
+    content: '';
+    width: 4px;
+    height: 20px;
+    background: var(--accent);
+    border-radius: 2px;
+  }
+  .cv-block ul{
+    margin:0;
+    padding-left:20px;
+    color:#cfcfcf;
+    line-height:1.8;
+    font-size: 16px;
+  }
+  .cv-block ul li {
+    margin-bottom: 8px;
+    position: relative;
+  }
 
-  /* Performances — фон полностью чёрный для естественного встраивания видео/фото */
-  #performances{background:var(--black);padding:100px 20px 140px;text-align:center}
-  #performances h2{color:#fff;font-size:42px;font-weight:400;margin-bottom:60px}
-  .video-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:28px;justify-items:center;width:100%;max-width:1200px;margin:0 auto}
+  /* Performances - с разделительной линией сверху */
+  #performances{
+    background:var(--black);padding:100px 20px 140px;text-align:center;
+    position: relative;
+  }
+  #performances:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-light));
+  }
+  #performances h2{
+    color:#fff;font-size:42px;font-weight:400;margin-bottom:60px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  #performances h2.visible{
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .video-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:28px;justify-items:center;width:100%;max-width:1200px;margin:0 auto
+  }
   .video-wrapper {
     position: relative;width: 100%;padding-bottom: 56.25%;overflow: hidden;border-radius: 14px;
     box-shadow: 0 10px 30px rgba(0,0,0,.6);
-    background: #000; /* чёрный фон вокруг ролика (твои фото на чёрном фоне) */
+    background: #000;
     border: 1px solid rgba(255,255,255,0.03);
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 1s ease, transform 1s ease; /* Ускорил с 1s до 0.8s */
   }
-  .video-wrapper iframe {position: absolute;top: 0;left: 0;width: 100%;height: 100%;border: 0;opacity: 0;transform: translateY(50px);transition: opacity 1.2s ease, transform 1.2s ease;}
-  .video-wrapper.visible iframe {opacity: 1;transform: translateY(0);}
+  .video-wrapper.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .video-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    opacity: 0;
+    transition: opacity 0.3s ease 0.1s; /* Ускорил: была задержка 0.3s, теперь 0.1s */
+  }
+  .video-wrapper.visible iframe {
+    opacity: 1;
+  }
 
-  /* Contacts — лёгкий кремовый, чтобы выглядело дружелюбно */
-  #contacts{background:var(--light-cream);color:#05053b;padding:80px 20px;text-align:center}
-  #contacts h2{font-size:30px;margin-bottom:12px}
-  .contact-inner{max-width:800px;margin:0 auto}
-  .contact-inner p{color:#333;margin-bottom:18px}
-  .contact-actions{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
-  .contact-actions a.email-btn{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:#fff;border-radius:50px;padding:12px 36px;font-weight:500;background:linear-gradient(45deg,var(--accent),#00a1f1)}
-  .contact-actions a.email-btn svg{width:20px;height:20px;fill:currentColor}
+  /* МОЙ КОД ДЛЯ CONTACTS */
+  #contacts{
+    background:var(--light-cream);
+    color:#05053b;
+    padding:80px 20px;
+    text-align:center;
+    position: relative;
+  }
+  #contacts:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-light));
+  }
+  #contacts h2{
+    font-size:30px;
+    margin-bottom:12px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  #contacts h2.visible{
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .contact-inner{
+    max-width:800px;
+    margin:0 auto
+  }
+  .contact-inner p{
+    color:#333;
+    margin-bottom:18px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease 0.1s, transform 0.8s ease 0.1s;
+  }
+  .contact-inner p.visible{
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .contact-actions{
+    display:flex;
+    gap:16px;
+    justify-content:center;
+    flex-wrap:wrap
+  }
+  .contact-actions a.email-btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    text-decoration:none;
+    color:#fff;
+    border-radius:50px;
+    padding:14px 36px;
+    font-weight:500;
+    background:linear-gradient(45deg,var(--accent),var(--accent-light));
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateY(15px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  }
+  .contact-actions a.email-btn.visible{
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .contact-actions a.email-btn:hover{
+    transform:translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  }
+  .contact-actions a.email-btn svg{
+    width:20px;
+    height:20px;
+    fill:currentColor
+  }
 
-  /* Footer */
-  footer {background:var(--frame);color:#ccc;text-align:center;font-size:15px;padding:34px 20px;border-top:1px solid rgba(255,255,255,0.06)}
+  /* МОЙ КОД ДЛЯ FOOTER */
+  footer {
+    background:var(--frame);
+    color:#ccc;
+    text-align:center;
+    font-size:15px;
+    padding:40px 20px;
+    border-top:1px solid rgba(255,255,255,0.05);
+    position: relative;
+  }
+  footer:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-light));
+  }
+  footer a {
+    color: var(--accent);
+    transition: color 0.3s ease;
+  }
+  footer a:hover {
+    color: var(--accent-light);
+  }
 
-  /* Loader (восстановлен) */
+  /* Loader */
   #loader {
     position:fixed;top:0;left:0;width:100%;height:100%;
-    background:var(--frame); /* #1B1A16 как ты просил */
+    background:var(--frame);
     display:flex;align-items:center;justify-content:center;z-index:9999;
     transition:opacity 0.8s ease;
   }
-  #loader.hidden {opacity:0;pointer-events:none;}
-  .loader-content {display:flex; flex-direction:column; align-items:center; gap:20px;}
+  #loader.hidden {
+    opacity:0;
+    pointer-events:none;
+  }
+  .loader-content {
+    display:flex; flex-direction:column; align-items:center; gap:20px;
+  }
   .loader-logo {
     width:120px;
     height:auto;
-    background:var(--frame); /* на случай, если логотип не грузится — фон совпадает */
+    background:var(--frame);
     display:block;
     object-fit:contain;
     filter:none;
   }
-  .spinner {width:50px; height:50px; border:6px solid rgba(255,255,255,0.15); border-top-color:#fff; border-radius:50%; animation: spin 1s linear infinite;}
+  .spinner {
+    width:50px; height:50px; border:6px solid rgba(201, 163, 74, 0.15); /* Золотистый вместо белого */
+    border-top-color:var(--accent); border-radius:50%; animation: spin 1s linear infinite;
+  }
   @keyframes spin {to{transform:rotate(360deg)}}
 
   /* Modal */
-  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.85);display:none;align-items:center;justify-content:center;z-index:2000;padding:20px}
+  .modal-backdrop{
+    position:fixed;inset:0;background:rgba(0,0,0,0.85);
+    display:none;align-items:center;justify-content:center;z-index:2000;padding:20px
+  }
   .modal-backdrop.visible{display:flex}
-  .modal-content{max-width:1200px;max-height:90vh;overflow:auto;border-radius:8px;position:relative}
+  .modal-content{
+    max-width:1200px;max-height:90vh;overflow:auto;
+    border-radius:8px;position:relative
+  }
   .modal-content img{display:block;max-width:100%;height:auto;border-radius:6px}
-  .modal-close{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.5);border:0;color:#fff;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:16px}
+  .modal-close{
+    position:absolute;top:10px;right:10px;background:rgba(0,0,0,.5);
+    border:0;color:#fff;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:16px
+  }
   .modal-caption{color:#ddd;margin-top:8px;text-align:center}
   .pdf-frame{width:95vw;height:85vh;border:0;border-radius:6px;background:#fff}
 </style>
 </head>
 <body>
 
-<!-- LOADER (восстановлен) -->
+<!-- LOADER -->
 <div id="loader">
   <div class="loader-content">
-    <!-- если logo.jpg имеет фон #1B1A16 — он будет совпадать с фоном загрузки -->
     <img src="logo.jpg" alt="Logo" class="loader-logo">
     <div class="spinner" aria-hidden="true"></div>
   </div>
@@ -204,92 +523,75 @@
     <a href="#text-block">About</a>
     <a href="#contacts">Contacts</a>
   </nav>
-  <!-- social icons removed from header as requested -->
 </header>
 
-<!-- HERO (s.JPG fills viewport, centered by object-position) -->
+<!-- HERO -->
 <div class="hero" id="hero">
   <div class="hero-frame" aria-hidden="false">
     <img id="heroImg" src="s.JPG" alt="Sergei Mkrtichian — portrait">
   </div>
 </div>
 
-<!-- ABOUT / Dear Friends -->
+<!-- ABOUT -->
 <div class="text-block" id="text-block">
-  <h1>Dear Friends,</h1>
-  <p>I’ve created this site so you can find out more about me, what I’ve done in the past, and what I’m up to currently. I look forward to connecting with you at my concerts.</p>
-  <em>- Sergei Mkrtichian</em>
+  <h1 class="text-reveal">Dear Friends,</h1>
+  <p class="text-reveal">I've created this site so you can find out more about me, what I've done in the past, and what I'm up to currently. I look forward to connecting with you at my concerts.</p>
+  <em class="text-reveal">- Sergei Mkrtichian</em>
 
-  <!-- social buttons block (kept here) -->
+  <!-- social buttons -->
   <div class="socials" aria-hidden="false">
-    <a class="instagram" href="https://www.instagram.com/sergunchik_mk/" target="_blank" rel="noopener">
+    <a class="instagram text-reveal" href="https://www.instagram.com/sergunchik_mk/" target="_blank" rel="noopener">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2Zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5A4.25 4.25 0 0 0 20.5 16.25v-8.5A4.25 4.25 0 0 0 16.25 3.5h-8.5Zm8.75 2.25a.75.75 0 1 1 0 1.5h-.01a.75.75 0 1 1 0-1.5h.01ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 1.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"/></svg>
       Instagram
     </a>
 
-    <a class="facebook" href="https://www.facebook.com/profile.php?id=100095484424565" target="_blank" rel="noopener">
+    <a class="facebook text-reveal" href="https://www.facebook.com/profile.php?id=100095484424565" target="_blank" rel="noopener">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M22 12a10 10 0 1 0-11.5 9.9v-7H8v-3h2.5V9.5c0-2.4 1.4-3.8 3.6-3.8 1 0 2 .2 2 .2v2.2H15c-1.2 0-1.6.8-1.6 1.5V12H17l-.5 3h-3v7A10 10 0 0 0 22 12Z"/></svg>
       Facebook
     </a>
 
-    <a class="youtube" href="https://youtube.com/@sergei_mkrtichian?si=yijFIbmlZmJFL3BU" target="_blank" rel="noopener">
+    <a class="youtube text-reveal" href="https://youtube.com/@sergei_mkrtichian?si=yijFIbmlZmJFL3BU" target="_blank" rel="noopener">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21.8 8s-.2-1.4-.8-2c-.8-.8-1.7-.8-2.2-.9C16.2 4.9 12 4.9 12 4.9h-.1s-4.2 0-6.8.2c-.5 0-1.5.1-2.2.9-.6.6-.8 2-.8 2S2 9.6 2 11.2v1.6c0 1.6.2 3.2.2 3.2s.2 1.4.8 2c.8.8 1.8.8 2.3.9 1.7.2 7 .2 7 .2s4.2 0 6.8-.2c.5 0 1.5-.1 2.2-.9.6-.6.8-2 .8-2s.2-1.6.2-3.2v-1.6c0-1.6-.2-3.2-.2-3.2ZM10 14.7V9.3l5.2 2.7L10 14.7Z"/></svg>
       YouTube
     </a>
-
-<!--     <a class="email" href="mailto:mkrtiart1959@gmail.com" rel="noopener">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm0 2v.01l8 5 8-5V6H4Zm16 12V8.24l-8 5-8-5V18h16Z"/></svg>
-      E-mail
-    </a> -->
   </div>
-
-<!--   
-  <div class="bio-photos" aria-hidden="false">
-    <button data-full="photo1.jpg" data-caption="Performance, 2023"><img src="photo1-thumb.jpg" alt="Performance 1"></button>
-    <button data-full="photo2.jpg" data-caption="Portrait, 2022"><img src="photo2-thumb.jpg" alt="Portrait 1"></button>
-    <button data-full="photo3.jpg" data-caption="Rehearsal"><img src="photo3-thumb.jpg" alt="Rehearsal"></button>
-    <button data-full="photo4.jpg" data-caption="On stage"><img src="photo4-thumb.jpg" alt="On stage"></button>
-    <button data-full="photo5.jpg" data-caption="Backstage"><img src="photo5-thumb.jpg" alt="Backstage"></button>
-    <button data-full="photo6.jpg" data-caption="Portrait"><img src="photo6-thumb.jpg" alt="Portrait 2"></button>
-  </div> -->
 </div>
 
-<!-- CV -->
+<!-- CV - МОЯ ВЕРСИЯ -->
 <section id="cv" aria-labelledby="cv-heading">
-  <h2 id="cv-heading">Curriculum Vitae</h2>
-  <p class="lead">Sergei Mkrtichian — concert violinist. Educated at leading conservatories, prize-winner of international competitions, performer in major halls across Europe and beyond.</p>
+  <h2 id="cv-heading" class="text-reveal">Curriculum Vitae</h2>
+  <p class="lead text-reveal">Sergei Mkrtichian — concert violinist. Educated at leading conservatories, prize-winner of international competitions, performer in major halls across Europe and beyond.</p>
 
   <div class="cv-actions">
-    <a class="btn download" href="Sergei_Mkrtichian_CV.pdf" target="_blank" rel="noopener">
+    <a class="btn download text-reveal" href="Sergei_Mkrtichian_CV.pdf" target="_blank" rel="noopener">
       <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 3v10m0 0 4-4m-4 4-4-4M4 21h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
       Download CV (PDF)
     </a>
 
-    <a class="btn view" href="#" id="viewPdfBtn" title="View CV in browser">
+<!--     <a class="btn view text-reveal" href="#" id="viewPdfBtn" title="View CV in browser">
       <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21 12v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
       View CV
-    </a>
+    </a> -->
   </div>
 
   <div class="cv-details">
-    <div class="cv-block">
+    <div class="cv-block text-reveal">
       <h3>Education</h3>
       <ul>
-        <li>Conservatory of the Italian Switzerland 2024 - Present Time.  </li>
-        <li>Academic Music College of Moscow State Conservatory named after P.I. Tchaikovsky 2015 - Present time.  
-</li>
+        <li>Conservatory of the Italian Switzerland 2024 - Present Time.</li>
+        <li>Academic Music College of Moscow State Conservatory named after P.I. Tchaikovsky 2015 - Present time.</li>
       </ul>
     </div>
 
-    <div class="cv-block">
+    <div class="cv-block text-reveal">
       <h3>Competitions & Awards</h3>
       <ul>
         <li>2024 – Second prize at the 20th Khachaturian International Competition</li>
-        <li>2023 – Third Prize at the Tchaikovsky Youth International Competition. </li>
+        <li>2023 – Third Prize at the Tchaikovsky Youth International Competition.</li>
       </ul>
     </div>
 
-    <div class="cv-block">
+    <div class="cv-block text-reveal">
       <h3>Concert Highlights</h3>
       <ul>
         <li>Moscow State Kremlin Palace</li>
@@ -302,22 +604,22 @@
 
 <!-- Performances -->
 <section id="performances">
-  <h2>Recent Performances</h2>
+  <h2 class="text-reveal">Recent Performances</h2>
   <div class="video-grid">
-    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/nX7k7yeU0yM" allowfullscreen></iframe></div>
-    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/sCxiMHqT4Gc" allowfullscreen></iframe></div>
-    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/NjxJHLJn62E" allowfullscreen></iframe></div>
-    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/_C4V_rPluoY" allowfullscreen></iframe></div>
+    <div class="video-wrapper text-reveal"><iframe src="https://www.youtube.com/embed/nX7k7yeU0yM" allowfullscreen loading="lazy"></iframe></div>
+    <div class="video-wrapper text-reveal"><iframe src="https://www.youtube.com/embed/sCxiMHqT4Gc" allowfullscreen loading="lazy"></iframe></div>
+    <div class="video-wrapper text-reveal"><iframe src="https://www.youtube.com/embed/NjxJHLJn62E" allowfullscreen loading="lazy"></iframe></div>
+    <div class="video-wrapper text-reveal"><iframe src="https://www.youtube.com/embed/_C4V_rPluoY" allowfullscreen loading="lazy"></iframe></div>
   </div>
 </section>
 
-<!-- Contacts -->
+<!-- Contacts - МОЯ ВЕРСИЯ -->
 <section id="contacts">
-  <h2>Contact</h2>
+  <h2 class="text-reveal">Contact</h2>
   <div class="contact-inner">
-    <p>For concert bookings, masterclasses, and collaborations please contact:</p>
+    <p class="text-reveal">For concert bookings, masterclasses, and collaborations please contact:</p>
     <div class="contact-actions">
-      <a class="email-btn" href="mailto:mkrtiart1959@gmail.com" rel="noopener">
+      <a class="email-btn text-reveal" href="mailto:mkrtiart1959@gmail.com" rel="noopener">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm0 2v.01l8 5 8-5V6H4Zm16 12V8.24l-8 5-8-5V18h16Z"/></svg>
         mkrtiart1959@gmail.com
       </a>
@@ -325,6 +627,7 @@
   </div>
 </section>
 
+<!-- Footer - МОЯ ВЕРСИЯ -->
 <footer>
   © 2025 Sergei Mkrtichian. This website is licensed under the
   <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener">Apache License 2.0</a>.
@@ -340,14 +643,32 @@
 </div>
 
 <script>
-/* Loader & hero behavior (восстановлен) */
+/* Loader & hero behavior */
 const hero = document.getElementById('hero');
-const img = document.getElementById('heroImg');
+const heroImg = document.getElementById('heroImg');
 const header = document.getElementById('header');
 const loader = document.getElementById('loader');
-const maxScale = 1.7;
+// ИСПРАВЛЕНО: уменьшил масштаб с 1.7 до 1.4 - теперь увеличение будет более умеренным
+const maxScale = 1.4;
 let currentScale = 1;
 
+// Убеждаемся, что изображение всегда загружается правильно
+function initHeroImage() {
+  // Проверяем, загружено ли изображение
+  if (heroImg.complete) {
+    heroImg.classList.add('loaded');
+  } else {
+    heroImg.onload = () => {
+      heroImg.classList.add('loaded');
+    };
+    heroImg.onerror = () => {
+      console.error('Hero image failed to load');
+      heroImg.classList.add('loaded'); // Все равно показываем фон
+    };
+  }
+}
+
+// Показываем/скрываем лоадер
 const isFirstVisit = !localStorage.getItem('visited');
 if(isFirstVisit){
   localStorage.setItem('visited', 'true');
@@ -356,15 +677,32 @@ if(isFirstVisit){
   loader.style.display = 'none';
 }
 
-img.onload = () => {
-  hero.classList.add('loaded');
-  if(isFirstVisit){
+// Инициализируем главное изображение
+initHeroImage();
+
+// Скрываем лоадер после полной загрузки страницы
+window.addEventListener('load', () => {
+  setTimeout(() => {
     loader.classList.add('hidden');
-    setTimeout(()=>loader.style.display='none',800);
-  } else {
-    // просто показать изображение сразу, loader уже скрыт
-  }
-}
+    setTimeout(() => {
+      loader.style.display = 'none';
+      
+      // Анимация элементов header
+      const logo = document.querySelector('header img.logo');
+      const navLinks = document.querySelectorAll('nav a');
+      
+      if (logo) logo.classList.add('visible');
+      navLinks.forEach((link, index) => {
+        setTimeout(() => {
+          link.classList.add('visible');
+        }, index * 100);
+      });
+      
+      // Инициируем анимацию при скролле
+      initScrollAnimations();
+    }, 800);
+  }, 500);
+});
 
 /* Parallax + header animation */
 function animate() {
@@ -379,7 +717,7 @@ function animate() {
   }
   const targetScale = 1 + progress * (maxScale - 1);
   currentScale += (targetScale - currentScale) * 0.1;
-  img.style.transform = `scale(${currentScale})`;
+  heroImg.style.transform = `scale(${currentScale})`;
 
   const appearProgress = Math.min(scrollY / 300, 1);
   const bgOpacity = 0.35 * appearProgress;
@@ -396,17 +734,53 @@ function animate() {
 }
 requestAnimationFrame(animate);
 
-/* Video reveal on scroll */
-const videos = document.querySelectorAll('.video-wrapper');
-const observer = new IntersectionObserver((entries)=>{
-  entries.forEach(entry=>{
-    if(entry.isIntersecting){
-      entry.target.classList.add('visible');
-      observer.unobserve(entry.target);
-    }
+/* Анимация при скролле для всех элементов */
+function initScrollAnimations() {
+  // Элементы для анимации
+  const animatedElements = [
+    ...document.querySelectorAll('.text-reveal'),
+    ...document.querySelectorAll('.socials a'),
+    ...document.querySelectorAll('.bio-photos button'),
+    ...document.querySelectorAll('.cv-actions a.btn'),
+    ...document.querySelectorAll('.cv-block'),
+    ...document.querySelectorAll('.video-wrapper'),
+    ...document.querySelectorAll('.contact-actions a.email-btn')
+  ];
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        // ИСПРАВЛЕНО: для видео уменьшил задержку с 400 до 150ms
+        const delay = entry.target.classList.contains('video-wrapper') ? 150 : 100;
+        
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+          
+          // Для видео дополнительно запускаем анимацию появления самого iframe
+          if (entry.target.classList.contains('video-wrapper')) {
+            const iframe = entry.target.querySelector('iframe');
+            if (iframe) {
+              // Даем немного времени для загрузки iframe (уменьшил с 300 до 100ms)
+              setTimeout(() => {
+                iframe.style.opacity = '1';
+              }, 100);
+            }
+          }
+        }, delay);
+        
+        observer.unobserve(entry.target);
+      }
+    });
+  }, {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
   });
-},{threshold:0.2});
-videos.forEach(v=>observer.observe(v));
+
+  // Наблюдаем за всеми элементами
+  animatedElements.forEach(el => {
+    if (el) observer.observe(el);
+  });
+}
 
 /* Modal (image + PDF) */
 const modal = document.getElementById('modal');
@@ -441,6 +815,7 @@ function showModal(){
   modal.setAttribute('aria-hidden','false');
   document.body.style.overflow = 'hidden';
 }
+
 function closeModal(){
   modal.classList.remove('visible');
   modal.setAttribute('aria-hidden','true');
@@ -470,22 +845,24 @@ modalClose.addEventListener('click', closeModal);
 modal.addEventListener('click', (e)=>{ if(e.target === modal) closeModal(); });
 document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeModal(); });
 
-/* ADDED: trigger header animation exactly like video reveal (fade + translateY) */
-/* minimal, non-intrusive: adds `.visible` to logo and nav links on DOMContentLoaded */
-document.addEventListener('DOMContentLoaded', () => {
-  const logo = document.querySelector('header img.logo');
-  const links = Array.from(document.querySelectorAll('header nav a'));
-  if (logo) {
-    // show logo with same timing as video (no delay)
-    logo.classList.add('visible');
+/* Предотвращаем проблемы с изображением героя */
+window.addEventListener('pageshow', function(event) {
+  if (event.persisted) {
+    heroImg.classList.remove('loaded');
+    setTimeout(() => {
+      heroImg.classList.add('loaded');
+    }, 50);
   }
-  // stagger links slightly (keeps YouTube-like feel)
-  links.forEach((link, i) => {
-    setTimeout(() => link.classList.add('visible'), i * 80);
+});
+
+/* Предзагрузка изображений для лучшей производительности */
+document.addEventListener('DOMContentLoaded', () => {
+  const preloadImages = ['s.JPG', 'logo.jpg'];
+  preloadImages.forEach(src => {
+    const img = new Image();
+    img.src = src;
   });
 });
-/* end ADDED */
-
 </script>
 </body>
 </html>
