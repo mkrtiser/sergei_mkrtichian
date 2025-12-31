@@ -11,7 +11,8 @@
     --dark-gray: #0b0b0b;
     --light-cream: #fbf8f4;
     --muted: #7a7a7a;
-    --accent: #0078d7;
+    --accent: #B8860B; /* Скрипичный золотистый вместо синего */
+    --accent-light: #DAA520; /* Более светлый золотистый */
     --hero-fp-x: 33.3%;
     --hero-fp-y: 37.8%;
   }
@@ -30,7 +31,7 @@
   .text-reveal {
     opacity: 0;
     transform: translateY(30px);
-    transition: opacity 1s ease, transform 1s ease;
+    transition: opacity 0.8s ease, transform 0.8s ease;
     will-change: opacity, transform;
   }
   .text-reveal.visible {
@@ -95,9 +96,19 @@
     opacity: 1;
   }
 
-  /* About */
+  /* About - с разделительной линией сверху */
   .text-block{
-    background:var(--light-cream);color:#05053b;padding:120px 20px 60px;text-align:center
+    background:var(--light-cream);color:#05053b;padding:120px 20px 60px;text-align:center;
+    position: relative;
+  }
+  .text-block:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-light));
   }
   .text-block h1{
     font-size:42px;font-weight:400;margin:0 0 14px;
@@ -131,7 +142,7 @@
   .socials a.instagram{background:linear-gradient(45deg,#f58529,#dd2a7b,#8134af,#515bd4)}
   .socials a.facebook{background:#1877f2}
   .socials a.youtube{background:#ff0000}
-  .socials a.email{background:linear-gradient(45deg,#0078d7,#00a1f1)}
+  .socials a.email{background:linear-gradient(45deg,var(--accent),var(--accent-light))}
   .socials a:hover{transform:scale(1.04);opacity:.95}
 
   /* Bio photos */
@@ -154,60 +165,161 @@
   }
   .bio-photos button:hover{transform:scale(1.03);opacity:.95}
 
-  /* CV section */
+  /* МОЙ КОД ДЛЯ CV SECTION */
   #cv{
-    background:var(--dark-gray);padding:90px 20px 120px;color:#fff;
-    text-align:center;border-top:1px solid rgba(255,255,255,0.04)
+    background:var(--dark-gray);
+    padding:90px 20px 120px;
+    color:#fff;
+    text-align:center;
+    position: relative;
+  }
+  #cv:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-light));
   }
   #cv h2{
-    font-size:38px;font-weight:400;margin-bottom:12px;
-  }
-  #cv p.lead{
-    max-width:900px;margin:0 auto 20px;color:#ccc;font-size:18px;line-height:1.6;
-  }
-  .cv-actions{
-    display:flex;gap:16px;justify-content:center;margin:18px 0 34px;
-  }
-  .cv-actions a.btn{
-    display:inline-flex;align-items:center;gap:10px;text-decoration:none;
-    color:#fff;border-radius:50px;padding:12px 36px;font-weight:500;font-size:16px;
+    font-size:38px;
+    font-weight:400;
+    margin-bottom:12px;
     opacity: 0;
     transform: translateY(20px);
     transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  #cv h2.visible{
+    opacity: 1;
+    transform: translateY(0);
+  }
+  #cv p.lead{
+    max-width:900px;
+    margin:0 auto 20px;
+    color:#ccc;
+    font-size:18px;
+    line-height:1.6;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease 0.1s, transform 0.8s ease 0.1s;
+  }
+  #cv p.lead.visible{
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .cv-actions{
+    display:flex;
+    gap:16px;
+    justify-content:center;
+    margin:30px 0 50px;
+    flex-wrap: wrap;
+  }
+  .cv-actions a.btn{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    text-decoration:none;
+    color:#fff;
+    border-radius:50px;
+    padding:14px 36px;
+    font-weight:500;
+    font-size:16px;
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateY(15px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
   }
   .cv-actions a.btn.visible{
     opacity: 1;
     transform: translateY(0);
   }
   .cv-actions a.btn.download{
-    background:linear-gradient(45deg,#1b1b1b,#2b2b2b);
-    border:1px solid rgba(255,255,255,0.06)
+    background:var(--dark-gray);
+    border:1px solid rgba(255,255,255,0.1);
   }
-  .cv-actions a.btn.view{background:linear-gradient(45deg,var(--accent),#00a1f1)}
+  .cv-actions a.btn.view{
+    background:linear-gradient(45deg,var(--accent),var(--accent-light));
+  }
+  .cv-actions a.btn:hover{
+    transform:translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  }
   .cv-actions a.btn svg{width:20px;height:20px;fill:currentColor}
 
   .cv-details{
-    display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:26px;max-width:1100px;margin:0 auto;text-align:left
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:40px;
+    max-width:1100px;
+    margin:0 auto;
+    text-align:left
   }
   .cv-block{
     opacity: 0;
     transform: translateY(20px);
     transition: opacity 0.8s ease, transform 0.8s ease;
+    padding: 30px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.05);
   }
   .cv-block.visible{
     opacity: 1;
     transform: translateY(0);
   }
-  .cv-block h3{color:#fff;margin-top:0;margin-bottom:8px;font-size:18px;font-weight:500}
-  .cv-block ul{margin:0;padding-left:20px;color:#cfcfcf;line-height:1.6}
+  .cv-block h3{
+    color:#fff;
+    margin-top:0;
+    margin-bottom:15px;
+    font-size:20px;
+    font-weight:600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .cv-block h3:before {
+    content: '';
+    width: 4px;
+    height: 20px;
+    background: var(--accent);
+    border-radius: 2px;
+  }
+  .cv-block ul{
+    margin:0;
+    padding-left:20px;
+    color:#cfcfcf;
+    line-height:1.8;
+    font-size: 16px;
+  }
+  .cv-block ul li {
+    margin-bottom: 8px;
+    position: relative;
+  }
 
-  /* Performances */
+  /* Performances - с разделительной линией сверху */
   #performances{
-    background:var(--black);padding:100px 20px 140px;text-align:center
+    background:var(--black);padding:100px 20px 140px;text-align:center;
+    position: relative;
+  }
+  #performances:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-light));
   }
   #performances h2{
     color:#fff;font-size:42px;font-weight:400;margin-bottom:60px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  #performances h2.visible{
+    opacity: 1;
+    transform: translateY(0);
   }
   .video-grid{
     display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
@@ -219,41 +331,131 @@
     background: #000;
     border: 1px solid rgba(255,255,255,0.03);
     opacity: 0;
-    transform: translateY(50px);
-    transition: opacity 1.2s ease, transform 1.2s ease;
+    transform: translateY(30px);
+    transition: opacity 1s ease, transform 1s ease; /* Ускорил с 1s до 0.8s */
   }
   .video-wrapper.visible {
     opacity: 1;
     transform: translateY(0);
   }
-  .video-wrapper iframe {position: absolute;top: 0;left: 0;width: 100%;height: 100%;border: 0;}
-
-  /* Contacts */
-  #contacts{
-    background:var(--light-cream);color:#05053b;padding:80px 20px;text-align:center
+  .video-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    opacity: 0;
+    transition: opacity 0.3s ease 0.1s; /* Ускорил: была задержка 0.3s, теперь 0.1s */
   }
-  #contacts h2{font-size:30px;margin-bottom:12px}
-  .contact-inner{max-width:800px;margin:0 auto}
-  .contact-inner p{color:#333;margin-bottom:18px}
-  .contact-actions{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
-  .contact-actions a.email-btn{
-    display:inline-flex;align-items:center;gap:10px;text-decoration:none;
-    color:#fff;border-radius:50px;padding:12px 36px;font-weight:500;
-    background:linear-gradient(45deg,var(--accent),#00a1f1);
+  .video-wrapper.visible iframe {
+    opacity: 1;
+  }
+
+  /* МОЙ КОД ДЛЯ CONTACTS */
+  #contacts{
+    background:var(--light-cream);
+    color:#05053b;
+    padding:80px 20px;
+    text-align:center;
+    position: relative;
+  }
+  #contacts:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-light));
+  }
+  #contacts h2{
+    font-size:30px;
+    margin-bottom:12px;
     opacity: 0;
     transform: translateY(20px);
     transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  #contacts h2.visible{
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .contact-inner{
+    max-width:800px;
+    margin:0 auto
+  }
+  .contact-inner p{
+    color:#333;
+    margin-bottom:18px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease 0.1s, transform 0.8s ease 0.1s;
+  }
+  .contact-inner p.visible{
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .contact-actions{
+    display:flex;
+    gap:16px;
+    justify-content:center;
+    flex-wrap:wrap
+  }
+  .contact-actions a.email-btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    text-decoration:none;
+    color:#fff;
+    border-radius:50px;
+    padding:14px 36px;
+    font-weight:500;
+    background:linear-gradient(45deg,var(--accent),var(--accent-light));
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateY(15px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
   }
   .contact-actions a.email-btn.visible{
     opacity: 1;
     transform: translateY(0);
   }
-  .contact-actions a.email-btn svg{width:20px;height:20px;fill:currentColor}
+  .contact-actions a.email-btn:hover{
+    transform:translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  }
+  .contact-actions a.email-btn svg{
+    width:20px;
+    height:20px;
+    fill:currentColor
+  }
 
-  /* Footer */
+  /* МОЙ КОД ДЛЯ FOOTER */
   footer {
-    background:var(--frame);color:#ccc;text-align:center;
-    font-size:15px;padding:34px 20px;border-top:1px solid rgba(255,255,255,0.06)
+    background:var(--frame);
+    color:#ccc;
+    text-align:center;
+    font-size:15px;
+    padding:40px 20px;
+    border-top:1px solid rgba(255,255,255,0.05);
+    position: relative;
+  }
+  footer:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-light));
+  }
+  footer a {
+    color: var(--accent);
+    transition: color 0.3s ease;
+  }
+  footer a:hover {
+    color: var(--accent-light);
   }
 
   /* Loader */
@@ -279,8 +481,8 @@
     filter:none;
   }
   .spinner {
-    width:50px; height:50px; border:6px solid rgba(255,255,255,0.15);
-    border-top-color:#fff; border-radius:50%; animation: spin 1s linear infinite;
+    width:50px; height:50px; border:6px solid rgba(201, 163, 74, 0.15); /* Золотистый вместо белого */
+    border-top-color:var(--accent); border-radius:50%; animation: spin 1s linear infinite;
   }
   @keyframes spin {to{transform:rotate(360deg)}}
 
@@ -338,42 +540,42 @@
 
   <!-- social buttons -->
   <div class="socials" aria-hidden="false">
-    <a class="instagram" href="https://www.instagram.com/sergunchik_mk/" target="_blank" rel="noopener">
+    <a class="instagram text-reveal" href="https://www.instagram.com/sergunchik_mk/" target="_blank" rel="noopener">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2Zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5A4.25 4.25 0 0 0 20.5 16.25v-8.5A4.25 4.25 0 0 0 16.25 3.5h-8.5Zm8.75 2.25a.75.75 0 1 1 0 1.5h-.01a.75.75 0 1 1 0-1.5h.01ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 1.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"/></svg>
       Instagram
     </a>
 
-    <a class="facebook" href="https://www.facebook.com/profile.php?id=100095484424565" target="_blank" rel="noopener">
+    <a class="facebook text-reveal" href="https://www.facebook.com/profile.php?id=100095484424565" target="_blank" rel="noopener">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M22 12a10 10 0 1 0-11.5 9.9v-7H8v-3h2.5V9.5c0-2.4 1.4-3.8 3.6-3.8 1 0 2 .2 2 .2v2.2H15c-1.2 0-1.6.8-1.6 1.5V12H17l-.5 3h-3v7A10 10 0 0 0 22 12Z"/></svg>
       Facebook
     </a>
 
-    <a class="youtube" href="https://youtube.com/@sergei_mkrtichian?si=yijFIbmlZmJFL3BU" target="_blank" rel="noopener">
+    <a class="youtube text-reveal" href="https://youtube.com/@sergei_mkrtichian?si=yijFIbmlZmJFL3BU" target="_blank" rel="noopener">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21.8 8s-.2-1.4-.8-2c-.8-.8-1.7-.8-2.2-.9C16.2 4.9 12 4.9 12 4.9h-.1s-4.2 0-6.8.2c-.5 0-1.5.1-2.2.9-.6.6-.8 2-.8 2S2 9.6 2 11.2v1.6c0 1.6.2 3.2.2 3.2s.2 1.4.8 2c.8.8 1.8.8 2.3.9 1.7.2 7 .2 7 .2s4.2 0 6.8-.2c.5 0 1.5-.1 2.2-.9.6-.6.8-2 .8-2s.2-1.6.2-3.2v-1.6c0-1.6-.2-3.2-.2-3.2ZM10 14.7V9.3l5.2 2.7L10 14.7Z"/></svg>
       YouTube
     </a>
   </div>
 </div>
 
-<!-- CV -->
+<!-- CV - МОЯ ВЕРСИЯ -->
 <section id="cv" aria-labelledby="cv-heading">
   <h2 id="cv-heading" class="text-reveal">Curriculum Vitae</h2>
   <p class="lead text-reveal">Sergei Mkrtichian — concert violinist. Educated at leading conservatories, prize-winner of international competitions, performer in major halls across Europe and beyond.</p>
 
   <div class="cv-actions">
-    <a class="btn download" href="Sergei_Mkrtichian_CV.pdf" target="_blank" rel="noopener">
+    <a class="btn download text-reveal" href="Sergei_Mkrtichian_CV.pdf" target="_blank" rel="noopener">
       <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 3v10m0 0 4-4m-4 4-4-4M4 21h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
       Download CV (PDF)
     </a>
 
-    <a class="btn view" href="#" id="viewPdfBtn" title="View CV in browser">
+<!--     <a class="btn view text-reveal" href="#" id="viewPdfBtn" title="View CV in browser">
       <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21 12v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
       View CV
-    </a>
+    </a> -->
   </div>
 
   <div class="cv-details">
-    <div class="cv-block">
+    <div class="cv-block text-reveal">
       <h3>Education</h3>
       <ul>
         <li>Conservatory of the Italian Switzerland 2024 - Present Time.</li>
@@ -381,7 +583,7 @@
       </ul>
     </div>
 
-    <div class="cv-block">
+    <div class="cv-block text-reveal">
       <h3>Competitions & Awards</h3>
       <ul>
         <li>2024 – Second prize at the 20th Khachaturian International Competition</li>
@@ -389,7 +591,7 @@
       </ul>
     </div>
 
-    <div class="cv-block">
+    <div class="cv-block text-reveal">
       <h3>Concert Highlights</h3>
       <ul>
         <li>Moscow State Kremlin Palace</li>
@@ -404,20 +606,20 @@
 <section id="performances">
   <h2 class="text-reveal">Recent Performances</h2>
   <div class="video-grid">
-    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/nX7k7yeU0yM" allowfullscreen></iframe></div>
-    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/sCxiMHqT4Gc" allowfullscreen></iframe></div>
-    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/NjxJHLJn62E" allowfullscreen></iframe></div>
-    <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/_C4V_rPluoY" allowfullscreen></iframe></div>
+    <div class="video-wrapper text-reveal"><iframe src="https://www.youtube.com/embed/nX7k7yeU0yM" allowfullscreen loading="lazy"></iframe></div>
+    <div class="video-wrapper text-reveal"><iframe src="https://www.youtube.com/embed/sCxiMHqT4Gc" allowfullscreen loading="lazy"></iframe></div>
+    <div class="video-wrapper text-reveal"><iframe src="https://www.youtube.com/embed/NjxJHLJn62E" allowfullscreen loading="lazy"></iframe></div>
+    <div class="video-wrapper text-reveal"><iframe src="https://www.youtube.com/embed/_C4V_rPluoY" allowfullscreen loading="lazy"></iframe></div>
   </div>
 </section>
 
-<!-- Contacts -->
+<!-- Contacts - МОЯ ВЕРСИЯ -->
 <section id="contacts">
   <h2 class="text-reveal">Contact</h2>
   <div class="contact-inner">
     <p class="text-reveal">For concert bookings, masterclasses, and collaborations please contact:</p>
     <div class="contact-actions">
-      <a class="email-btn" href="mailto:mkrtiart1959@gmail.com" rel="noopener">
+      <a class="email-btn text-reveal" href="mailto:mkrtiart1959@gmail.com" rel="noopener">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm0 2v.01l8 5 8-5V6H4Zm16 12V8.24l-8 5-8-5V18h16Z"/></svg>
         mkrtiart1959@gmail.com
       </a>
@@ -425,6 +627,7 @@
   </div>
 </section>
 
+<!-- Footer - МОЯ ВЕРСИЯ -->
 <footer>
   © 2025 Sergei Mkrtichian. This website is licensed under the
   <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener">Apache License 2.0</a>.
@@ -440,12 +643,13 @@
 </div>
 
 <script>
-/* Loader & hero behavior - ФИКС ПРОПАДАНИЯ ФОТО */
+/* Loader & hero behavior */
 const hero = document.getElementById('hero');
 const heroImg = document.getElementById('heroImg');
 const header = document.getElementById('header');
 const loader = document.getElementById('loader');
-const maxScale = 1.7;
+// ИСПРАВЛЕНО: уменьшил масштаб с 1.7 до 1.4 - теперь увеличение будет более умеренным
+const maxScale = 1.4;
 let currentScale = 1;
 
 // Убеждаемся, что изображение всегда загружается правильно
@@ -546,7 +750,24 @@ function initScrollAnimations() {
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
+        // ИСПРАВЛЕНО: для видео уменьшил задержку с 400 до 150ms
+        const delay = entry.target.classList.contains('video-wrapper') ? 150 : 100;
+        
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+          
+          // Для видео дополнительно запускаем анимацию появления самого iframe
+          if (entry.target.classList.contains('video-wrapper')) {
+            const iframe = entry.target.querySelector('iframe');
+            if (iframe) {
+              // Даем немного времени для загрузки iframe (уменьшил с 300 до 100ms)
+              setTimeout(() => {
+                iframe.style.opacity = '1';
+              }, 100);
+            }
+          }
+        }, delay);
+        
         observer.unobserve(entry.target);
       }
     });
@@ -559,19 +780,6 @@ function initScrollAnimations() {
   animatedElements.forEach(el => {
     if (el) observer.observe(el);
   });
-
-  // Анимация видео
-  const videos = document.querySelectorAll('.video-wrapper');
-  const videoObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-        videoObserver.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.2 });
-  
-  videos.forEach(v => videoObserver.observe(v));
 }
 
 /* Modal (image + PDF) */
@@ -637,19 +845,18 @@ modalClose.addEventListener('click', closeModal);
 modal.addEventListener('click', (e)=>{ if(e.target === modal) closeModal(); });
 document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeModal(); });
 
-/* Принудительная перезагрузка изображения при возврате на страницу */
+/* Предотвращаем проблемы с изображением героя */
 window.addEventListener('pageshow', function(event) {
   if (event.persisted) {
     heroImg.classList.remove('loaded');
     setTimeout(() => {
       heroImg.classList.add('loaded');
-    }, 100);
+    }, 50);
   }
 });
 
-/* Анимация элементов при загрузке DOM */
+/* Предзагрузка изображений для лучшей производительности */
 document.addEventListener('DOMContentLoaded', () => {
-  // Предзагрузка основных изображений
   const preloadImages = ['s.JPG', 'logo.jpg'];
   preloadImages.forEach(src => {
     const img = new Image();
