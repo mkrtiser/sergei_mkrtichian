@@ -646,120 +646,128 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
   /* -------------------------
-   Равномерное уменьшение всех ссылок в nav
+/* -------------------------
+   Пропорциональное (равномерное) уменьшение содержимого nav
+   — учитываем реальные границы текста (без padding)
    ------------------------- */
 (function(){
-  const NAV_MIN_LINK_SCALE = 0.72; // минимальный общий масштаб (подстройте при необходимости)
-  const SCALE_EPS = 0.0001;
-  const MAX_ITERS = 3; // обычно 1 итерации хватает, но даём пару попыток
+  const MIN_SCALE = 0.68; // минимальный коэффициент (подберите по вкусу)
+  const EPS = 0.5; // запас в px для сравнения ("влезает/не влезает")
 
-  function uniformAdjustNavLinks(headerEl) {
+  const headerEl = document.getElementById('header');
+  if (!headerEl) return;
+
+  // Утилита: обёртываем содержимое ссылки span.link-inner (если ещё не обёрнуто)
+  function ensureInner(link) {
+    if (link.querySelector('.link-inner')) return link.querySelector('.link-inner');
+    const inner = document.createElement('span');
+    inner.className = 'link-inner';
+    // Перенесём все дочерние узлы внутрь inner
+    while (link.firstChild) inner.appendChild(link.firstChild);
+    // Сбросим пользовательские стили на inner чтобы вести корректные измерения
+    inner.style.display = 'inline-block';
+    inner.style.whiteSpace = 'nowrap';
+    inner.style.lineHeight = '1'; // оставить управление высотой ссылок на link
+    link.appendChild(inner);
+    return inner;
+  }
+
+  function parsePx(value) {
+    return Number.parseFloat(value) || 0;
+  }
+
+  function adjustNavProportional() {
     const nav = headerEl.querySelector('nav');
     if (!nav) return;
     const links = Array.from(nav.querySelectorAll('a'));
     if (links.length === 0) return;
 
-    // Сохраняем оригинальный font-size (если ещё не сохранён)
+    // Сохраняем оригинальные font-size для inner (если ещё не сохранено) и создаём inner
     links.forEach(l => {
-      if (!l.dataset.origFontSize) {
-        l.dataset.origFontSize = getComputedStyle(l).fontSize;
+      const inner = ensureInner(l);
+      if (!inner.dataset.origFontSize) {
+        // берём computed font-size для inner (наследуется от a)
+        inner.dataset.origFontSize = getComputedStyle(inner).fontSize;
       }
-      // Сначала сбрасываем к оригиналу, чтобы корректно измерить "нативные" ширины
-      l.style.fontSize = l.dataset.origFontSize;
-      // Убираем трансформации, min-width и пр., чтобы измерения были корректны
-      l.style.minWidth = '';
-      l.style.transform = '';
-      l.style.whiteSpace = 'nowrap';
+      // Сбрасываем на оригинал перед измерением
+      inner.style.fontSize = inner.dataset.origFontSize;
+      inner.style.transform = '';
     });
 
-    // Вычисляем доступную ширину для nav (включая padding, но без внешних отступов)
-    // Используем clientWidth nav — это внутреннее пространство, доступное под содержимое.
+    // Вычисляем доступное место внутри nav
     const available = nav.clientWidth;
 
-    // Желаемый gap между ссылками (в px) — используем computed gap (column-gap)
+    // Узнаём CSS gap (в px) — fallback 18px
     const navStyle = getComputedStyle(nav);
-    let desiredGap = parseFloat(navStyle.gap);
-    if (Number.isNaN(desiredGap)) desiredGap = 18; // fallback
+    let gap = parsePx(navStyle.gap);
+    if (!gap) gap = 18;
 
-    // Собираем суммарные "нативные" ширины (offsetWidth / getBoundingClientRect)
-    // Используем getBoundingClientRect для точности.
-    let widths = links.map(l => {
-      const rect = l.getBoundingClientRect();
-      return rect.width;
+    // Собираем paddings каждой ссылки (левый+правый) и "content widths" (inner.getBoundingClientRect())
+    let totalPadding = 0;
+    const contentWidths = links.map(l => {
+      const cs = getComputedStyle(l);
+      const padding = parsePx(cs.paddingLeft) + parsePx(cs.paddingRight);
+      totalPadding += padding;
+      const inner = ensureInner(l);
+      const rect = inner.getBoundingClientRect();
+      // Если inner пуст (редкий случай) — fallback на bounding rect всей ссылки
+      const contentW = (rect && rect.width) ? rect.width : l.getBoundingClientRect().width - padding;
+      return contentW;
     });
 
-    // Сумма ширин и общих gaps
-    const totalWidths = widths.reduce((s,w) => s + w, 0);
-    const totalGaps = desiredGap * Math.max(0, links.length - 1);
+    const totalContent = contentWidths.reduce((s, w) => s + w, 0);
+    const totalGaps = gap * Math.max(0, links.length - 1);
 
-    // Если влезает без изменений — просто вернем оригинальные размеры
-    if (totalWidths + totalGaps <= available + 0.5) {
-      links.forEach(l => { l.style.fontSize = l.dataset.origFontSize; });
+    // Если всё влезает — восстанавливаем оригинальные размеры и выходим
+    if (totalContent + totalPadding + totalGaps <= available + EPS) {
+      links.forEach(l => {
+        const inner = ensureInner(l);
+        inner.style.fontSize = inner.dataset.origFontSize;
+      });
       return;
     }
 
-    // Ищем единый коэффициент s такой, что s * totalWidths + totalGaps <= available
-    // => s <= (available - totalGaps) / totalWidths
-    let s = (available - totalGaps) / totalWidths;
-    if (!isFinite(s) || s <= 0) s = NAV_MIN_LINK_SCALE;
+    // Иначе — вычисляем единый коэффициент s, чтобы пропорционально уменьшить содержимое
+    // s = (available - totalPadding - totalGaps) / totalContent
+    let s = (available - totalPadding - totalGaps) / totalContent;
+    if (!isFinite(s) || s <= 0) s = MIN_SCALE;
     if (s > 1) s = 1;
-    if (s < NAV_MIN_LINK_SCALE) s = NAV_MIN_LINK_SCALE;
+    if (s < MIN_SCALE) s = MIN_SCALE;
 
-    // Применим s и проверим (даём несколько итераций, потому что при изменении fontSize
-    // ширины могут немного поменяться из-за Rounding/line-height и т.д.)
-    let iter = 0;
-    while (iter < MAX_ITERS) {
-      links.forEach((l, idx) => {
-        const orig = parseFloat(l.dataset.origFontSize);
-        l.style.fontSize = (orig * s) + 'px';
-      });
+    // Применяем s к font-size каждого inner (пропорционально их исходному font-size)
+    links.forEach((l, idx) => {
+      const inner = ensureInner(l);
+      const orig = parsePx(inner.dataset.origFontSize);
+      inner.style.fontSize = (orig * s) + 'px';
+      // transform-origin на всякий случай, чтобы масштаб выглядел естественно
+      inner.style.transformOrigin = 'left center';
+    });
 
-      // Немного подождём рендер (через requestAnimationFrame) чтобы измерить снова
-      // (но поскольку это внутри функции синхронно, используем getBoundingClientRect сразу)
-      const newWidths = links.map(l => l.getBoundingClientRect().width);
-      const newTotal = newWidths.reduce((a,b)=>a+b,0);
-      if (newTotal + totalGaps <= available + 0.5) break;
-
-      // Пересчитаем s заново (коррекция)
-      let newS = (available - totalGaps) / newTotal;
-      if (!isFinite(newS) || newS <= 0) newS = NAV_MIN_LINK_SCALE;
-      if (newS > s) newS = s; // не увеличиваем выше текущего s
-      if (newS < NAV_MIN_LINK_SCALE) newS = NAV_MIN_LINK_SCALE;
-
-      // Если изменение мало — выходим
-      if (Math.abs(newS - s) < SCALE_EPS) break;
-      s = newS;
-      iter++;
-    }
-
-    // Важно: при возврате места (resize больше) восстанавливаем оригинал в scheduleAdjust()
+    // NB: Мы изменяем font-size у внутреннего спана — это влияет на layout, поэтому
+    // при успешном срабатывании элементы займут меньше места и уже не будут налезать.
   }
 
-  // Хук для вызова (вызывайте после fitHeaderScale)
-  const headerEl = document.getElementById('header');
-  function scheduleUniformAdjust() {
-    if (!headerEl) return;
-    // Запускаем в RAF, чтобы браузер провёл reflow перед измерением
-    requestAnimationFrame(() => {
-      try {
-        uniformAdjustNavLinks(headerEl);
-      } catch (e) {
-        console.error('uniformAdjustNavLinks error', e);
-      }
+  // Debounced scheduler (легкий)
+  let raf = null;
+  function scheduleAdjust() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(() => {
+      adjustNavProportional();
+      raf = null;
     });
   }
 
-  // Подключаем к тем же событиям, что и раньше
-  window.addEventListener('resize', scheduleUniformAdjust);
-  window.addEventListener('orientationchange', scheduleUniformAdjust);
+  // Подключаем к событиям
+  window.addEventListener('resize', scheduleAdjust);
+  window.addEventListener('orientationchange', scheduleAdjust);
+  document.addEventListener('DOMContentLoaded', scheduleAdjust);
+  window.addEventListener('load', scheduleAdjust);
   if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(scheduleUniformAdjust).catch(() => scheduleUniformAdjust());
+    document.fonts.ready.then(scheduleAdjust).catch(scheduleAdjust);
   }
-  document.addEventListener('DOMContentLoaded', scheduleUniformAdjust);
-  window.addEventListener('load', scheduleUniformAdjust);
 
-  // Экспорт для отладки
-  window.uniformAdjustNavLinks = scheduleUniformAdjust;
+  // Экспорт для отладки/ручного вызова (например — вызвать в конце fitHeaderScale())
+  window.adjustNavProportional = scheduleAdjust;
 })();
 
 </script>
