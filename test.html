@@ -265,6 +265,104 @@
   .modal-close{ position:absolute; top:10px; right:10px; background:rgba(0,0,0,.5); border:0; color:#fff; padding:8px 12px; border-radius:8px; cursor:pointer; font-size:16px }
   .modal-caption{ color:#ddd; margin-top:8px; text-align:center }
   .pdf-frame{ width:95vw; height:85vh; border:0; border-radius:6px; background:#fff }
+
+  /* ===== Responsive header fixes — вставить в конец <style> =====
+   Делает header гибким: позволяет перенос, равные отступы, адаптивный логотип и шрифты.
+   Не требует правки HTML. */
+header{
+  /* разрешаем перенос элементов (логотип/навигация) при нехватке места */
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px; /* минимальный отступ между элементами */
+  box-sizing:border-box;
+  padding-left:18px;
+  padding-right:18px;
+}
+
+/* Логотип: гибкая высота, не больше оригинала, уменьшается на маленьких экранах */
+header img.logo{
+  height: clamp(32px, 6.5vw, 56px); /* от 32px до 56px, пропорционально ширине экрана */
+  max-width: 40%; /* предохраняет логотип от слишком большого расширения */
+  width: auto;
+  flex: 0 0 auto;
+  margin: 6px 0; /* вертикальный отступ при переносе */
+  object-fit:contain;
+}
+
+/* Навигация: занимает оставшееся место, может переноситься, равные отступы между ссылками */
+nav{
+  display:flex;
+  flex: 1 1 auto;      /* занимает доступное пространство */
+  gap: clamp(8px, 2.5vw, 22px);
+  align-items:center;
+  justify-content:flex-end;
+  min-width: 0;        /* важно для корректного сжатия flex-элемента */
+  flex-wrap:wrap;      /* ссылки могут переноситься на новую строку при узком экране */
+}
+
+/* Ссылки: не ломают верстку благодаря nowrap и адаптивному размеру шрифта */
+nav a{
+  white-space: nowrap; /* предотвращает перенос внутри одной ссылки */
+  padding: 6px 8px;
+  font-size: clamp(12px, 1.8vw, 16px); /* от 12px до 16px */
+  box-sizing: border-box;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  text-align:center;
+  flex: 0 0 auto; /* не растягиваем ссылки чтобы сохранить равные отступы */
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* При переносе навигации на новую строку — выравниваем элементы равномерно */
+@media (max-width: 520px){
+  /* Уменьшаем отступы header, чтобы сэкономить место */
+  header{
+    padding-left:12px;
+    padding-right:12px;
+    gap:8px;
+    height: calc(64px + env(safe-area-inset-top));
+  }
+
+  /* Логотип — чуть меньше и центрируется над/под навигацией если происходит перенос */
+  header img.logo{
+    height: clamp(28px, 8vw, 48px);
+    margin: 6px auto;
+    order: 1;
+  }
+
+  /* Навигация — при переносе занимает всю ширину и распределяет ссылки равномерно */
+  nav{
+    width:100%;
+    order: 2;
+    justify-content: space-evenly; /* равные расстояния между пунктами в узком режиме */
+    padding: 6px 0;
+  }
+
+  nav a{
+    font-size: clamp(11px, 2.2vw, 14px);
+    padding: 6px 8px;
+  }
+}
+
+/* На очень узких экранах (очень маленькие телефоны) — ещё более компактно */
+@media (max-width: 360px){
+  header img.logo{ height: 26px; }
+  nav a{ font-size: 11px; padding:4px 6px; gap:6px; }
+}
+
+/* Защита от перекрытия контента — увеличиваем z-index при необходимости */
+header{ z-index: 1100; }
+
+/* Маленькая полировка: если всё ещё нечего не помещается, даём ссылкам возможность сокращаться */
+nav a { 
+  max-width: calc(100% / 2); /* защита от слишком длинных пунктов — не требует правки HTML */
+}
+
 </style>
 </head>
 <body>
