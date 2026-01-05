@@ -645,6 +645,175 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
+  /* -------------------------
+   Дополнение: подгонка пробелов между словами (по символам)
+   ------------------------- */
+(function(){
+  const NAV_MIN_LINK_SCALE = 0.62; // минимальное относительное уменьшение каждой ссылки
+  const LINK_SHRINK_STEP = 0.985;  // шаг уменьшения при итерации (0.985 ~ -1.5% в каждом шаге)
+  const MAX_ITERS = 40;
+
+  // helper: найти текстовый узел и индекс первого/последнего непустого символа
+  function findCharNodeAndIndex(el, findFirst = true) {
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
+    if (findFirst) {
+      let node;
+      while ((node = walker.nextNode())) {
+        const txt = node.textContent || '';
+        for (let i = 0; i < txt.length; i++) {
+          if (txt[i].trim() !== '') return { node, index: i };
+        }
+      }
+    } else {
+      // ищем с конца
+      const textNodes = [];
+      let node;
+      while ((node = walker.nextNode())) textNodes.push(node);
+      for (let ni = textNodes.length - 1; ni >= 0; ni--) {
+        const txt = textNodes[ni].textContent || '';
+        for (let i = txt.length - 1; i >= 0; i--) {
+          if (txt[i].trim() !== '') return { node: textNodes[ni], index: i };
+        }
+      }
+    }
+    return null;
+  }
+
+  // helper: получить rect для конкретного символа (первого/последнего)
+  function getCharRect(anchorEl, firstOrLast = 'first') {
+    const res = findCharNodeAndIndex(anchorEl, firstOrLast === 'first');
+    if (!res) {
+      // fallback: bounding rect всей ссылки
+      return anchorEl.getBoundingClientRect();
+    }
+    const range = document.createRange();
+    try {
+      range.setStart(res.node, res.index);
+      range.setEnd(res.node, res.index + 1);
+      const rect = range.getBoundingClientRect();
+      if (rect && rect.width !== 0) return rect;
+    } catch (e) {
+      // ignore
+    }
+    return anchorEl.getBoundingClientRect();
+  }
+
+  // главная функция: подгоняет font-size у nav ссылок чтобы избежать налезания
+  function adjustNavLinksForEqualGaps(headerEl) {
+    const nav = headerEl.querySelector('nav');
+    if (!nav) return;
+    const links = Array.from(nav.querySelectorAll('a'));
+    if (links.length <= 1) {
+      // ничего не нужно подгонять
+      // также восстанавливаем оригинальные размеры (если были изменены ранее)
+      links.forEach(l => {
+        if (l.dataset.origFontSize) l.style.fontSize = l.dataset.origFontSize;
+      });
+      return;
+    }
+
+    // желаемый gap: берём текущее CSS-свойство gap навигации (в px)
+    const navStyle = getComputedStyle(nav);
+    let desiredGap = parseFloat(navStyle.gap) || 18; // fallback 18px
+    // учитываем --hs масштаб (navStyle.gap уже содержит вычисленное значение в px)
+
+    // подготовка: сохраняем оригинальные fontSize (один раз)
+    links.forEach(link => {
+      if (!link.dataset.origFontSize) {
+        link.dataset.origFontSize = getComputedStyle(link).fontSize;
+      }
+      // при каждом проходе начинаем с оригинала
+      link.style.fontSize = link.dataset.origFontSize;
+      // убираем transform/scale, чтобы измерения были корректными
+      link.style.transform = '';
+      // также сбрасываем принудительную ширину
+      link.style.minWidth = '';
+    });
+
+    // Теперь идём по парам слева-направо и добиваемся desiredGap между соседями.
+    // Если обнаруживаем нехватку места — уменьшаем font-size у предыдущей ссылки (сначала),
+    // если предыдущая уже дошла до минимума — уменьшаем следующую.
+    for (let i = 0; i < links.length - 1; i++) {
+      const prev = links[i];
+      const next = links[i + 1];
+
+      // итеративно устраняем налезание
+      let iters = 0;
+      while (iters < MAX_ITERS) {
+        const prevLast = getCharRect(prev, 'last');
+        const nextFirst = getCharRect(next, 'first');
+
+        // gap между символами (px)
+        const currentGap = nextFirst.left - prevLast.right;
+
+        if (currentGap >= desiredGap - 0.5) break; // достаточно места (параноидальный запас 0.5px)
+
+        // уменьшать будем предыдущую ссылку в первую очередь
+        const prevFont = parseFloat(getComputedStyle(prev).fontSize);
+        const prevOrig = parseFloat(prev.dataset.origFontSize);
+        let prevScale = prevFont / (prevOrig || prevFont);
+
+        if (prevScale > NAV_MIN_LINK_SCALE + 0.0001) {
+          prevScale = Math.max(NAV_MIN_LINK_SCALE, prevScale * LINK_SHRINK_STEP);
+          prev.style.fontSize = (prevOrig * prevScale) + 'px';
+        } else {
+          // предыдущая уже минимальна — уменьшаем следующую
+          const nextFont = parseFloat(getComputedStyle(next).fontSize);
+          const nextOrig = parseFloat(next.dataset.origFontSize);
+          let nextScale = nextFont / (nextOrig || nextFont);
+          if (nextScale > NAV_MIN_LINK_SCALE + 0.0001) {
+            nextScale = Math.max(NAV_MIN_LINK_SCALE, nextScale * LINK_SHRINK_STEP);
+            next.style.fontSize = (nextOrig * nextScale) + 'px';
+          } else {
+            // обе ссылки достигли минимума — выходим (не можем больше сократить)
+            break;
+          }
+        }
+        iters++;
+      }
+    }
+
+    // (опционально) финальная проверка: если шапка всё ещё переполняется,
+    // можно снизить общий --hs чуть далее (но в нашем подходе мы предпочитаем
+    // сначала локально уменьшать слова, чтобы сохранить общий масштаб).
+    // Здесь мы не трогаем --hs, потому что ваша уже существующая логика это делает.
+  }
+
+  // Экспортируем/встраиваем вызов: вызывается после fitHeaderScale()
+  // Если fitHeaderScale находится в той же области видимости, добавьте сюда вызов.
+  // Предполагаем, что window.fitHeaderScale уже определена (в вашем коде).
+  const headerEl = document.getElementById('header');
+  function scheduleAdjust() {
+    if (!headerEl) return;
+    // Небольшой таймаут на перерисовку — иначе rect может быть старым.
+    requestAnimationFrame(() => {
+      try {
+        adjustNavLinksForEqualGaps(headerEl);
+      } catch (e) {
+        // ничего страшного — не ломаем страницу
+        console.error('adjustNavLinksForEqualGaps error', e);
+      }
+    });
+  }
+
+  // Подключаем к уже существующим местам пересчёта:
+  // - в конце fitHeaderScale() (если вы хотите вставить туда вызов)
+  // - и в местах scheduleFit() / ResizeObserver
+  // Ниже добавляем слушатели на resize/orientationchange и font-load как дополнительную страховку:
+  window.addEventListener('resize', scheduleAdjust);
+  window.addEventListener('orientationchange', scheduleAdjust);
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(scheduleAdjust).catch(()=>scheduleAdjust());
+  }
+
+  // Также вызываем один раз после initial load
+  document.addEventListener('DOMContentLoaded', scheduleAdjust);
+  window.addEventListener('load', scheduleAdjust);
+
+  // И экспорт в глобальную область для ручного вызова из консоли/отладки:
+  window.adjustNavLinksForEqualGaps = () => scheduleAdjust();
+})();
+
 </script>
 </body>
 </html>
