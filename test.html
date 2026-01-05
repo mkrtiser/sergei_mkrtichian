@@ -3,7 +3,6 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<!-- Мета-теги для PWA и полноэкранного режима -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
@@ -22,88 +21,49 @@
     --dark-gray: #0b0b0b;
     --light-cream: #fbf8f4;
     --muted: #7a7a7a;
-    --accent: #B8860B; /* Скрипичный золотистый вместо синего */
-    --accent-light: #DAA520; /* Более светлый золотистый */
+    --accent: #B8860B;
+    --accent-light: #DAA520;
     --hero-fp-x: 33.3%;
     --hero-fp-y: 37.8%;
 
-    /* Header scale — по умолчанию 1 (используется JS, меняется только когда нужно) */
+    /* Header scale — будет менять JS только при необходимости */
     --hs: 1;
   }
 
-  /* Исправляем 100vh для мобильных устройств */
-  html {
-    height: -webkit-fill-available;
-  }
-  
+  html { height: -webkit-fill-available; }
   html,body{
     height:100%;margin:0;padding:0;
     background:var(--black);
     font-family:"Georgia",serif;color:#fff;
     scroll-behavior:smooth;
     overflow-x: hidden;
-    /* Убираем полосу прокрутки на iOS */
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: none;
   }
-  
-  /* Динамическая высота viewport для мобильных */
-  .hero {
-    height: 100vh;
-    /* Для мобильных браузеров */
-    height: -webkit-fill-available;
-    height: 100dvh;
-  }
-  
-  /* Скрываем адресную строку при скролле */
-  body {
-    /* Для iOS Safari */
-    -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;
-  }
-  
-  /* Предотвращаем масштабирование */
-  * {
-    -webkit-text-size-adjust: 100%;
-  }
-  
+
+  .hero { height: 100vh; height: -webkit-fill-available; height: 100dvh; }
+
+  * { -webkit-text-size-adjust: 100%; }
   a{color:inherit; text-decoration: none;}
   button{font-family:inherit; cursor: pointer;}
 
-  /* Общие анимационные стили для текста */
-  .text-reveal {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.8s ease, transform 0.8s ease;
-    will-change: opacity, transform;
-  }
-  .text-reveal.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  .text-reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; will-change: opacity, transform; }
+  .text-reveal.visible { opacity: 1; transform: translateY(0); }
 
-  /* Header
-     — Важное изменение: размеры подпираются переменной --hs, по умолчанию 1.
-     JS будет менять --hs ТОЛЬКО если элемент не помещается. */
+  /* ====== HEADER - exact behavior preserved, but sizes multiplied by --hs ====== */
   header{
     position:fixed;top:0;left:0;width:100%;
-    /* высота шапки с учётом безопасной зоны */
     height: calc((80px * var(--hs)) + env(safe-area-inset-top));
     background:rgba(0,0,0,0);color:#fff;
     display:flex;align-items:center;justify-content:space-between;
-    /* padding горизонтальный масштабируется */
     padding:0 calc(28px * var(--hs));z-index:1100;box-sizing:border-box;
     transition:transform .25s ease,opacity .25s ease,background .25s ease, height .18s ease, padding .18s ease;
-    /* Учитываем безопасные зоны на iOS */
     padding-top: env(safe-area-inset-top);
-
-    /* Не даём переноситься — держим в одну строку */
     flex-wrap: nowrap;
     gap: calc(18px * var(--hs));
-    min-width: 0; /* для корректного сжатия flex-элементов */
+    min-width: 0;
   }
   header img.logo{
-    /* исходная высота 56px — умножается на --hs, поэтому при --hs=1 всё как раньше */
     height: calc(56px * var(--hs));
     opacity: 0;
     transform: translateY(-20px);
@@ -113,109 +73,49 @@
     flex: 0 0 auto;
     margin: 0;
     box-sizing: border-box;
+    object-fit: contain;
   }
-  header img.logo.visible{
-    opacity: 1;
-    transform: translateY(0);
-  }
-  /* nav: gap и font-size масштабируются через --hs */
+  header img.logo.visible{ opacity: 1; transform: translateY(0); }
+
   nav{
-    display:flex;gap: calc(18px * var(--hs));font-size: calc(16px * var(--hs));align-items:center;
-    flex: 1 1 auto; justify-content:flex-end; min-width: 0;
-    /* Мы НЕ обрезаем и НЕ ставим ellipsis — текст должен уменьшаться при необходимости */
+    display:flex;
+    gap: calc(18px * var(--hs));
+    font-size: calc(16px * var(--hs));
+    align-items:center;
+    flex: 1 1 auto;
+    justify-content:flex-end;
+    min-width: 0;
     white-space: nowrap;
-    overflow: visible;
+    overflow: visible; /* no ellipsis — we scale instead */
   }
   nav a{
     color:#fff;text-decoration:none;font-weight:500;
-    transition:opacity .25s;
-    opacity: 0;
-    transform: translateY(-20px);
+    opacity: 0; transform: translateY(-20px);
     transition: opacity 1s ease .1s, transform 1s ease .1s, color .25s;
-
-    /* Не укорачиваем текст — пусть шрифт и padding уменьшаются равномерно */
-    white-space: nowrap;
-    overflow: visible;
-    text-overflow: clip;
-
-    flex: 0 1 auto;
-    min-width: 0;
+    white-space: nowrap; overflow: visible; text-overflow: clip;
+    flex: 0 1 auto; min-width: 0;
     padding: calc(6px * var(--hs)) calc(8px * var(--hs));
     box-sizing: border-box;
     font-size: inherit;
   }
-  nav a.visible{
-    opacity: 1;
-    transform: translateY(0);
-  }
-  nav a:hover{opacity:.85}
+  nav a.visible{ opacity: 1; transform: translateY(0); }
+  nav a:hover{ opacity: .85; }
 
-  /* HERO */
-  .hero{
-    display:block;
-    background:var(--black);
-    overflow:hidden;
-    position:relative;
-  }
-  .hero-frame{
-    width:100%;height:100%;position:relative;overflow:hidden;background:#000
-  }
-  .hero-frame img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    object-position: var(--hero-fp-x) var(--hero-fp-y);
-    transform-origin:center center;
-    transition:transform 1.6s ease,opacity 1.2s ease;
-    display:block;
-    opacity: 0;
-  }
-  .hero-frame img.loaded{
-    opacity: 1;
-  }
+  /* Rest of CSS unchanged (kept from your original) */
+  .hero{ display:block; background:var(--black); overflow:hidden; position:relative; }
+  .hero-frame{ width:100%;height:100%;position:relative;overflow:hidden;background:#000 }
+  .hero-frame img{ width:100%; height:100%; object-fit:cover; object-position: var(--hero-fp-x) var(--hero-fp-y); transform-origin:center center; transition:transform 1.6s ease,opacity 1.2s ease; display:block; opacity: 0; }
+  .hero-frame img.loaded{ opacity: 1; }
 
-  /* About - с разделительной линией сверху */
-  .text-block{
-    background:var(--light-cream);color:#05053b;padding:120px 20px 60px;text-align:center;
-    position: relative;
-  }
-  .text-block:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--accent), var(--accent-light));
-  }
-  .text-block h1{
-    font-size:42px;font-weight:400;margin:0 0 14px;
-  }
-  .text-block p{
-    font-size:18px;color:var(--muted);max-width:900px;
-    margin:0 auto 16px;line-height:1.6;
-  }
-  .text-block em{
-    display:block;margin-top:14px;font-style:normal;color:#444;font-size:17px
-  }
+  .text-block{ background:var(--light-cream);color:#05053b;padding:120px 20px 60px;text-align:center; position: relative; }
+  .text-block:before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--accent), var(--accent-light)); }
+  .text-block h1{ font-size:42px;font-weight:400;margin:0 0 14px; }
+  .text-block p{ font-size:18px;color:var(--muted);max-width:900px; margin:0 auto 16px;line-height:1.6; }
+  .text-block em{ display:block;margin-top:14px;font-style:normal;color:#444;font-size:17px }
 
-  /* Social buttons */
-  .socials{
-    display:flex;flex-direction:column;align-items:center;gap:16px;margin-top:46px
-  }
-  .socials a{
-    display:flex;align-items:center;justify-content:center;gap:12px;
-    text-decoration:none;font-weight:500;font-size:18px;color:#fff;
-    border-radius:50px;padding:14px 48px;width:260px;text-align:center;
-    transition:transform .25s ease,opacity .25s;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.8s ease, transform 0.8s ease, background .25s;
-  }
-  .socials a.visible{
-    opacity: 1;
-    transform: translateY(0);
-  }
+  .socials{ display:flex;flex-direction:column;align-items:center;gap:16px;margin-top:46px }
+  .socials a{ display:flex;align-items:center;justify-content:center;gap:12px; text-decoration:none;font-weight:500;font-size:18px;color:#fff; border-radius:50px;padding:14px 48px;width:260px;text-align:center; transition:transform .25s ease,opacity .25s; opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease, transform 0.8s ease, background .25s; }
+  .socials a.visible{ opacity: 1; transform: translateY(0); }
   .socials a svg{width:22px;height:22px;fill:currentColor}
   .socials a.instagram{background:linear-gradient(45deg,#f58529,#dd2a7b,#8134af,#515bd4)}
   .socials a.facebook{background:#1877f2}
@@ -223,375 +123,80 @@
   .socials a.email{background:linear-gradient(45deg,var(--accent),var(--accent-light))}
   .socials a:hover{transform:scale(1.04);opacity:.95}
 
-  /* Bio photos */
-  .bio-photos{
-    margin-top:34px;display:flex;flex-wrap:wrap;gap:14px;justify-content:center
-  }
-  .bio-photos button{
-    background:transparent;border:0;padding:0;cursor:pointer;
-    border-radius:10px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.6);
-    transition:transform .25s ease,opacity .25s;
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  .bio-photos button.visible{
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .bio-photos button img{
-    display:block;width:180px;height:120px;object-fit:cover;background:var(--black)
-  }
+  .bio-photos{ margin-top:34px;display:flex;flex-wrap:wrap;gap:14px;justify-content:center }
+  .bio-photos button{ background:transparent;border:0;padding:0;cursor:pointer; border-radius:10px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.6); transition:transform .25s ease,opacity .25s; opacity: 0; transform: translateY(20px); }
+  .bio-photos button.visible{ opacity: 1; transform: translateY(0); }
+  .bio-photos button img{ display:block;width:180px;height:120px;object-fit:cover;background:var(--black) }
   .bio-photos button:hover{transform:scale(1.03);opacity:.95}
 
-  /* МОЙ КОД ДЛЯ CV SECTION */
-  #cv{
-    background:var(--dark-gray);
-    padding:90px 20px 120px;
-    color:#fff;
-    text-align:center;
-    position: relative;
-  }
-  #cv:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--accent), var(--accent-light));
-  }
-  #cv h2{
-    font-size:38px;
-    font-weight:400;
-    margin-bottom:12px;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.8s ease, transform 0.8s ease;
-  }
-  #cv h2.visible{
-    opacity: 1;
-    transform: translateY(0);
-  }
-  #cv p.lead{
-    max-width:900px;
-    margin:0 auto 20px;
-    color:#ccc;
-    font-size:18px;
-    line-height:1.6;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.8s ease 0.1s, transform 0.8s ease 0.1s;
-  }
-  #cv p.lead.visible{
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .cv-actions{
-    display:flex;
-    gap:16px;
-    justify-content:center;
-    margin:30px 0 50px;
-    flex-wrap: wrap;
-  }
-  .cv-actions a.btn{
-    display:inline-flex;
-    align-items:center;
-    gap:10px;
-    text-decoration:none;
-    color:#fff;
-    border-radius:50px;
-    padding:14px 36px;
-    font-weight:500;
-    font-size:16px;
-    transition: all 0.3s ease;
-    opacity: 0;
-    transform: translateY(15px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-  }
-  .cv-actions a.btn.visible{
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .cv-actions a.btn.download{
-    background:var(--dark-gray);
-    border:1px solid rgba(255,255,255,0.1);
-  }
-  .cv-actions a.btn.view{
-    background:linear-gradient(45deg,var(--accent),var(--accent-light));
-  }
-  .cv-actions a.btn:hover{
-    transform:translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-  }
+  #cv{ background:var(--dark-gray); padding:90px 20px 120px; color:#fff; text-align:center; position: relative; }
+  #cv:before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--accent), var(--accent-light)); }
+  #cv h2{ font-size:38px; font-weight:400; margin-bottom:12px; opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease, transform 0.8s ease; }
+  #cv h2.visible{ opacity: 1; transform: translateY(0); }
+  #cv p.lead{ max-width:900px; margin:0 auto 20px; color:#ccc; font-size:18px; line-height:1.6; opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease 0.1s, transform 0.8s ease 0.1s; }
+  #cv p.lead.visible{ opacity: 1; transform: translateY(0); }
+  .cv-actions{ display:flex; gap:16px; justify-content:center; margin:30px 0 50px; flex-wrap: wrap; }
+  .cv-actions a.btn{ display:inline-flex; align-items:center; gap:10px; text-decoration:none; color:#fff; border-radius:50px; padding:14px 36px; font-weight:500; font-size:16px; transition: all 0.3s ease; opacity: 0; transform: translateY(15px); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+  .cv-actions a.btn.visible{ opacity: 1; transform: translateY(0); }
+  .cv-actions a.btn.download{ background:var(--dark-gray); border:1px solid rgba(255,255,255,0.1); }
+  .cv-actions a.btn.view{ background:linear-gradient(45deg,var(--accent),var(--accent-light)); }
+  .cv-actions a.btn:hover{ transform:translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
   .cv-actions a.btn svg{width:20px;height:20px;fill:currentColor}
 
-  .cv-details{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-    gap:40px;
-    max-width:1100px;
-    margin:0 auto;
-    text-align:left
-  }
-  .cv-block{
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.8s ease, transform 0.8s ease;
-    padding: 30px;
-    background: rgba(255,255,255,0.03);
-    border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.05);
-  }
-  .cv-block.visible{
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .cv-block h3{
-    color:#fff;
-    margin-top:0;
-    margin-bottom:15px;
-    font-size:20px;
-    font-weight:600;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .cv-block h3:before {
-    content: '';
-    width: 4px;
-    height: 20px;
-    background: var(--accent);
-    border-radius: 2px;
-  }
-  .cv-block ul{
-    margin:0;
-    padding-left:20px;
-    color:#cfcfcf;
-    line-height:1.8;
-    font-size: 16px;
-  }
-  .cv-block ul li {
-    margin-bottom: 8px;
-    position: relative;
-  }
+  .cv-details{ display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:40px; max-width:1100px; margin:0 auto; text-align:left }
+  .cv-block{ opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease, transform 0.8s ease; padding: 30px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
+  .cv-block.visible{ opacity: 1; transform: translateY(0); }
+  .cv-block h3{ color:#fff; margin-top:0; margin-bottom:15px; font-size:20px; font-weight:600; display: flex; align-items: center; gap: 10px; }
+  .cv-block h3:before { content: ''; width: 4px; height: 20px; background: var(--accent); border-radius: 2px; }
+  .cv-block ul{ margin:0; padding-left:20px; color:#cfcfcf; line-height:1.8; font-size: 16px; }
+  .cv-block ul li { margin-bottom: 8px; position: relative; }
 
-  /* Performances - с разделительной линией сверху */
-  #performances{
-    background:var(--black);padding:100px 20px 140px;text-align:center;
-    position: relative;
-  }
-  #performances:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--accent), var(--accent-light));
-  }
-  #performances h2{
-    color:#fff;font-size:42px;font-weight:400;margin-bottom:60px;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.8s ease, transform 0.8s ease;
-  }
-  #performances h2.visible{
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .video-grid{
-    display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-    gap:28px;justify-items:center;width:100%;max-width:1200px;margin:0 auto
-  }
-  .video-wrapper {
-    position: relative;width: 100%;padding-bottom: 56.25%;overflow: hidden;border-radius: 14px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.6);
-    background: #000;
-    border: 1px solid rgba(255,255,255,0.03);
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 1s ease, transform 1s ease; /* Ускорил с 1s до 0.8s */
-  }
-  .video-wrapper.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .video-wrapper iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border: 0;
-    opacity: 0;
-    transition: opacity 0.3s ease 0.1s; /* Ускорил: была задержка 0.3s, теперь 0.1s */
-  }
-  .video-wrapper.visible iframe {
-    opacity: 1;
-  }
+  #performances{ background:var(--black);padding:100px 20px 140px;text-align:center; position: relative; }
+  #performances:before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--accent), var(--accent-light)); }
+  #performances h2{ color:#fff;font-size:42px;font-weight:400;margin-bottom:60px; opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease, transform 0.8s ease; }
+  #performances h2.visible{ opacity: 1; transform: translateY(0); }
+  .video-grid{ display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:28px;justify-items:center;width:100%;max-width:1200px;margin:0 auto }
+  .video-wrapper { position: relative;width: 100%;padding-bottom: 56.25%;overflow: hidden;border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.6); background: #000; border: 1px solid rgba(255,255,255,0.03); opacity: 0; transform: translateY(30px); transition: opacity 1s ease, transform 1s ease; }
+  .video-wrapper.visible { opacity: 1; transform: translateY(0); }
+  .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; opacity: 0; transition: opacity 0.3s ease 0.1s; }
+  .video-wrapper.visible iframe { opacity: 1; }
 
-  /* МОЙ КОД ДЛЯ CONTACTS */
-  #contacts{
-    background:var(--light-cream);
-    color:#05053b;
-    padding:80px 20px;
-    text-align:center;
-    position: relative;
-  }
-  #contacts:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--accent), var(--accent-light));
-  }
-  #contacts h2{
-    font-size:30px;
-    margin-bottom:12px;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.8s ease, transform 0.8s ease;
-  }
-  #contacts h2.visible{
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .contact-inner{
-    max-width:800px;
-    margin:0 auto
-  }
-  .contact-inner p{
-    color:#333;
-    margin-bottom:18px;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.8s ease 0.1s, transform 0.8s ease 0.1s;
-  }
-  .contact-inner p.visible{
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .contact-actions{
-    display:flex;
-    gap:16px;
-    justify-content:center;
-    flex-wrap:wrap
-  }
-  .contact-actions a.email-btn{
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    gap:10px;
-    text-decoration:none;
-    color:#fff;
-    border-radius:50px;
-    padding:14px 36px;
-    font-weight:500;
-    background:linear-gradient(45deg,var(--accent),var(--accent-light));
-    transition: all 0.3s ease;
-    opacity: 0;
-    transform: translateY(15px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-  }
-  .contact-actions a.email-btn.visible{
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .contact-actions a.email-btn:hover{
-    transform:translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-  }
-  .contact-actions a.email-btn svg{
-    width:20px;
-    height:20px;
-    fill:currentColor
-  }
+  #contacts{ background:var(--light-cream); color:#05053b; padding:80px 20px; text-align:center; position: relative; }
+  #contacts:before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--accent), var(--accent-light)); }
+  #contacts h2{ font-size:30px; margin-bottom:12px; opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease, transform 0.8s ease; }
+  #contacts h2.visible{ opacity: 1; transform: translateY(0); }
+  .contact-inner{ max-width:800px; margin:0 auto }
+  .contact-inner p{ color:#333; margin-bottom:18px; opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease 0.1s, transform 0.8s ease 0.1s; }
+  .contact-inner p.visible{ opacity: 1; transform: translateY(0); }
+  .contact-actions{ display:flex; gap:16px; justify-content:center; flex-wrap:wrap }
+  .contact-actions a.email-btn{ display:inline-flex; align-items:center; justify-content:center; gap:10px; text-decoration:none; color:#fff; border-radius:50px; padding:14px 36px; font-weight:500; background:linear-gradient(45deg,var(--accent),var(--accent-light)); transition: all 0.3s ease; opacity: 0; transform: translateY(15px); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+  .contact-actions a.email-btn.visible{ opacity: 1; transform: translateY(0); }
+  .contact-actions a.email-btn:hover{ transform:translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+  .contact-actions a.email-btn svg{ width:20px; height:20px; fill:currentColor }
 
-  /* МОЙ КОД ДЛЯ FOOTER */
-  footer {
-    background:var(--frame);
-    color:#ccc;
-    text-align:center;
-    font-size:15px;
-    padding:40px 20px;
-    border-top:1px solid rgba(255,255,255,0.05);
-    position: relative;
-    /* Учитываем безопасную зону снизу */
-    padding-bottom: calc(40px + env(safe-area-inset-bottom));
-  }
-  footer:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--accent), var(--accent-light));
-  }
-  footer a {
-    color: var(--accent);
-    transition: color 0.3s ease;
-  }
-  footer a:hover {
-    color: var(--accent-light);
-  }
+  footer { background:var(--frame); color:#ccc; text-align:center; font-size:15px; padding:40px 20px; border-top:1px solid rgba(255,255,255,0.05); position: relative; padding-bottom: calc(40px + env(safe-area-inset-bottom)); }
+  footer:before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--accent), var(--accent-light)); }
+  footer a { color: var(--accent); transition: color 0.3s ease; }
+  footer a:hover { color: var(--accent-light); }
 
-  /* Loader */
-  #loader {
-    position:fixed;top:0;left:0;width:100%;height:100%;
-    background:var(--frame);
-    display:flex;align-items:center;justify-content:center;z-index:9999;
-    transition:opacity 0.8s ease;
-    /* Учитываем безопасные зоны */
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
-    height: calc(100% + env(safe-area-inset-top) + env(safe-area-inset-bottom));
-  }
-  #loader.hidden {
-    opacity:0;
-    pointer-events:none;
-  }
-  .loader-content {
-    display:flex; flex-direction:column; align-items:center; gap:20px;
-  }
-  .loader-logo {
-    width:120px;
-    height:auto;
-    background:var(--frame);
-    display:block;
-    object-fit:contain;
-    filter:none;
-  }
-  .spinner {
-    width:50px; height:50px; border:6px solid rgba(201, 163, 74, 0.15); /* Золотистый вместо белого */
-    border-top-color:var(--accent); border-radius:50%; animation: spin 1s linear infinite;
-  }
+  #loader { position:fixed;top:0;left:0;width:100%;height:100%; background:var(--frame); display:flex;align-items:center;justify-content:center;z-index:9999; transition:opacity 0.8s ease; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); height: calc(100% + env(safe-area-inset-top) + env(safe-area-inset-bottom)); }
+  #loader.hidden { opacity:0; pointer-events:none; }
+  .loader-content { display:flex; flex-direction:column; align-items:center; gap:20px; }
+  .loader-logo { width:120px; height:auto; background:var(--frame); display:block; object-fit:contain; filter:none; }
+  .spinner { width:50px; height:50px; border:6px solid rgba(201, 163, 74, 0.15); border-top-color:var(--accent); border-radius:50%; animation: spin 1s linear infinite; }
   @keyframes spin {to{transform:rotate(360deg)}}
 
-  /* Modal */
-  .modal-backdrop{
-    position:fixed;inset:0;background:rgba(0,0,0,0.85);
-    display:none;align-items:center;justify-content:center;z-index:2000;padding:20px
-  }
+  .modal-backdrop{ position:fixed;inset:0;background:rgba(0,0,0,0.85); display:none;align-items:center;justify-content:center;z-index:2000;padding:20px }
   .modal-backdrop.visible{display:flex}
-  .modal-content{
-    max-width:1200px;max-height:90vh;overflow:auto;
-    border-radius:8px;position:relative
-  }
-  .modal-content img{display:block;max-width:100%;height:auto;border-radius:6px}
-  .modal-close{
-    position:absolute;top:10px;right:10px;background:rgba(0,0,0,.5);
-    border:0;color:#fff;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:16px
-  }
-  .modal-caption{color:#ddd;margin-top:8px;text-align:center}
-  .pdf-frame{width:95vw;height:85vh;border:0;border-radius:6px;background:#fff'}
+  .modal-content{ max-width:1200px;max-height:90vh;overflow:auto; border-radius:8px;position:relative }
+  .modal-content img{ display:block;max-width:100%;height:auto;border-radius:6px }
+  .modal-close{ position:absolute;top:10px;right:10px;background:rgba(0,0,0,.5); border:0;color:#fff;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:16px }
+  .modal-caption{ color:#ddd;margin-top:8px;text-align:center }
+  .pdf-frame{ width:95vw;height:85vh;border:0;border-radius:6px;background:#fff }
 </style>
 </head>
 <body>
 
-<!-- LOADER -->
 <div id="loader">
   <div class="loader-content">
     <img src="logo.jpg" alt="Logo" class="loader-logo">
@@ -609,20 +214,17 @@
   </nav>
 </header>
 
-<!-- HERO -->
 <div class="hero" id="hero">
   <div class="hero-frame" aria-hidden="false">
     <img id="heroImg" src="s.JPG" alt="Sergei Mkrtichian — portrait">
   </div>
 </div>
 
-<!-- ABOUT -->
 <div class="text-block" id="text-block">
   <h1 class="text-reveal">Dear Friends,</h1>
   <p class="text-reveal">I've created this site so you can find out more about me, what I've done in the past, and what I'm up to currently. I look forward to connecting with you at my concerts.</p>
   <em class="text-reveal">- Sergei Mkrtichian</em>
 
-  <!-- social buttons -->
   <div class="socials" aria-hidden="false">
     <a class="instagram text-reveal" href="https://www.instagram.com/sergunchik_mk/" target="_blank" rel="noopener">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2Zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5A4.25 4.25 0 0 0 20.5 16.25v-8.5A4.25 4.25 0 0 0 16.25 3.5h-8.5Zm8.75 2.25a.75.75 0 1 1 0 1.5h-.01a.75.75 0 1 1 0-1.5h.01ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 1.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"/></svg>
@@ -641,7 +243,6 @@
   </div>
 </div>
 
-<!-- CV - МОЯ ВЕРСИЯ -->
 <section id="cv" aria-labelledby="cv-heading">
   <h2 id="cv-heading" class="text-reveal">Curriculum Vitae</h2>
   <p class="lead text-reveal">Sergei Mkrtichian — concert violinist. Educated at leading conservatories, prize-winner of international competitions, performer in major halls across Europe and beyond.</p>
@@ -681,7 +282,6 @@
   </div>
 </section>
 
-<!-- Performances -->
 <section id="performances">
   <h2 class="text-reveal">Recent Performances</h2>
   <div class="video-grid">
@@ -692,7 +292,6 @@
   </div>
 </section>
 
-<!-- Contacts - МОЯ ВЕРСИЯ -->
 <section id="contacts">
   <h2 class="text-reveal">Contact</h2>
   <div class="contact-inner">
@@ -706,13 +305,11 @@
   </div>
 </section>
 
-<!-- Footer - МОЯ ВЕРСИЯ -->
 <footer>
   © 2025 Sergei Mkrtichian. This website is licensed under the
   <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener">Apache License 2.0</a>.
 </footer>
 
-<!-- Modal -->
 <div id="modal" class="modal-backdrop" role="dialog" aria-hidden="true">
   <div class="modal-content" role="document">
     <button class="modal-close" id="modalClose">✕</button>
@@ -722,79 +319,56 @@
 </div>
 
 <script>
-/* Loader & hero behavior */
+/* Existing behavior (loader/hero) preserved */
 const hero = document.getElementById('hero');
 const heroImg = document.getElementById('heroImg');
 const header = document.getElementById('header');
 const loader = document.getElementById('loader');
-// ИСПРАВЛЕНО: уменьшил масштаб с 1.7 до 1.2 - теперь увеличение будет более умеренным
 const maxScale = 1.2;
 let currentScale = 1;
 
-// Убеждаемся, что изображение всегда загружается правильно
 function initHeroImage() {
-  // Проверяем, загружено ли изображение
   if (heroImg.complete) {
     heroImg.classList.add('loaded');
   } else {
     heroImg.onload = () => {
       heroImg.classList.add('loaded');
-      // после загрузки изображения пересматриваем шапку (логотип мог изменить размер)
+      // logo size may change visually after hero loads; re-fit header
       fitHeaderScale();
     };
     heroImg.onerror = () => {
       console.error('Hero image failed to load');
-      heroImg.classList.add('loaded'); // Все равно показываем фон
+      heroImg.classList.add('loaded');
       fitHeaderScale();
     };
   }
 }
-
-// Показываем/скрываем лоадер
 const isFirstVisit = !localStorage.getItem('visited');
-if(isFirstVisit){
-  localStorage.setItem('visited', 'true');
-  loader.style.display = 'flex';
-} else {
-  loader.style.display = 'none';
-}
-
-// Инициализируем главное изображение
+if(isFirstVisit){ localStorage.setItem('visited', 'true'); loader.style.display = 'flex'; } else { loader.style.display = 'none'; }
 initHeroImage();
 
-// Скрываем лоадер после полной загрузки страницы
 window.addEventListener('load', () => {
   setTimeout(() => {
     loader.classList.add('hidden');
     setTimeout(() => {
       loader.style.display = 'none';
-      
-      // Анимация элементов header
       const logo = document.querySelector('header img.logo');
       const navLinks = document.querySelectorAll('nav a');
-      
       if (logo) logo.classList.add('visible');
       navLinks.forEach((link, index) => {
-        setTimeout(() => {
-          link.classList.add('visible');
-        }, index * 100);
+        setTimeout(() => { link.classList.add('visible'); }, index * 100);
       });
-      
-      // Инициируем анимацию при скролле
       initScrollAnimations();
-
-      // Подогнать шапку (после полной загрузки)
       fitHeaderScale();
     }, 800);
   }, 500);
 });
 
-/* Parallax + header animation */
+/* Parallax */
 function animate() {
   const rect = hero.getBoundingClientRect();
   const windowHeight = window.innerHeight;
   const scrollY = window.scrollY;
-
   let progress = 0;
   if (rect.bottom > 0 && rect.top < windowHeight) {
     progress = (windowHeight - rect.top) / (windowHeight + rect.height);
@@ -803,25 +377,21 @@ function animate() {
   const targetScale = 1 + progress * (maxScale - 1);
   currentScale += (targetScale - currentScale) * 0.1;
   heroImg.style.transform = `scale(${currentScale})`;
-
   const appearProgress = Math.min(scrollY / 300, 1);
   const bgOpacity = 0.35 * appearProgress;
   header.style.background = `rgba(0, 0, 0, ${bgOpacity})`;
-
   let hideProgress = 0;
   if (rect.top < 0) hideProgress = Math.min(Math.abs(rect.top) / 250, 1);
   const translateY = -100 * hideProgress;
   const finalOpacity = 1 - hideProgress;
   header.style.transform = `translateY(${translateY}%)`;
   header.style.opacity = finalOpacity;
-
   requestAnimationFrame(animate);
 }
 requestAnimationFrame(animate);
 
-/* Анимация при скролле для всех элементов */
+/* Scroll reveal (unchanged) */
 function initScrollAnimations() {
-  // Элементы для анимации
   const animatedElements = [
     ...document.querySelectorAll('.text-reveal'),
     ...document.querySelectorAll('.socials a'),
@@ -831,156 +401,172 @@ function initScrollAnimations() {
     ...document.querySelectorAll('.video-wrapper'),
     ...document.querySelectorAll('.contact-actions a.email-btn')
   ];
-
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        // ИСПРАВЛЕНО: для видео уменьшил задержку с 400 до 150ms
         const delay = entry.target.classList.contains('video-wrapper') ? 150 : 100;
-        
         setTimeout(() => {
           entry.target.classList.add('visible');
-          
-          // Для видео дополнительно запускаем анимацию появления самого iframe
           if (entry.target.classList.contains('video-wrapper')) {
             const iframe = entry.target.querySelector('iframe');
             if (iframe) {
-              // Даем немного времени для загрузки iframe (уменьшил с 300 до 100ms)
-              setTimeout(() => {
-                iframe.style.opacity = '1';
-              }, 100);
+              setTimeout(() => { iframe.style.opacity = '1'; }, 100);
             }
           }
         }, delay);
-        
         observer.unobserve(entry.target);
       }
     });
-  }, {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-  });
-
-  // Наблюдаем за всеми элементами
-  animatedElements.forEach(el => {
-    if (el) observer.observe(el);
-  });
+  }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+  animatedElements.forEach(el => { if (el) observer.observe(el); });
 }
 
-/* -------------------------
-   New: smart header scaling
-   -------------------------
-   Поведение:
-   - при загрузке/resize без переполнения --hs остаётся 1 (исходные размеры)
-   - если содержимое шапки не помещается, вычисляем минимальный равномерный коэффициент
-     и применяем его к --hs, чтобы всё влезло
-   - динамический перерасчёт при resize, изменении содержимого (ResizeObserver),
-     загрузке шрифтов/изображений
+/* ============================
+   Smart header scaling (updated)
+   ============================
+   - учитывает ширину каждого слова (boundingRect.width)
+   - учитывает gap внутри nav и gap header между logo и nav
+   - оставляет исходные размеры пока всё помещается
 */
-(function(){
-  const MIN_HS = 0.6; // минимальный коэффициент масштаба
+function pxToNumber(px) {
+  if (!px) return 0;
+  return parseFloat(px.replace('px','')) || 0;
+}
+
+function getGapPx(el) {
+  const cs = getComputedStyle(el);
+  // modern: cs.gap; fallback to cs.columnGap/rowGap
+  const gap = cs.gap || cs.columnGap || '0px';
+  return pxToNumber(gap);
+}
+
+function fitHeaderScale() {
+  const MIN_HS = 0.58; // минимальное значение
   const headerEl = document.getElementById('header');
   if (!headerEl) return;
 
-  let raf = null;
-  let resizeTimer = null;
+  // Reset to native size first
+  headerEl.style.setProperty('--hs', '1');
 
-  // Дебаунс: вызываем функцию с паузой
-  function scheduleFit() {
-    if (raf) cancelAnimationFrame(raf);
-    // небольшой timeout чтобы дать браузеру применить стили/вставить контент
-    raf = requestAnimationFrame(() => {
-      fitHeaderScale();
-    });
-    if (resizeTimer) clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => {
-      fitHeaderScale();
-    }, 120);
+  // Force layout
+  const headerClientWidth = headerEl.clientWidth;
+
+  // Elements
+  const logo = headerEl.querySelector('img.logo');
+  const nav = headerEl.querySelector('nav');
+  const anchors = nav ? Array.from(nav.querySelectorAll('a')) : [];
+
+  // Calculate logo width (actual rendered)
+  const logoWidth = logo ? Math.ceil(logo.getBoundingClientRect().width) : 0;
+
+  // Calculate each anchor width (actual rendered)
+  let anchorsSum = 0;
+  anchors.forEach(a => {
+    const r = a.getBoundingClientRect();
+    anchorsSum += Math.ceil(r.width);
+  });
+
+  // Gaps
+  const navGap = nav ? getGapPx(nav) : 0;            // gap between nav items
+  const headerGap = getGapPx(headerEl);             // gap between logo and nav (header gap)
+
+  // Total nav gaps width:
+  const navGapsTotal = Math.max(0, anchors.length - 1) * navGap;
+
+  // Total required content width at current scale=1
+  let required = logoWidth + headerGap + anchorsSum + navGapsTotal;
+
+  // If nav is empty, no headerGap required (header gap applies only if logo and nav both present)
+  if (!logo || anchors.length === 0) {
+    required = anchorsSum;
   }
 
-  // Основная функция: устанавливает --hs
-  function fitHeaderScale() {
-    // Сначала сбросим к 1 и измерим "нативную" ширину содержимого
+  // Small epsilon tolerance
+  const EPS = 1;
+
+  if (required <= headerClientWidth + EPS) {
+    // Fits — ensure --hs is exactly 1
     headerEl.style.setProperty('--hs', '1');
-    // Force reflow to get accurate measurements
-    // (через requestAnimationFrame уже вызвано)
-    const available = headerEl.clientWidth;
+    return;
+  }
 
-    // scrollWidth даёт полную ширину контента внутри header
-    let contentWidth = headerEl.scrollWidth;
+  // Compute needed scale factor (how much to multiply sizes so that required * scale <= header width)
+  // But note: when we multiply font-size and padding etc by scale, anchor widths and logo heights will scale roughly linearly.
+  // So needed = available / required
+  let needed = (headerClientWidth - EPS) / required;
 
-    // Если влезает — ничего не делаем
-    if (contentWidth <= available + 1) {
-      // Убедимся, что значение равно 1 (на случай, если раньше уменьшали)
-      headerEl.style.setProperty('--hs', '1');
+  // Apply small safety multiplier to avoid jitter
+  needed = needed * 0.995;
+
+  if (needed < MIN_HS) needed = MIN_HS;
+
+  // Apply scale
+  headerEl.style.setProperty('--hs', String(needed));
+
+  // Iterate a few times to stabilize (measure actual widths after scale application)
+  for (let i = 0; i < 6; i++) {
+    // Force reflow then re-measure
+    const newLogoWidth = logo ? Math.ceil(logo.getBoundingClientRect().width) : 0;
+    let newAnchorsSum = 0;
+    anchors.forEach(a => newAnchorsSum += Math.ceil(a.getBoundingClientRect().width));
+    const newNavGapsTotal = Math.max(0, anchors.length - 1) * getGapPx(nav);
+    const newRequired = newLogoWidth + headerGap + newAnchorsSum + newNavGapsTotal;
+
+    if (newRequired <= headerEl.clientWidth + EPS) {
+      // good
       return;
     }
 
-    // Вычисляем требуемый коэффициент
-    let needed = available / contentWidth;
-
-    // Немного запас (чтобы не срабатывать на 1-2 пикселя)
-    // но не делаем запас слишком большим — 0.98
-    needed = needed * 0.995;
-
-    if (needed < MIN_HS) needed = MIN_HS;
-
-    headerEl.style.setProperty('--hs', String(needed));
-
-    // Проверяем и если всё ещё не помещается (из-за процентов/ограничений),
-    // делаем ещё одну итерацию — обычно достаточно 1-2 раз.
-    // Ограничим число итераций чтобы не зациклиться.
-    let iterations = 0;
-    while (headerEl.scrollWidth > headerEl.clientWidth + 1 && iterations < 6) {
-      contentWidth = headerEl.scrollWidth;
-      const avail = headerEl.clientWidth;
-      let factor = avail / contentWidth;
-      factor = factor * 0.995;
-      let currentHs = parseFloat(getComputedStyle(headerEl).getPropertyValue('--hs')) || 1;
-      let newHs = currentHs * factor;
-      if (newHs < MIN_HS) newHs = MIN_HS;
-      headerEl.style.setProperty('--hs', String(newHs));
-      iterations++;
-    }
+    // compute additional factor
+    let factor = (headerEl.clientWidth - EPS) / newRequired;
+    factor = factor * 0.995;
+    let currentHs = parseFloat(getComputedStyle(headerEl).getPropertyValue('--hs')) || needed;
+    let nextHs = currentHs * factor;
+    if (nextHs < MIN_HS) nextHs = MIN_HS;
+    // if change is negligible, stop
+    if (Math.abs(nextHs - currentHs) < 0.002) break;
+    headerEl.style.setProperty('--hs', String(nextHs));
   }
+}
 
-  // Запускаем при изменениях размеров окна
-  window.addEventListener('resize', scheduleFit);
-  window.addEventListener('orientationchange', scheduleFit);
+// schedule fit with debounce
+let fitTimeout = null;
+function scheduleFitHeader() {
+  if (fitTimeout) clearTimeout(fitTimeout);
+  fitTimeout = setTimeout(() => {
+    fitHeaderScale();
+  }, 60);
+}
 
-  // Запускаем при загрузке шрифтов (если поддерживается)
-  if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(() => {
-      scheduleFit();
-    }).catch(()=>{ scheduleFit(); });
-  }
+// react to resize/orientation
+window.addEventListener('resize', scheduleFitHeader);
+window.addEventListener('orientationchange', scheduleFitHeader);
 
-  // ResizeObserver на header — если внутри что-то меняется (например, текст динамически)
-  if (window.ResizeObserver) {
-    const ro = new ResizeObserver(() => {
-      scheduleFit();
-    });
+// observe header / logo / nav changes
+if (window.ResizeObserver) {
+  const ro = new ResizeObserver(() => scheduleFitHeader());
+  const headerEl = document.getElementById('header');
+  if (headerEl) {
     ro.observe(headerEl);
-    // также наблюдаем за логотипом и nav (на случай динамических изменений)
     const logo = headerEl.querySelector('img.logo');
     const nav = headerEl.querySelector('nav');
     if (logo) ro.observe(logo);
     if (nav) ro.observe(nav);
+    // observe anchors individually (in case text changes)
+    nav && nav.querySelectorAll('a').forEach(a => ro.observe(a));
   }
+}
 
-  // Срабатываем при initial DOMContentLoaded и после полной загрузки
-  document.addEventListener('DOMContentLoaded', () => {
-    scheduleFit();
-  });
-  window.addEventListener('load', () => {
-    scheduleFit();
-  });
+// if fonts loaded later
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(scheduleFitHeader).catch(()=>scheduleFitHeader());
+}
 
-  // Экспорт функции в глобальную область для отладки (необязательно)
-  window.fitHeaderScale = fitHeaderScale;
-})();
+// initial calls
+document.addEventListener('DOMContentLoaded', scheduleFitHeader);
+window.addEventListener('load', scheduleFitHeader);
 
-/* Modal (image + PDF) */
+/* Modal + other existing JS (unchanged) */
 const modal = document.getElementById('modal');
 const modalInner = document.getElementById('modalInner');
 const modalCaption = document.getElementById('modalCaption');
@@ -995,7 +581,6 @@ function openImage(url, caption=''){
   modalCaption.textContent = caption;
   showModal();
 }
-
 function openPDF(url, caption=''){
   modalInner.innerHTML = '';
   const iframe = document.createElement('iframe');
@@ -1007,22 +592,9 @@ function openPDF(url, caption=''){
   modalCaption.textContent = caption;
   showModal();
 }
+function showModal(){ modal.classList.add('visible'); modal.setAttribute('aria-hidden','false'); document.body.style.overflow = 'hidden'; }
+function closeModal(){ modal.classList.remove('visible'); modal.setAttribute('aria-hidden','true'); modalInner.innerHTML = ''; modalCaption.textContent = ''; document.body.style.overflow = ''; }
 
-function showModal(){
-  modal.classList.add('visible');
-  modal.setAttribute('aria-hidden','false');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeModal(){
-  modal.classList.remove('visible');
-  modal.setAttribute('aria-hidden','true');
-  modalInner.innerHTML = '';
-  modalCaption.textContent = '';
-  document.body.style.overflow = '';
-}
-
-/* thumbnails click */
 document.querySelectorAll('.bio-photos button').forEach(btn=>{
   btn.addEventListener('click', (e)=>{
     const full = btn.getAttribute('data-full');
@@ -1030,61 +602,43 @@ document.querySelectorAll('.bio-photos button').forEach(btn=>{
     if(full) openImage(full, caption);
   });
 });
-
-/* open CV view */
 const viewPdfBtn = document.getElementById('viewPdfBtn');
 viewPdfBtn && viewPdfBtn.addEventListener('click', (e)=>{
   e.preventDefault();
   openPDF('Sergei_Mkrtichian_CV.pdf', 'CV — Sergei Mkrtichian');
 });
-
-/* modal close / backdrop / ESC */
-modalClose.addEventListener('click', closeModal);
-modal.addEventListener('click', (e)=>{ if(e.target === modal) closeModal(); });
+modalClose && modalClose.addEventListener('click', closeModal);
+modal && modal.addEventListener('click', (e)=>{ if(e.target === modal) closeModal(); });
 document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeModal(); });
 
-/* Предотвращаем проблемы с изображением героя */
 window.addEventListener('pageshow', function(event) {
   if (event.persisted) {
     heroImg.classList.remove('loaded');
-    setTimeout(() => {
-      heroImg.classList.add('loaded');
-    }, 50);
+    setTimeout(() => { heroImg.classList.add('loaded'); }, 50);
   }
 });
 
-/* Предзагрузка изображений для лучшей производительности */
 document.addEventListener('DOMContentLoaded', () => {
   const preloadImages = ['s.JPG', 'logo.jpg'];
-  preloadImages.forEach(src => {
-    const img = new Image();
-    img.src = src;
-  });
+  preloadImages.forEach(src => { const img = new Image(); img.src = src; });
 });
 
-/* JavaScript для улучшения работы на мобильных */
 document.addEventListener('DOMContentLoaded', function() {
-  // Функция для установки правильной высоты на мобильных
   function setVH() {
     let vh = window.innerHeight * 0.01;
     document.documentElement.style.setProperty('--vh', `${vh}px`);
   }
-  
   setVH();
   window.addEventListener('resize', setVH);
   window.addEventListener('orientationchange', setVH);
-  
-  // Предотвращаем масштабирование при двойном тапе на мобильных
+
   let lastTouchEnd = 0;
   document.addEventListener('touchend', function(event) {
     const now = (new Date()).getTime();
-    if (now - lastTouchEnd <= 300) {
-      event.preventDefault();
-    }
+    if (now - lastTouchEnd <= 300) { event.preventDefault(); }
     lastTouchEnd = now;
   }, false);
-  
-  // Убираем выделение при тапе на кнопках
+
   document.querySelectorAll('button, a').forEach(el => {
     el.addEventListener('touchstart', function() {
       this.style.webkitTapHighlightColor = 'transparent';
