@@ -647,34 +647,56 @@ document.addEventListener('DOMContentLoaded', function() {
 });
   /* -------------------------
 /* -------------------------
-   Пропорциональное (равномерное) уменьшение содержимого nav
-   — учитываем реальные границы текста (без padding)
+/* -------------------------
+   Пропорциональное уменьшение (текст + иконки), с учётом реальных границ и точного CSS gap
+   Вставьте этот блок в ваш <script>, например после fitHeaderScale()
    ------------------------- */
 (function(){
-  const MIN_SCALE = 0.68; // минимальный коэффициент (подберите по вкусу)
-  const EPS = 0.5; // запас в px для сравнения ("влезает/не влезает")
-
+  const MIN_SCALE = 0.6;     // минимальный коэффициент (подберите при необходимости)
+  const EPS = 0.5;           // tolerance в px при сравнениях
   const headerEl = document.getElementById('header');
   if (!headerEl) return;
 
-  // Утилита: обёртываем содержимое ссылки span.link-inner (если ещё не обёрнуто)
+  // Обёртка content -> .link-inner, делает SVG/IMG responsive (1em)
   function ensureInner(link) {
-    if (link.querySelector('.link-inner')) return link.querySelector('.link-inner');
-    const inner = document.createElement('span');
+    let inner = link.querySelector('.link-inner');
+    if (inner) return inner;
+
+    inner = document.createElement('span');
     inner.className = 'link-inner';
-    // Перенесём все дочерние узлы внутрь inner
+    // перенести всё содержимое в inner
     while (link.firstChild) inner.appendChild(link.firstChild);
-    // Сбросим пользовательские стили на inner чтобы вести корректные измерения
+    // базовые стили для корректных измерений
     inner.style.display = 'inline-block';
     inner.style.whiteSpace = 'nowrap';
-    inner.style.lineHeight = '1'; // оставить управление высотой ссылок на link
+    inner.style.lineHeight = '1';
+    // Вставляем обратно
     link.appendChild(inner);
+
+    // Для всех svg/img внутри — сделать масштабируемыми относительно font-size
+    // и задать display/align чтобы не портить поточный layout.
+    const svgs = inner.querySelectorAll('svg');
+    svgs.forEach(sv => {
+      // ставим CSS width/height в em — они станут зависеть от font-size inner
+      sv.style.width = sv.style.width || '1em';
+      sv.style.height = sv.style.height || '1em';
+      sv.style.display = sv.style.display || 'inline-block';
+      sv.style.verticalAlign = sv.style.verticalAlign || 'middle';
+      // Если у SVG есть атрибуты width/height — они остаются, но CSS переопределит их
+    });
+    const imgs = inner.querySelectorAll('img');
+    imgs.forEach(im => {
+      im.style.width = im.style.width || '1em';
+      im.style.height = im.style.height || '1em';
+      im.style.display = im.style.display || 'inline-block';
+      im.style.verticalAlign = im.style.verticalAlign || 'middle';
+    });
+
     return inner;
   }
 
-  function parsePx(value) {
-    return Number.parseFloat(value) || 0;
-  }
+  // Парсер px значений из computedStyle
+  function px(v){ return Number.parseFloat(v) || 0; }
 
   function adjustNavProportional() {
     const nav = headerEl.querySelector('nav');
@@ -682,43 +704,43 @@ document.addEventListener('DOMContentLoaded', function() {
     const links = Array.from(nav.querySelectorAll('a'));
     if (links.length === 0) return;
 
-    // Сохраняем оригинальные font-size для inner (если ещё не сохранено) и создаём inner
+    // подготовка: wrap, сохранить orig font-size у inner, сбросить временные стили
     links.forEach(l => {
       const inner = ensureInner(l);
       if (!inner.dataset.origFontSize) {
-        // берём computed font-size для inner (наследуется от a)
         inner.dataset.origFontSize = getComputedStyle(inner).fontSize;
       }
-      // Сбрасываем на оригинал перед измерением
       inner.style.fontSize = inner.dataset.origFontSize;
       inner.style.transform = '';
     });
 
-    // Вычисляем доступное место внутри nav
+    // доступная ширина внутри nav
     const available = nav.clientWidth;
 
-    // Узнаём CSS gap (в px) — fallback 18px
+    // точный gap из CSS (если browser поддерживает)
     const navStyle = getComputedStyle(nav);
-    let gap = parsePx(navStyle.gap);
-    if (!gap) gap = 18;
+    // some browsers return .gap, others return columnGap; prefer .gap then columnGap
+    let gap = px(navStyle.gap || navStyle.columnGap || navStyle['column-gap']);
+    // если gap не определён (старые браузеры) — fallback на исходное значение дизайна:
+    if (!gap) gap = 18; // соответствует calc(18px * var(--hs)) в исходном CSS при hs=1
 
-    // Собираем paddings каждой ссылки (левый+правый) и "content widths" (inner.getBoundingClientRect())
+    // собираем paddings каждой ссылки и реальную ширину контента (inner)
     let totalPadding = 0;
     const contentWidths = links.map(l => {
       const cs = getComputedStyle(l);
-      const padding = parsePx(cs.paddingLeft) + parsePx(cs.paddingRight);
-      totalPadding += padding;
+      const pad = px(cs.paddingLeft) + px(cs.paddingRight);
+      totalPadding += pad;
       const inner = ensureInner(l);
+      // реальная ширина контента — bounding rect inner
       const rect = inner.getBoundingClientRect();
-      // Если inner пуст (редкий случай) — fallback на bounding rect всей ссылки
-      const contentW = (rect && rect.width) ? rect.width : l.getBoundingClientRect().width - padding;
-      return contentW;
+      const w = rect && rect.width ? rect.width : Math.max(0, l.getBoundingClientRect().width - pad);
+      return w;
     });
 
     const totalContent = contentWidths.reduce((s, w) => s + w, 0);
     const totalGaps = gap * Math.max(0, links.length - 1);
 
-    // Если всё влезает — восстанавливаем оригинальные размеры и выходим
+    // Если влезает без изменений — восстановить оригинал и выйти
     if (totalContent + totalPadding + totalGaps <= available + EPS) {
       links.forEach(l => {
         const inner = ensureInner(l);
@@ -727,37 +749,32 @@ document.addEventListener('DOMContentLoaded', function() {
       return;
     }
 
-    // Иначе — вычисляем единый коэффициент s, чтобы пропорционально уменьшить содержимое
-    // s = (available - totalPadding - totalGaps) / totalContent
+    // Вычисляем единый коэффициент s, чтобы пропорционально уменьшить весь контент
     let s = (available - totalPadding - totalGaps) / totalContent;
     if (!isFinite(s) || s <= 0) s = MIN_SCALE;
     if (s > 1) s = 1;
     if (s < MIN_SCALE) s = MIN_SCALE;
 
-    // Применяем s к font-size каждого inner (пропорционально их исходному font-size)
-    links.forEach((l, idx) => {
+    // Применяем s к font-size каждого inner (пропорционально исходному font-size)
+    links.forEach(l => {
       const inner = ensureInner(l);
-      const orig = parsePx(inner.dataset.origFontSize);
+      const orig = px(inner.dataset.origFontSize);
       inner.style.fontSize = (orig * s) + 'px';
-      // transform-origin на всякий случай, чтобы масштаб выглядел естественно
       inner.style.transformOrigin = 'left center';
     });
-
-    // NB: Мы изменяем font-size у внутреннего спана — это влияет на layout, поэтому
-    // при успешном срабатывании элементы займут меньше места и уже не будут налезать.
   }
 
-  // Debounced scheduler (легкий)
+  // scheduler (RAF) и события
   let raf = null;
   function scheduleAdjust() {
     if (raf) cancelAnimationFrame(raf);
     raf = requestAnimationFrame(() => {
-      adjustNavProportional();
+      try { adjustNavProportional(); }
+      catch(e){ console.error(e); }
       raf = null;
     });
   }
 
-  // Подключаем к событиям
   window.addEventListener('resize', scheduleAdjust);
   window.addEventListener('orientationchange', scheduleAdjust);
   document.addEventListener('DOMContentLoaded', scheduleAdjust);
@@ -766,7 +783,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.fonts.ready.then(scheduleAdjust).catch(scheduleAdjust);
   }
 
-  // Экспорт для отладки/ручного вызова (например — вызвать в конце fitHeaderScale())
+  // экспорт для ручного вызова (например, вызвать в конце fitHeaderScale())
   window.adjustNavProportional = scheduleAdjust;
 })();
 
