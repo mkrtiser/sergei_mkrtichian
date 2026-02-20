@@ -190,16 +190,95 @@
     font-size: 0.84rem;
   }
 
+  #startupPanel {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    pointer-events: none;
+    padding-top: 12px;
+  }
+
+  #startupPanel.hidden {
+    display: none;
+  }
+
+  #startupCard {
+    width: min(560px, calc(100vw - 24px));
+    border: 1px solid rgba(214, 188, 107, 0.35);
+    border-radius: 12px;
+    background: rgba(27, 24, 17, 0.94);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+    padding: 10px;
+    pointer-events: auto;
+  }
+
+  .startupTitle {
+    font-size: 0.95rem;
+    color: #f7efd8;
+    margin-bottom: 8px;
+  }
+
+  .startupActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .startupActions button {
+    border: 1px solid #6e6240;
+    background: #32291a;
+    color: #f2e9cf;
+    border-radius: 7px;
+    padding: 7px 10px;
+    cursor: pointer;
+    font-size: 0.86rem;
+  }
+
+  #bookmarkHint {
+    margin-top: 7px;
+    color: #cfc7ab;
+    font-size: 0.8rem;
+  }
+
+  .startupRemember {
+    margin-top: 6px;
+    font-size: 0.82rem;
+    color: #d8d1b8;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
 </style>
 </head>
 <body>
 <canvas id="canvas"></canvas>
+<div id="startupPanel">
+  <div id="startupCard">
+    <div class="startupTitle">For best use: fullscreen + bookmark</div>
+    <div class="startupActions">
+      <button id="fullscreenBtn" type="button">Go Fullscreen</button>
+      <button id="bookmarkBtn" type="button">Add Bookmark</button>
+      <button id="installBtn" type="button" class="hidden">Install App</button>
+      <button id="startupCloseBtn" type="button">Close</button>
+    </div>
+    <div id="bookmarkHint">Tip: use Ctrl+D (or Cmd+D on Mac).</div>
+    <label class="startupRemember"><input id="dontShowStartupInput" type="checkbox" /> Don't show again</label>
+  </div>
+</div>
 <div id="menuPanel" class="hidden">
   <div class="menuTitle">Quick Settings</div>
   <div class="menuHint">Pitch range is fixed: 150-3000 Hz</div>
   <div class="menuRow"><label for="a4Input">Reference A</label><input id="a4Range" type="range" min="380" max="500" step="0.1" value="440" /><input id="a4Input" type="number" min="380" max="500" step="0.1" value="440" /></div>
   <div class="menuActions" style="margin-top: 2px; margin-bottom: 8px;"><button id="learnABtn" type="button">Auto A</button></div>
   <button id="advancedToggleBtn" class="menuAdvancedToggle" type="button">Advanced settings</button>
+  <div class="menuActions" style="margin-top: 6px; margin-bottom: 8px;">
+    <button id="advancedFullscreenBtn" type="button">Go Fullscreen</button>
+    <button id="advancedBookmarkBtn" type="button">Add Bookmark</button>
+  </div>
   <div id="advancedPanel" class="hidden">
     <div class="menuRow"><label for="smoothingInput">Smoothness</label><input id="smoothingRange" type="range" min="1" max="15" step="1" value="5" /><input id="smoothingInput" type="number" min="1" max="15" step="1" value="5" /></div>
     <div class="menuRow"><label for="centsRangeInput">Scale (+/- cents)</label><input id="centsRangeRange" type="range" min="20" max="100" step="5" value="50" /><input id="centsRangeInput" type="number" min="20" max="100" step="5" value="50" /></div>
@@ -234,6 +313,15 @@ const noteEl = document.getElementById('note');
 const centsEl = document.getElementById('cents');
 const dbEl = document.getElementById('db');
 const bar = document.querySelector('#indicator .bar');
+const startupPanel = document.getElementById('startupPanel');
+const fullscreenBtn = document.getElementById('fullscreenBtn');
+const bookmarkBtn = document.getElementById('bookmarkBtn');
+const installBtn = document.getElementById('installBtn');
+const startupCloseBtn = document.getElementById('startupCloseBtn');
+const bookmarkHint = document.getElementById('bookmarkHint');
+const dontShowStartupInput = document.getElementById('dontShowStartupInput');
+const advancedFullscreenBtn = document.getElementById('advancedFullscreenBtn');
+const advancedBookmarkBtn = document.getElementById('advancedBookmarkBtn');
 const menuPanel = document.getElementById('menuPanel');
 const advancedToggleBtn = document.getElementById('advancedToggleBtn');
 const advancedPanel = document.getElementById('advancedPanel');
@@ -273,6 +361,8 @@ let learnADeadline = 0;
 let learnASamples = [];
 let centerZoneEnabled = true;
 let centerZoneDiameter = 10;
+let deferredInstallPrompt = null;
+let fullscreenAutoTried = false;
 
 function resizeCanvas() {
   canvas.width = window.innerWidth;
@@ -622,6 +712,39 @@ function bindPair(numberEl, rangeEl) {
   rangeEl.addEventListener('change', syncFromRange);
 }
 
+async function requestFullscreenNow() {
+  const el = document.documentElement;
+  try {
+    if (document.fullscreenElement) return true;
+    if (el.requestFullscreen) await el.requestFullscreen();
+    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    else if (el.msRequestFullscreen) el.msRequestFullscreen();
+    return !!document.fullscreenElement || !!document.webkitFullscreenElement;
+  } catch {
+    return false;
+  }
+}
+
+function closeStartupPanel() {
+  if (dontShowStartupInput.checked) localStorage.setItem('tuner_hide_startup', '1');
+  startupPanel.classList.add('hidden');
+}
+
+function showBookmarkHint() {
+  const isMac = /Mac|iPhone|iPad/.test(navigator.platform);
+  const hotkey = isMac ? 'Cmd+D' : 'Ctrl+D';
+  bookmarkHint.textContent = `Use ${hotkey} to add this page to bookmarks.`;
+}
+
+async function tryFullscreenAuto() {
+  if (fullscreenAutoTried) return;
+  fullscreenAutoTried = true;
+  const ok = await requestFullscreenNow();
+  if (ok) {
+    bookmarkHint.textContent = 'Fullscreen enabled.';
+  }
+}
+
 async function startTuner() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
@@ -663,6 +786,40 @@ bindPair(silenceInput, silenceRange);
 bindPair(loudInput, loudRange);
 bindPair(zoneDiameterInput, zoneDiameterRange);
 centerZoneEnabledInput.addEventListener('change', applySettingsFromUI);
+fullscreenBtn.addEventListener('click', async () => {
+  const ok = await requestFullscreenNow();
+  bookmarkHint.textContent = ok
+    ? 'Fullscreen enabled.'
+    : 'Fullscreen was blocked. You can still continue.';
+});
+bookmarkBtn.addEventListener('click', showBookmarkHint);
+advancedFullscreenBtn.addEventListener('click', async () => {
+  const ok = await requestFullscreenNow();
+  bookmarkHint.textContent = ok
+    ? 'Fullscreen enabled.'
+    : 'Fullscreen was blocked. You can still continue.';
+});
+advancedBookmarkBtn.addEventListener('click', showBookmarkHint);
+installBtn.addEventListener('click', async () => {
+  if (!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  await deferredInstallPrompt.userChoice;
+  deferredInstallPrompt = null;
+  installBtn.classList.add('hidden');
+});
+startupCloseBtn.addEventListener('click', closeStartupPanel);
+startupCloseBtn.addEventListener('pointerdown', closeStartupPanel);
+window.addEventListener('beforeinstallprompt', (event) => {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+  installBtn.classList.remove('hidden');
+});
+tryFullscreenAuto();
+window.addEventListener('pointerdown', tryFullscreenAuto, { once: true });
+window.addEventListener('keydown', tryFullscreenAuto, { once: true });
+if (localStorage.getItem('tuner_hide_startup') === '1') {
+  startupPanel.classList.add('hidden');
+}
 learnABtn.addEventListener('click', () => {
   learnAActive = true;
   learnASamples = [];
