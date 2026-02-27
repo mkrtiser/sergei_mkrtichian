@@ -1,0 +1,980 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Chromatic Tuner</title>
+<style>
+  :root {
+    --bg: #1b1a16;
+    --grid: #2b2a24;
+    --axis: #4b483f;
+    --track: #ffd700;
+    --text: #f4f4f4;
+    --muted: #cfcfcf;
+  }
+
+  body {
+    margin: 0;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", Tahoma, sans-serif;
+  }
+
+  #canvas {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+  }
+
+  #hud {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    pointer-events: auto;
+  }
+
+  #note {
+    font-size: 2.4em;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  #cents {
+    margin-top: 6px;
+    font-size: 1.15em;
+    color: var(--muted);
+  }
+
+  #db {
+    margin-top: 4px;
+    font-size: 0.95em;
+    color: #bdb8a5;
+    pointer-events: none;
+  }
+
+  #indicator {
+    position: relative;
+    margin: 10px auto 0;
+    width: 240px;
+    height: 10px;
+    border-radius: 999px;
+    background: #333;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
+    pointer-events: none;
+  }
+
+  #indicator .bar {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 100%;
+    border-radius: 999px;
+    background: #888;
+  }
+
+  #menuPanel {
+    position: fixed;
+    top: 58px;
+    left: 10px;
+    z-index: 20;
+    width: 320px;
+    max-height: calc(100vh - 64px);
+    overflow: auto;
+    border: 1px solid rgba(214, 188, 107, 0.28);
+    border-radius: 14px;
+    background: linear-gradient(180deg, rgba(36, 31, 21, 0.96), rgba(25, 22, 16, 0.97));
+    padding: 13px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+  }
+
+  .hidden { display: none; }
+
+  .menuTitle {
+    font-size: 1.04rem;
+    margin-bottom: 4px;
+    color: #f8f0d7;
+    font-weight: 650;
+  }
+
+  .menuHint {
+    margin-bottom: 10px;
+    font-size: 0.8rem;
+    color: #bfb69c;
+  }
+
+  .menuHelp {
+    margin: 4px 0 10px;
+    padding: 8px 9px;
+    border-radius: 8px;
+    border: 1px solid rgba(214, 188, 107, 0.22);
+    background: rgba(255, 255, 255, 0.03);
+    font-size: 0.78rem;
+    color: #cfc7aa;
+    line-height: 1.35;
+  }
+
+  .menuRow {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .menuRow label {
+    font-size: 0.86rem;
+    color: #d9d1b6;
+  }
+
+  .menuRow input {
+    width: 108px;
+    background: #17140d;
+    border: 1px solid #5a523c;
+    color: #f6eed9;
+    border-radius: 7px;
+    padding: 5px 7px;
+    font-size: 0.88rem;
+  }
+
+  .menuRow input[type="range"] {
+    width: 110px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    accent-color: #d8be6f;
+  }
+
+  .menuActions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .menuAdvancedToggle {
+    width: 100%;
+    margin-top: 6px;
+    border: 1px solid #6e6240;
+    background: #2f2619;
+    color: #f2e9cf;
+    border-radius: 8px;
+    padding: 7px 10px;
+    cursor: pointer;
+    text-align: left;
+    font-size: 0.88rem;
+  }
+
+  .menuRowCheckbox {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .menuRowCheckbox label {
+    font-size: 0.86rem;
+    color: #d9d1b6;
+  }
+
+  .menuActions button {
+    border: 1px solid #6e6240;
+    background: #332a1b;
+    color: #f2e9cf;
+    border-radius: 7px;
+    padding: 6px 10px;
+    cursor: pointer;
+  }
+
+  #learnAStatus {
+    margin-top: 8px;
+    min-height: 1.2em;
+    color: #cfc8af;
+    font-size: 0.84rem;
+  }
+
+  #launchScreen {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+      radial-gradient(1200px 600px at 50% -10%, rgba(121, 185, 255, 0.14), transparent 55%),
+      rgba(13, 12, 10, 0.9);
+  }
+
+  #launchScreen.hidden {
+    display: none;
+  }
+
+  #launchCard {
+    width: min(760px, calc(100vw - 30px));
+    padding: 22px 16px;
+    text-align: center;
+  }
+
+  #launchTitle {
+    font-size: clamp(1.35rem, 2.7vw, 2rem);
+    color: #f6efd9;
+    margin-bottom: 10px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  #launchText {
+    color: #d5ccb0;
+    font-size: clamp(0.92rem, 1.8vw, 1.05rem);
+    margin-bottom: 16px;
+  }
+
+  #launchFullscreenBtn {
+    border: 1px solid #8d7a42;
+    background: #d6b85f;
+    color: #1d180d;
+    border-radius: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+
+  #launchFullscreenBtn:disabled {
+    opacity: 0.72;
+    cursor: default;
+  }
+
+  #launchStatus {
+    margin-top: 10px;
+    min-height: 1.2em;
+    color: #e6debf;
+    font-size: 0.86rem;
+  }
+
+</style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<div id="launchScreen">
+  <div id="launchCard">
+    <div id="launchTitle">Chromatic Tuner</div>
+    <div id="launchText">Play your A to start. Auto A + Auto RMS will calibrate automatically from first sound.</div>
+    <button id="launchFullscreenBtn" type="button">Enter Fullscreen</button>
+    <div id="launchStatus"></div>
+  </div>
+</div>
+<div id="menuPanel" class="hidden">
+  <div class="menuTitle">Quick Settings</div>
+  <div class="menuHint">Pitch range is fixed: 150-3000 Hz</div>
+  <div class="menuRow"><label for="a4Input">Reference A</label><input id="a4Range" type="range" min="380" max="500" step="0.1" value="440" /><input id="a4Input" type="number" min="380" max="500" step="0.1" value="440" /></div>
+  <div class="menuActions" style="margin-top: 2px; margin-bottom: 8px;">
+    <button id="learnABtn" type="button">Auto A</button>
+    <button id="learnRmsBtn" type="button">Auto RMS</button>
+  </div>
+  <div class="menuHelp">
+    <div><strong>Noise gate (RMS):</strong> minimum level to treat sound as valid.</div>
+    <div><strong>Full opacity RMS:</strong> level where the line reaches maximum visibility.</div>
+  </div>
+  <button id="advancedToggleBtn" class="menuAdvancedToggle" type="button">Advanced settings</button>
+  <div class="menuActions" style="margin-top: 6px; margin-bottom: 8px;">
+    <button id="advancedFullscreenBtn" type="button">Go Fullscreen</button>
+    <button id="advancedBookmarkBtn" type="button">Add Bookmark</button>
+  </div>
+  <div id="advancedPanel" class="hidden">
+    <div class="menuRow"><label for="smoothingInput">Smoothness</label><input id="smoothingRange" type="range" min="1" max="15" step="1" value="5" /><input id="smoothingInput" type="number" min="1" max="15" step="1" value="5" /></div>
+    <div class="menuRow"><label for="centsRangeInput">Scale (+/- cents)</label><input id="centsRangeRange" type="range" min="20" max="100" step="5" value="50" /><input id="centsRangeInput" type="number" min="20" max="100" step="5" value="50" /></div>
+    <div class="menuRow"><label for="speedInput">Line speed</label><input id="speedRange" type="range" min="1" max="8" step="0.5" value="2" /><input id="speedInput" type="number" min="1" max="8" step="0.5" value="2" /></div>
+    <div class="menuRow"><label for="silenceInput">Noise gate (RMS)</label><input id="silenceRange" type="range" min="0.001" max="0.05" step="0.001" value="0.01" /><input id="silenceInput" type="number" min="0.001" max="0.05" step="0.001" value="0.01" /></div>
+    <div class="menuRow"><label for="loudInput">Full opacity RMS</label><input id="loudRange" type="range" min="0.01" max="0.3" step="0.005" value="0.08" /><input id="loudInput" type="number" min="0.01" max="0.3" step="0.005" value="0.08" /></div>
+    <div class="menuRowCheckbox"><label for="centerZoneEnabledInput">Center zone</label><input id="centerZoneEnabledInput" type="checkbox" checked /></div>
+    <div class="menuRow"><label for="zoneDiameterInput">Zone diameter (cents)</label><input id="zoneDiameterRange" type="range" min="2" max="40" step="1" value="10" /><input id="zoneDiameterInput" type="number" min="2" max="40" step="1" value="10" /></div>
+  </div>
+  <div id="learnAStatus"></div>
+</div>
+<div id="hud">
+  <div id="note">Listening...</div>
+  <div id="cents">0 cents</div>
+  <div id="db">-80 dB</div>
+  <div id="indicator"><div class="bar"></div></div>
+</div>
+
+<script type="module">
+const minFreq = 150;
+const maxFreq = 3000;
+const sampleRate = 48000;
+let smoothing = 5;
+let centsRange = 50;
+let silenceRms = 0.01;
+let loudRms = 0.08;
+let tuningA = 440;
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const noteEl = document.getElementById('note');
+const centsEl = document.getElementById('cents');
+const dbEl = document.getElementById('db');
+const bar = document.querySelector('#indicator .bar');
+const launchScreen = document.getElementById('launchScreen');
+const launchFullscreenBtn = document.getElementById('launchFullscreenBtn');
+const launchStatus = document.getElementById('launchStatus');
+const advancedFullscreenBtn = document.getElementById('advancedFullscreenBtn');
+const advancedBookmarkBtn = document.getElementById('advancedBookmarkBtn');
+const menuPanel = document.getElementById('menuPanel');
+const advancedToggleBtn = document.getElementById('advancedToggleBtn');
+const advancedPanel = document.getElementById('advancedPanel');
+const a4Range = document.getElementById('a4Range');
+const a4Input = document.getElementById('a4Input');
+const smoothingRange = document.getElementById('smoothingRange');
+const smoothingInput = document.getElementById('smoothingInput');
+const centsRangeRange = document.getElementById('centsRangeRange');
+const centsRangeInput = document.getElementById('centsRangeInput');
+const speedRange = document.getElementById('speedRange');
+const speedInput = document.getElementById('speedInput');
+const silenceRange = document.getElementById('silenceRange');
+const silenceInput = document.getElementById('silenceInput');
+const loudRange = document.getElementById('loudRange');
+const loudInput = document.getElementById('loudInput');
+const centerZoneEnabledInput = document.getElementById('centerZoneEnabledInput');
+const zoneDiameterRange = document.getElementById('zoneDiameterRange');
+const zoneDiameterInput = document.getElementById('zoneDiameterInput');
+const learnABtn = document.getElementById('learnABtn');
+const learnRmsBtn = document.getElementById('learnRmsBtn');
+const learnAStatus = document.getElementById('learnAStatus');
+
+let centerY = 0;
+let speed = 2;
+const gridStep = 60;
+let offsetX = 0;
+let trail = [];
+let lastMedianCents = 0;
+let lastCents = [];
+let latestPoint = null;
+let silentFrames = 0;
+let noPitchFrames = 0;
+let maxHoldFrames = 18;
+let lastShownNote = 'Listening...';
+let lastShownCents = 0;
+let learnAActive = false;
+let learnADeadline = 0;
+let learnASamples = [];
+let learnRmsActive = false;
+let learnRmsDeadline = 0;
+let learnRmsSamples = [];
+let centerZoneEnabled = true;
+let centerZoneDiameter = 10;
+let started = false;
+let startupFlowRunning = false;
+let smoothedPitchHz = null;
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  centerY = canvas.height / 2;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+let audioCtx = null;
+let analyser = null;
+let timeBuffer = null;
+
+function getRms(buffer) {
+  let rms = 0;
+  for (let i = 0; i < buffer.length; i++) rms += buffer[i] * buffer[i];
+  return Math.sqrt(rms / buffer.length);
+}
+
+function correlationAtLag(buffer, lag) {
+  let corr = 0;
+  for (let i = 0; i < buffer.length - lag; i++) corr += buffer[i] * buffer[i + lag];
+  return corr;
+}
+
+function detectPitch(buffer, minF = minFreq, maxF = maxFreq, sr = sampleRate) {
+
+  const minLag = Math.floor(sr / maxF);
+  const maxLag = Math.floor(sr / minF);
+
+  let bestLag = -1;
+  let bestCorr = 0;
+
+  for (let lag = minLag; lag <= maxLag; lag++) {
+    const corr = correlationAtLag(buffer, lag);
+    if (corr > bestCorr) {
+      bestCorr = corr;
+      bestLag = lag;
+    }
+  }
+
+  if (bestLag <= 0) return null;
+
+  // Fractional-lag refinement to avoid stair-step pitch jumps.
+  let refinedLag = bestLag;
+  if (bestLag > minLag && bestLag < maxLag) {
+    const c0 = correlationAtLag(buffer, bestLag - 1);
+    const c1 = bestCorr;
+    const c2 = correlationAtLag(buffer, bestLag + 1);
+    const denom = (2 * c1) - c0 - c2;
+    if (Math.abs(denom) > 1e-8) {
+      const shift = 0.5 * (c0 - c2) / denom;
+      const boundedShift = Math.max(-0.5, Math.min(0.5, shift));
+      refinedLag = bestLag + boundedShift;
+    }
+  }
+
+  return sr / refinedLag;
+}
+
+const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+function freqToNote(f) {
+  const midi = 69 + 12 * Math.log2(f / tuningA);
+  const rounded = Math.round(midi);
+  const cents = Math.round((midi - rounded) * 100);
+  return {
+    name: noteNames[((rounded % 12) + 12) % 12],
+    octave: Math.floor(rounded / 12) - 1,
+    cents
+  };
+}
+
+function drawCentsScale() {
+  const marks = [];
+  for (let m = -centsRange; m <= centsRange; m += 25) marks.push(m);
+  if (marks[marks.length - 1] !== centsRange) marks.push(centsRange);
+  ctx.font = '13px Segoe UI';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+
+  for (const mark of marks) {
+    const y = centerY - (mark / centsRange) * (canvas.height / 2);
+    const isCenter = mark === 0;
+    ctx.strokeStyle = isCenter ? '#555246' : '#353329';
+    ctx.lineWidth = isCenter ? 2 : 1;
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(canvas.width, y);
+    ctx.stroke();
+
+    ctx.fillStyle = isCenter ? '#d7d4c8' : '#9c998f';
+    const label = mark > 0 ? `+${mark}c` : `${mark}c`;
+    ctx.fillText(label, canvas.width - 8, y);
+  }
+}
+
+function drawMovingGrid() {
+  ctx.strokeStyle = '#2b2a24';
+  ctx.lineWidth = 1;
+
+  const phase = ((offsetX % gridStep) + gridStep) % gridStep;
+  for (let x = -phase; x < canvas.width; x += gridStep) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, canvas.height);
+    ctx.stroke();
+  }
+}
+
+function drawCenterZone() {
+  if (!centerZoneEnabled) return;
+  const zoneCents = Math.min(centerZoneDiameter / 2, centsRange);
+  const yTop = centerY - (zoneCents / centsRange) * (canvas.height / 2);
+  const yBottom = centerY + (zoneCents / centsRange) * (canvas.height / 2);
+
+  // Bright cyan gives better long-distance visibility on dark background.
+  ctx.fillStyle = 'rgba(80, 230, 255, 0.14)';
+  ctx.fillRect(0, yTop, canvas.width, yBottom - yTop);
+
+  ctx.strokeStyle = 'rgba(95, 242, 255, 0.82)';
+  ctx.lineWidth = 1.4;
+  ctx.beginPath();
+  ctx.moveTo(0, yTop);
+  ctx.lineTo(canvas.width, yTop);
+  ctx.moveTo(0, yBottom);
+  ctx.lineTo(canvas.width, yBottom);
+  ctx.stroke();
+}
+
+function drawNoteRanges(startX) {
+  ctx.font = '12px Segoe UI';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+  ctx.strokeStyle = 'rgba(185, 176, 142, 0.48)';
+  ctx.fillStyle = 'rgba(231, 223, 193, 0.95)';
+
+  let segmentStart = -1;
+  let segmentNote = null;
+
+  for (let i = 0; i <= trail.length; i++) {
+    const item = i < trail.length ? trail[i] : null;
+    const note = item && item.note ? item.note : null;
+
+    if (segmentStart === -1) {
+      if (note) {
+        segmentStart = i;
+        segmentNote = note;
+      }
+      continue;
+    }
+
+    if (note !== segmentNote) {
+      const segmentEnd = i - 1;
+      const x1 = startX + segmentStart * speed;
+      const x2 = startX + segmentEnd * speed;
+      const width = x2 - x1;
+      const y = canvas.height - 24;
+      if (width >= 24) {
+        ctx.beginPath();
+        ctx.moveTo(x1, y);
+        ctx.lineTo(x2, y);
+        ctx.moveTo(x1, y - 6);
+        ctx.lineTo(x1, y + 6);
+        ctx.moveTo(x2, y - 6);
+        ctx.lineTo(x2, y + 6);
+        ctx.stroke();
+      }
+      if (width >= 44) ctx.fillText(segmentNote, (x1 + x2) / 2, y - 8);
+
+      if (note) {
+        segmentStart = i;
+        segmentNote = note;
+      } else {
+        segmentStart = -1;
+        segmentNote = null;
+      }
+    }
+  }
+}
+
+function drawTrail() {
+  if (trail.length === 0) return;
+  const startX = canvas.width - (trail.length - 1) * speed + offsetX;
+
+  ctx.lineWidth = 3;
+  for (let i = 1; i < trail.length; i++) {
+    const prev = trail[i - 1];
+    const curr = trail[i];
+    if (!prev || !curr) continue;
+
+    const x1 = startX + (i - 1) * speed;
+    const y1 = centerY - (prev.cents / centsRange) * (canvas.height / 2);
+    const x2 = startX + i * speed;
+    const y2 = centerY - (curr.cents / centsRange) * (canvas.height / 2);
+    const alpha = Math.max(0.06, Math.min(1, (prev.alpha + curr.alpha) / 2));
+    ctx.strokeStyle = `rgba(255, 215, 0, ${alpha})`;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+  }
+
+  drawNoteRanges(startX);
+}
+
+function estimateAFromFrequency(f) {
+  const midi440 = 69 + 12 * Math.log2(f / 440);
+  const nearestAMidi = Math.round((midi440 - 9) / 12) * 12 + 9;
+  const a = f / Math.pow(2, (nearestAMidi - 69) / 12);
+  if (!Number.isFinite(a)) return null;
+  if (a < 380 || a > 500) return null;
+  return a;
+}
+
+function finalizeLearnA() {
+  learnAActive = false;
+  if (learnASamples.length < 8) {
+    learnAStatus.textContent = 'Not enough signal. Play A louder and more stable.';
+    return;
+  }
+  const sorted = [...learnASamples].sort((a, b) => a - b);
+  const median = sorted[Math.floor(sorted.length / 2)];
+  tuningA = Math.round(median * 10) / 10;
+  a4Input.value = tuningA.toFixed(1);
+  a4Range.value = tuningA.toFixed(1);
+  learnAStatus.textContent = `A4 set to ${tuningA.toFixed(1)} Hz`;
+}
+
+function finalizeLearnRms() {
+  learnRmsActive = false;
+  if (learnRmsSamples.length < 20) {
+    learnAStatus.textContent = 'Not enough level data. Play steady note for ~3 sec.';
+    return;
+  }
+
+  const sorted = [...learnRmsSamples].sort((a, b) => a - b);
+  const p20 = sorted[Math.floor(sorted.length * 0.2)];
+  const p80 = sorted[Math.floor(sorted.length * 0.8)];
+
+  const nextSilence = Math.max(0.001, Math.min(0.05, p20 * 0.7));
+  const nextLoud = Math.max(nextSilence + 0.005, Math.min(0.3, p80 * 1.05));
+
+  silenceRms = nextSilence;
+  loudRms = nextLoud;
+  silenceInput.value = silenceRms.toFixed(3);
+  silenceRange.value = silenceInput.value;
+  loudInput.value = loudRms.toFixed(3);
+  loudRange.value = loudInput.value;
+
+  learnAStatus.textContent = `RMS auto-set: gate=${silenceRms.toFixed(3)}, full=${loudRms.toFixed(3)}`;
+}
+
+function updatePitchState() {
+  if (!analyser || !timeBuffer) return;
+  analyser.getFloatTimeDomainData(timeBuffer);
+  const rms = getRms(timeBuffer);
+  const db = Math.max(-80, 20 * Math.log10(Math.max(rms, 1e-6)));
+  dbEl.textContent = `${db.toFixed(1)} dB`;
+  if (learnRmsActive && rms > 0.002) learnRmsSamples.push(rms);
+
+  if (rms < silenceRms) {
+    silentFrames += 1;
+    latestPoint = null;
+    lastCents = [];
+    smoothedPitchHz = null;
+    noteEl.textContent = lastShownNote;
+    centsEl.textContent = `${lastShownCents >= 0 ? '+' : ''}${lastShownCents} cents`;
+    bar.style.left = '50%';
+    bar.style.background = '#888';
+    return;
+  }
+
+  silentFrames = 0;
+  const f = detectPitch(timeBuffer);
+
+  if (!f) {
+    latestPoint = null;
+    smoothedPitchHz = null;
+    noteEl.textContent = lastShownNote;
+    centsEl.textContent = `${lastShownCents >= 0 ? '+' : ''}${lastShownCents} cents`;
+    bar.style.left = '50%';
+    bar.style.background = '#888';
+    return;
+  }
+
+  if (smoothedPitchHz == null) {
+    smoothedPitchHz = f;
+  } else {
+    // Dynamic smoothing: follows vibrato continuously but avoids hard jumps.
+    const delta = Math.abs(f - smoothedPitchHz);
+    const baseAlpha = Math.max(0.04, 0.22 - (smoothing - 1) * 0.012);
+    const alpha = delta > 6 ? 0.35 : baseAlpha;
+    smoothedPitchHz += (f - smoothedPitchHz) * alpha;
+  }
+
+  const { name, octave, cents } = freqToNote(smoothedPitchHz);
+  lastCents.push(cents);
+  if (lastCents.length > smoothing) lastCents.shift();
+
+  const sorted = [...lastCents].sort((a, b) => a - b);
+  const medianCents = sorted[Math.floor(sorted.length / 2)];
+  lastMedianCents = medianCents;
+
+  noteEl.textContent = `${name}${octave}`;
+  centsEl.textContent = `${medianCents >= 0 ? '+' : ''}${medianCents} cents`;
+  lastShownNote = `${name}${octave}`;
+  lastShownCents = medianCents;
+
+  const pct = Math.max(-1, Math.min(1, medianCents / centsRange));
+  bar.style.left = `${50 + pct * 50}%`;
+
+  const abs = Math.abs(medianCents);
+  if (abs <= 5) bar.style.background = '#2ecc71';
+  else if (abs <= 15) bar.style.background = '#f1c40f';
+  else bar.style.background = '#e74c3c';
+
+  const normalized = (rms - silenceRms) / (loudRms - silenceRms);
+  const alpha = Math.max(0.1, Math.min(1, normalized));
+  latestPoint = { cents: medianCents, alpha, note: `${name}${octave}` };
+  noPitchFrames = 0;
+
+  if (learnAActive) {
+    const aCandidate = estimateAFromFrequency(f);
+    if (aCandidate) learnASamples.push(aCandidate);
+  }
+}
+
+function drawFrame() {
+  ctx.fillStyle = '#1b1a16';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  drawMovingGrid();
+  drawCenterZone();
+  drawCentsScale();
+  drawTrail();
+}
+
+function animate() {
+  if (learnAActive && performance.now() >= learnADeadline) finalizeLearnA();
+  if (learnRmsActive && performance.now() >= learnRmsDeadline) finalizeLearnRms();
+  updatePitchState();
+
+  offsetX -= speed;
+  const maxLen = Math.ceil(canvas.width / speed) + 10;
+  if (offsetX <= -speed) {
+    offsetX += speed;
+    if (latestPoint) {
+      trail.push({ ...latestPoint });
+      noPitchFrames = 0;
+    } else {
+      noPitchFrames += 1;
+      const prev = trail.length > 0 ? trail[trail.length - 1] : null;
+      if (prev && noPitchFrames <= maxHoldFrames) {
+        trail.push({
+          cents: prev.cents,
+          note: prev.note,
+          alpha: Math.max(0.02, prev.alpha * 0.9)
+        });
+      } else {
+        trail.push(null);
+      }
+    }
+    if (trail.length > maxLen) trail.shift();
+  }
+
+  drawFrame();
+  requestAnimationFrame(animate);
+}
+
+function applySettingsFromUI() {
+  const nextA4 = parseFloat(a4Input.value);
+  const nextSmooth = parseInt(smoothingInput.value, 10);
+  const nextRange = parseFloat(centsRangeInput.value);
+  const nextSpeed = parseFloat(speedInput.value);
+  const nextSilence = parseFloat(silenceInput.value);
+  const nextLoud = parseFloat(loudInput.value);
+  const nextZoneDiameter = parseFloat(zoneDiameterInput.value);
+
+  if (Number.isFinite(nextA4) && nextA4 >= 380 && nextA4 <= 500) tuningA = nextA4;
+  if (Number.isFinite(nextSmooth) && nextSmooth >= 1 && nextSmooth <= 15) smoothing = nextSmooth;
+  if (Number.isFinite(nextRange) && nextRange >= 20 && nextRange <= 100) centsRange = nextRange;
+  if (Number.isFinite(nextSpeed) && nextSpeed >= 1 && nextSpeed <= 8) speed = nextSpeed;
+  if (Number.isFinite(nextSilence) && nextSilence >= 0.001 && nextSilence <= 0.05) silenceRms = nextSilence;
+  if (Number.isFinite(nextLoud) && nextLoud > silenceRms && nextLoud <= 0.3) loudRms = nextLoud;
+  if (Number.isFinite(nextZoneDiameter) && nextZoneDiameter >= 2 && nextZoneDiameter <= 40) centerZoneDiameter = nextZoneDiameter;
+  centerZoneEnabled = centerZoneEnabledInput.checked;
+
+  learnAStatus.textContent = `Applied. A4=${tuningA.toFixed(1)} Hz`;
+}
+
+function bindPair(numberEl, rangeEl) {
+  const syncFromNumber = () => {
+    rangeEl.value = numberEl.value;
+    applySettingsFromUI();
+  };
+  const syncFromRange = () => {
+    numberEl.value = rangeEl.value;
+    applySettingsFromUI();
+  };
+  numberEl.addEventListener('input', syncFromNumber);
+  numberEl.addEventListener('change', syncFromNumber);
+  rangeEl.addEventListener('input', syncFromRange);
+  rangeEl.addEventListener('change', syncFromRange);
+}
+
+async function requestFullscreenNow() {
+  const el = document.documentElement;
+  try {
+    if (document.fullscreenElement) return true;
+    if (el.requestFullscreen) await el.requestFullscreen();
+    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    else if (el.msRequestFullscreen) el.msRequestFullscreen();
+    return !!document.fullscreenElement || !!document.webkitFullscreenElement;
+  } catch {
+    return false;
+  }
+}
+
+function bookmarkHintText() {
+  const isMac = /Mac|iPhone|iPad/.test(navigator.platform);
+  return `Use ${isMac ? 'Cmd+D' : 'Ctrl+D'} to add bookmark.`;
+}
+
+async function ensureAudioInitialized() {
+  if (audioCtx && analyser && timeBuffer) {
+    if (audioCtx.state === 'suspended') await audioCtx.resume();
+    return true;
+  }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: false,
+        noiseSuppression: false,
+        autoGainControl: false
+      }
+    });
+
+    audioCtx = new AudioContext({ sampleRate });
+    const source = audioCtx.createMediaStreamSource(stream);
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 2048;
+    source.connect(analyser);
+    timeBuffer = new Float32Array(analyser.fftSize);
+
+    if (audioCtx.state === 'suspended') await audioCtx.resume();
+    return true;
+  } catch (err) {
+    noteEl.textContent = 'No microphone access';
+    centsEl.textContent = 'Allow microphone in browser and reload the page';
+    dbEl.textContent = '-- dB';
+    bar.style.left = '50%';
+    bar.style.background = '#888';
+    return false;
+  }
+}
+
+function applyAutoAFromSamples(samples) {
+  if (samples.length < 8) return false;
+  const sorted = [...samples].sort((a, b) => a - b);
+  const median = sorted[Math.floor(sorted.length / 2)];
+  tuningA = Math.round(median * 10) / 10;
+  a4Input.value = tuningA.toFixed(1);
+  a4Range.value = tuningA.toFixed(1);
+  return true;
+}
+
+function applyAutoRmsFromSamples(samples) {
+  if (samples.length < 20) return false;
+  const sorted = [...samples].sort((a, b) => a - b);
+  const p20 = sorted[Math.floor(sorted.length * 0.2)];
+  const p80 = sorted[Math.floor(sorted.length * 0.8)];
+  silenceRms = Math.max(0.001, Math.min(0.05, p20 * 0.7));
+  loudRms = Math.max(silenceRms + 0.005, Math.min(0.3, p80 * 1.05));
+  silenceInput.value = silenceRms.toFixed(3);
+  silenceRange.value = silenceInput.value;
+  loudInput.value = loudRms.toFixed(3);
+  loudRange.value = loudInput.value;
+  return true;
+}
+
+async function runStartupCalibration() {
+  const needASamples = 8;
+  const needRmsSamples = 20;
+  const hardTimeoutMs = 12000;
+  const aSamples = [];
+  const rmsSamples = [];
+  const startedAt = performance.now();
+
+  while (true) {
+    analyser.getFloatTimeDomainData(timeBuffer);
+    const rms = getRms(timeBuffer);
+    if (rms > 0.002) rmsSamples.push(rms);
+    const f = detectPitch(timeBuffer);
+    if (f) {
+      const a = estimateAFromFrequency(f);
+      if (a) aSamples.push(a);
+    }
+
+    const aOkNow = aSamples.length >= needASamples;
+    const rmsOkNow = rmsSamples.length >= needRmsSamples;
+    const elapsedMs = performance.now() - startedAt;
+
+    launchStatus.textContent = `Calibrating... A ${Math.min(aSamples.length, needASamples)}/${needASamples}, RMS ${Math.min(rmsSamples.length, needRmsSamples)}/${needRmsSamples}`;
+
+    if (aOkNow && rmsOkNow) break;
+    if (elapsedMs >= hardTimeoutMs) break;
+    await new Promise(resolve => setTimeout(resolve, 33));
+  }
+
+  const aOk = applyAutoAFromSamples(aSamples);
+  const rmsOk = applyAutoRmsFromSamples(rmsSamples);
+  if (!aOk || !rmsOk) {
+    launchStatus.textContent = 'Calibration quality is low. You can tune manually in settings.';
+  } else {
+    launchStatus.textContent = `Ready. A4 ${tuningA.toFixed(1)} Hz, gate ${silenceRms.toFixed(3)}, full ${loudRms.toFixed(3)}.`;
+  }
+}
+
+async function waitForFirstSound(timeoutMs = 12000) {
+  const deadline = performance.now() + timeoutMs;
+  let stableFrames = 0;
+  while (performance.now() < deadline) {
+    analyser.getFloatTimeDomainData(timeBuffer);
+    const rms = getRms(timeBuffer);
+    const f = detectPitch(timeBuffer);
+    const hasSignal = rms > 0.006 && !!f;
+    stableFrames = hasSignal ? stableFrames + 1 : 0;
+
+    if (stableFrames >= 5) return true;
+    await new Promise(resolve => setTimeout(resolve, 33));
+  }
+  return false;
+}
+
+async function runStartupFlow() {
+  if (startupFlowRunning || started) return;
+  startupFlowRunning = true;
+  launchStatus.textContent = 'Requesting microphone...';
+  const ok = await ensureAudioInitialized();
+  if (!ok) {
+    launchStatus.textContent = 'Microphone access is required.';
+    startupFlowRunning = false;
+    return;
+  }
+
+  launchStatus.textContent = 'Mic ready. Waiting for first sound...';
+  const heard = await waitForFirstSound();
+  if (!heard) {
+    launchStatus.textContent = 'No stable sound detected. Play your A to continue.';
+    startupFlowRunning = false;
+    runStartupFlow();
+    return;
+  }
+
+  await runStartupCalibration();
+  launchScreen.classList.add('hidden');
+  menuPanel.classList.add('hidden');
+  advancedPanel.classList.add('hidden');
+  started = true;
+  requestAnimationFrame(animate);
+}
+
+noteEl.addEventListener('click', () => menuPanel.classList.toggle('hidden'));
+advancedToggleBtn.addEventListener('click', () => {
+  advancedPanel.classList.toggle('hidden');
+  advancedToggleBtn.textContent = advancedPanel.classList.contains('hidden') ? 'Advanced settings' : 'Hide advanced settings';
+});
+bindPair(a4Input, a4Range);
+bindPair(smoothingInput, smoothingRange);
+bindPair(centsRangeInput, centsRangeRange);
+bindPair(speedInput, speedRange);
+bindPair(silenceInput, silenceRange);
+bindPair(loudInput, loudRange);
+bindPair(zoneDiameterInput, zoneDiameterRange);
+centerZoneEnabledInput.addEventListener('change', applySettingsFromUI);
+advancedFullscreenBtn.addEventListener('click', async () => {
+  const ok = await requestFullscreenNow();
+  learnAStatus.textContent = ok
+    ? 'Fullscreen enabled.'
+    : 'Fullscreen was blocked. You can still continue.';
+});
+advancedBookmarkBtn.addEventListener('click', () => {
+  learnAStatus.textContent = bookmarkHintText();
+});
+launchFullscreenBtn.addEventListener('click', async () => {
+  const ok = await requestFullscreenNow();
+  launchStatus.textContent = ok ? 'Fullscreen enabled.' : 'Fullscreen was blocked by browser.';
+});
+learnABtn.addEventListener('click', () => {
+  learnAActive = true;
+  learnASamples = [];
+  learnADeadline = performance.now() + 2500;
+  learnAStatus.textContent = 'Play A for ~2.5 sec...';
+});
+learnRmsBtn.addEventListener('click', () => {
+  learnRmsActive = true;
+  learnRmsSamples = [];
+  learnRmsDeadline = performance.now() + 3000;
+  learnAStatus.textContent = 'Play your normal loudness for ~3 sec...';
+});
+runStartupFlow();
+</script>
+</body>
+</html>
