@@ -111,6 +111,17 @@
     color: #bfb69c;
   }
 
+  .menuHelp {
+    margin: 4px 0 10px;
+    padding: 8px 9px;
+    border-radius: 8px;
+    border: 1px solid rgba(214, 188, 107, 0.22);
+    background: rgba(255, 255, 255, 0.03);
+    font-size: 0.78rem;
+    color: #cfc7aa;
+    line-height: 1.35;
+  }
+
   .menuRow {
     display: grid;
     grid-template-columns: 1fr auto auto;
@@ -190,90 +201,90 @@
     font-size: 0.84rem;
   }
 
-  #startupPanel {
+  #launchScreen {
     position: fixed;
     inset: 0;
     z-index: 30;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
-    pointer-events: none;
-    padding-top: 12px;
+    background:
+      radial-gradient(1200px 600px at 50% -10%, rgba(121, 185, 255, 0.14), transparent 55%),
+      rgba(13, 12, 10, 0.9);
   }
 
-  #startupPanel.hidden {
+  #launchScreen.hidden {
     display: none;
   }
 
-  #startupCard {
-    width: min(560px, calc(100vw - 24px));
-    border: 1px solid rgba(214, 188, 107, 0.35);
-    border-radius: 12px;
-    background: rgba(27, 24, 17, 0.94);
-    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
-    padding: 10px;
-    pointer-events: auto;
+  #launchCard {
+    width: min(760px, calc(100vw - 30px));
+    padding: 22px 16px;
+    text-align: center;
   }
 
-  .startupTitle {
-    font-size: 0.95rem;
-    color: #f7efd8;
-    margin-bottom: 8px;
+  #launchTitle {
+    font-size: clamp(1.35rem, 2.7vw, 2rem);
+    color: #f6efd9;
+    margin-bottom: 10px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
   }
 
-  .startupActions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+  #launchText {
+    color: #d5ccb0;
+    font-size: clamp(0.92rem, 1.8vw, 1.05rem);
+    margin-bottom: 16px;
   }
 
-  .startupActions button {
-    border: 1px solid #6e6240;
-    background: #32291a;
-    color: #f2e9cf;
-    border-radius: 7px;
-    padding: 7px 10px;
+  #launchFullscreenBtn {
+    border: 1px solid #8d7a42;
+    background: #d6b85f;
+    color: #1d180d;
+    border-radius: 10px;
+    padding: 10px 14px;
     cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+
+  #launchFullscreenBtn:disabled {
+    opacity: 0.72;
+    cursor: default;
+  }
+
+  #launchStatus {
+    margin-top: 10px;
+    min-height: 1.2em;
+    color: #e6debf;
     font-size: 0.86rem;
-  }
-
-  #bookmarkHint {
-    margin-top: 7px;
-    color: #cfc7ab;
-    font-size: 0.8rem;
-  }
-
-  .startupRemember {
-    margin-top: 6px;
-    font-size: 0.82rem;
-    color: #d8d1b8;
-    display: flex;
-    align-items: center;
-    gap: 6px;
   }
 
 </style>
 </head>
 <body>
 <canvas id="canvas"></canvas>
-<div id="startupPanel">
-  <div id="startupCard">
-    <div class="startupTitle">For best use: fullscreen + bookmark</div>
-    <div class="startupActions">
-      <button id="fullscreenBtn" type="button">Go Fullscreen</button>
-      <button id="bookmarkBtn" type="button">Add Bookmark</button>
-      <button id="installBtn" type="button" class="hidden">Install App</button>
-      <button id="startupCloseBtn" type="button">Close</button>
-    </div>
-    <div id="bookmarkHint">Tip: use Ctrl+D (or Cmd+D on Mac).</div>
-    <label class="startupRemember"><input id="dontShowStartupInput" type="checkbox" /> Don't show again</label>
+<div id="launchScreen">
+  <div id="launchCard">
+    <div id="launchTitle">Chromatic Tuner</div>
+    <div id="launchText">Play your A to start. Auto A + Auto RMS will calibrate automatically from first sound.</div>
+    <button id="launchFullscreenBtn" type="button">Enter Fullscreen</button>
+    <div id="launchStatus"></div>
   </div>
 </div>
 <div id="menuPanel" class="hidden">
   <div class="menuTitle">Quick Settings</div>
   <div class="menuHint">Pitch range is fixed: 150-3000 Hz</div>
   <div class="menuRow"><label for="a4Input">Reference A</label><input id="a4Range" type="range" min="380" max="500" step="0.1" value="440" /><input id="a4Input" type="number" min="380" max="500" step="0.1" value="440" /></div>
-  <div class="menuActions" style="margin-top: 2px; margin-bottom: 8px;"><button id="learnABtn" type="button">Auto A</button></div>
+  <div class="menuActions" style="margin-top: 2px; margin-bottom: 8px;">
+    <button id="learnABtn" type="button">Auto A</button>
+    <button id="learnRmsBtn" type="button">Auto RMS</button>
+    <button id="selfTestBtn" type="button">Self-check</button>
+  </div>
+  <div class="menuHelp">
+    <div><strong>Noise gate (RMS):</strong> minimum level to treat sound as valid.</div>
+    <div><strong>Full opacity RMS:</strong> level where the line reaches maximum visibility.</div>
+  </div>
   <button id="advancedToggleBtn" class="menuAdvancedToggle" type="button">Advanced settings</button>
   <div class="menuActions" style="margin-top: 6px; margin-bottom: 8px;">
     <button id="advancedFullscreenBtn" type="button">Go Fullscreen</button>
@@ -300,7 +311,7 @@
 <script type="module">
 const minFreq = 150;
 const maxFreq = 3000;
-const sampleRate = 48000;
+const preferredSampleRate = 48000;
 let smoothing = 5;
 let centsRange = 50;
 let silenceRms = 0.01;
@@ -313,13 +324,9 @@ const noteEl = document.getElementById('note');
 const centsEl = document.getElementById('cents');
 const dbEl = document.getElementById('db');
 const bar = document.querySelector('#indicator .bar');
-const startupPanel = document.getElementById('startupPanel');
-const fullscreenBtn = document.getElementById('fullscreenBtn');
-const bookmarkBtn = document.getElementById('bookmarkBtn');
-const installBtn = document.getElementById('installBtn');
-const startupCloseBtn = document.getElementById('startupCloseBtn');
-const bookmarkHint = document.getElementById('bookmarkHint');
-const dontShowStartupInput = document.getElementById('dontShowStartupInput');
+const launchScreen = document.getElementById('launchScreen');
+const launchFullscreenBtn = document.getElementById('launchFullscreenBtn');
+const launchStatus = document.getElementById('launchStatus');
 const advancedFullscreenBtn = document.getElementById('advancedFullscreenBtn');
 const advancedBookmarkBtn = document.getElementById('advancedBookmarkBtn');
 const menuPanel = document.getElementById('menuPanel');
@@ -341,6 +348,8 @@ const centerZoneEnabledInput = document.getElementById('centerZoneEnabledInput')
 const zoneDiameterRange = document.getElementById('zoneDiameterRange');
 const zoneDiameterInput = document.getElementById('zoneDiameterInput');
 const learnABtn = document.getElementById('learnABtn');
+const learnRmsBtn = document.getElementById('learnRmsBtn');
+const selfTestBtn = document.getElementById('selfTestBtn');
 const learnAStatus = document.getElementById('learnAStatus');
 
 let centerY = 0;
@@ -359,10 +368,34 @@ let lastShownCents = 0;
 let learnAActive = false;
 let learnADeadline = 0;
 let learnASamples = [];
+let learnRmsActive = false;
+let learnRmsDeadline = 0;
+let learnRmsSamples = [];
 let centerZoneEnabled = true;
 let centerZoneDiameter = 10;
-let deferredInstallPrompt = null;
-let fullscreenAutoTried = false;
+let started = false;
+let startupFlowRunning = false;
+let smoothedPitchHz = null;
+let selfTestActive = false;
+let selfTestStartTs = 0;
+let selfTestMidi = [];
+const selfTestNoteMs = 650;
+const selfTestGlideMs = 0;
+let selfTestOsc = null;
+let selfTestGain = null;
+let selfTestLastNoteIndex = -1;
+let transitionCandidateHz = null;
+let transitionFrames = 0;
+const minPitchClarity = 0.35;
+const transitionJumpCents = 70;
+const transitionConfirmFrames = 2;
+const transitionToleranceCents = 35;
+let forceSnapToPitch = false;
+let prevRms = 0;
+let onsetHoldFrames = 0;
+const onsetRmsJump = 0.006;
+const onsetRatio = 1.7;
+const onsetHoldFrameCount = 5; // ~80 ms at 60fps
 
 function resizeCanvas() {
   canvas.width = window.innerWidth;
@@ -382,27 +415,97 @@ function getRms(buffer) {
   return Math.sqrt(rms / buffer.length);
 }
 
-function detectPitch(buffer, minF = minFreq, maxF = maxFreq, sr = sampleRate) {
+function correlationAtLag(buffer, lag) {
+  let corr = 0;
+  for (let i = 0; i < buffer.length - lag; i++) corr += buffer[i] * buffer[i + lag];
+  return corr;
+}
 
-  const minLag = Math.floor(sr / maxF);
-  const maxLag = Math.floor(sr / minF);
+function centsDistance(f1, f2) {
+  return Math.abs(1200 * Math.log2(f1 / f2));
+}
 
+function snapCandidateToPreviousOctave(freq, prevFreq, minF, maxF) {
+  if (!Number.isFinite(prevFreq) || prevFreq <= 0) return freq;
+  const candidates = [freq, freq * 2, freq * 0.5, freq * 4, freq * 0.25]
+    .filter(v => Number.isFinite(v) && v >= minF && v <= maxF);
+  if (candidates.length === 0) return freq;
+
+  let best = candidates[0];
+  let bestDist = centsDistance(best, prevFreq);
+  for (let i = 1; i < candidates.length; i++) {
+    const d = centsDistance(candidates[i], prevFreq);
+    if (d < bestDist) {
+      best = candidates[i];
+      bestDist = d;
+    }
+  }
+  return best;
+}
+
+function detectPitch(buffer, minF = minFreq, maxF = maxFreq, sr = (audioCtx ? audioCtx.sampleRate : preferredSampleRate)) {
+  const minLagRaw = Math.max(2, Math.floor(sr / maxF));
+  const maxLagRaw = Math.min(buffer.length - 2, Math.floor(sr / minF));
+  let minLag = minLagRaw;
+  let maxLag = maxLagRaw;
+
+  // Raw mode: keep full lag search window for every frame.
+
+  const d = new Float32Array(maxLag + 1);
+  const cmndf = new Float32Array(maxLag + 1);
+  let running = 0;
+
+  for (let lag = 1; lag <= maxLag; lag++) {
+    let sum = 0;
+    const n = buffer.length - lag;
+    for (let i = 0; i < n; i++) {
+      const delta = buffer[i] - buffer[i + lag];
+      sum += delta * delta;
+    }
+    d[lag] = sum;
+    running += sum;
+    cmndf[lag] = lag === 0 || running <= 1e-10 ? 1 : (d[lag] * lag) / running;
+  }
+
+  const yinThreshold = 0.12;
   let bestLag = -1;
-  let bestCorr = 0;
 
   for (let lag = minLag; lag <= maxLag; lag++) {
-    let corr = 0;
-    for (let i = 0; i < buffer.length - lag; i++) {
-      corr += buffer[i] * buffer[i + lag];
-    }
-    if (corr > bestCorr) {
-      bestCorr = corr;
+    if (cmndf[lag] < yinThreshold) {
       bestLag = lag;
+      // Move to local minimum after threshold crossing.
+      while (bestLag + 1 <= maxLag && cmndf[bestLag + 1] <= cmndf[bestLag]) bestLag += 1;
+      break;
+    }
+  }
+
+  if (bestLag === -1) {
+    let bestVal = Infinity;
+    for (let lag = minLag; lag <= maxLag; lag++) {
+      if (cmndf[lag] < bestVal) {
+        bestVal = cmndf[lag];
+        bestLag = lag;
+      }
     }
   }
 
   if (bestLag <= 0) return null;
-  return sr / bestLag;
+
+  // Parabolic interpolation on CMNDF minimum.
+  let refinedLag = bestLag;
+  if (bestLag > minLag && bestLag < maxLag) {
+    const c0 = cmndf[bestLag - 1];
+    const c1 = cmndf[bestLag];
+    const c2 = cmndf[bestLag + 1];
+    const denom = c0 - (2 * c1) + c2;
+    if (Math.abs(denom) > 1e-10) {
+      const shift = 0.5 * (c0 - c2) / denom;
+      refinedLag = bestLag + Math.max(-0.5, Math.min(0.5, shift));
+    }
+  }
+
+  const clarity = 1 - Math.min(1, cmndf[bestLag]); // higher is better
+  return { freq: sr / refinedLag, clarity };
 }
 
 const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -415,6 +518,16 @@ function freqToNote(f) {
     octave: Math.floor(rounded / 12) - 1,
     cents
   };
+}
+
+function freqFromMidi(midi) {
+  return tuningA * Math.pow(2, (midi - 69) / 12);
+}
+
+function buildSelfTestMidi() {
+  // Chromatic scale: C4 -> C5 (inclusive), then loops
+  selfTestMidi = [];
+  for (let m = 60; m <= 72; m++) selfTestMidi.push(m);
 }
 
 function drawCentsScale() {
@@ -528,12 +641,15 @@ function drawNoteRanges(startX) {
 function drawTrail() {
   if (trail.length === 0) return;
   const startX = canvas.width - (trail.length - 1) * speed + offsetX;
+  const breakJumpCents = 12;
 
   ctx.lineWidth = 3;
   for (let i = 1; i < trail.length; i++) {
     const prev = trail[i - 1];
     const curr = trail[i];
     if (!prev || !curr) continue;
+    if (prev.note !== curr.note) continue;
+    if (Math.abs(curr.cents - prev.cents) > breakJumpCents) continue;
 
     const x1 = startX + (i - 1) * speed;
     const y1 = centerY - (prev.cents / centsRange) * (canvas.height / 2);
@@ -573,17 +689,61 @@ function finalizeLearnA() {
   learnAStatus.textContent = `A4 set to ${tuningA.toFixed(1)} Hz`;
 }
 
+function finalizeLearnRms() {
+  learnRmsActive = false;
+  if (learnRmsSamples.length < 20) {
+    learnAStatus.textContent = 'Not enough level data. Play steady note for ~3 sec.';
+    return;
+  }
+
+  const sorted = [...learnRmsSamples].sort((a, b) => a - b);
+  const p20 = sorted[Math.floor(sorted.length * 0.2)];
+  const p80 = sorted[Math.floor(sorted.length * 0.8)];
+
+  const nextSilence = Math.max(0.001, Math.min(0.05, p20 * 0.7));
+  const nextLoud = Math.max(nextSilence + 0.005, Math.min(0.3, p80 * 1.05));
+
+  silenceRms = nextSilence;
+  loudRms = nextLoud;
+  silenceInput.value = silenceRms.toFixed(3);
+  silenceRange.value = silenceInput.value;
+  loudInput.value = loudRms.toFixed(3);
+  loudRange.value = loudInput.value;
+
+  learnAStatus.textContent = `RMS auto-set: gate=${silenceRms.toFixed(3)}, full=${loudRms.toFixed(3)}`;
+}
+
 function updatePitchState() {
   if (!analyser || !timeBuffer) return;
   analyser.getFloatTimeDomainData(timeBuffer);
   const rms = getRms(timeBuffer);
   const db = Math.max(-80, 20 * Math.log10(Math.max(rms, 1e-6)));
   dbEl.textContent = `${db.toFixed(1)} dB`;
+  if (learnRmsActive && rms > 0.002) learnRmsSamples.push(rms);
+
+  const rmsRatio = prevRms > 1e-6 ? (rms / prevRms) : 1;
+  const isOnset = rms > silenceRms * 1.2 && ((rms - prevRms) > onsetRmsJump || rmsRatio > onsetRatio);
+  prevRms = rms;
+  if (isOnset) onsetHoldFrames = onsetHoldFrameCount;
+
+  if (onsetHoldFrames > 0) {
+    onsetHoldFrames -= 1;
+    noteEl.textContent = lastShownNote;
+    centsEl.textContent = `${lastShownCents >= 0 ? '+' : ''}${lastShownCents} cents`;
+    if (smoothedPitchHz != null) {
+      const alpha = Math.max(0.08, Math.min(1, (rms - silenceRms) / Math.max(1e-5, (loudRms - silenceRms))));
+      latestPoint = { cents: lastShownCents, alpha, note: lastShownNote };
+    }
+    return;
+  }
 
   if (rms < silenceRms) {
     silentFrames += 1;
     latestPoint = null;
     lastCents = [];
+    smoothedPitchHz = null;
+    transitionCandidateHz = null;
+    transitionFrames = 0;
     noteEl.textContent = lastShownNote;
     centsEl.textContent = `${lastShownCents >= 0 ? '+' : ''}${lastShownCents} cents`;
     bar.style.left = '50%';
@@ -592,9 +752,18 @@ function updatePitchState() {
   }
 
   silentFrames = 0;
-  const f = detectPitch(timeBuffer);
-
-  if (!f) {
+  const pitch = detectPitch(timeBuffer);
+  if (!pitch) {
+    latestPoint = null;
+    noteEl.textContent = lastShownNote;
+    centsEl.textContent = `${lastShownCents >= 0 ? '+' : ''}${lastShownCents} cents`;
+    bar.style.left = '50%';
+    bar.style.background = '#888';
+    return;
+  }
+  let f = pitch.freq;
+  const clarity = pitch.clarity;
+  if (!Number.isFinite(f) || !Number.isFinite(clarity) || clarity < minPitchClarity) {
     latestPoint = null;
     noteEl.textContent = lastShownNote;
     centsEl.textContent = `${lastShownCents >= 0 ? '+' : ''}${lastShownCents} cents`;
@@ -603,17 +772,16 @@ function updatePitchState() {
     return;
   }
 
+  // Raw mode: display detected pitch directly without temporal smoothing.
+  smoothedPitchHz = f;
   const { name, octave, cents } = freqToNote(f);
-  lastCents.push(cents);
-  if (lastCents.length > smoothing) lastCents.shift();
+  const currentNote = `${name}${octave}`;
+  const medianCents = cents;
+  lastMedianCents = cents;
 
-  const sorted = [...lastCents].sort((a, b) => a - b);
-  const medianCents = sorted[Math.floor(sorted.length / 2)];
-  lastMedianCents = medianCents;
-
-  noteEl.textContent = `${name}${octave}`;
+  noteEl.textContent = currentNote;
   centsEl.textContent = `${medianCents >= 0 ? '+' : ''}${medianCents} cents`;
-  lastShownNote = `${name}${octave}`;
+  lastShownNote = currentNote;
   lastShownCents = medianCents;
 
   const pct = Math.max(-1, Math.min(1, medianCents / centsRange));
@@ -626,13 +794,27 @@ function updatePitchState() {
 
   const normalized = (rms - silenceRms) / (loudRms - silenceRms);
   const alpha = Math.max(0.1, Math.min(1, normalized));
-  latestPoint = { cents: medianCents, alpha, note: `${name}${octave}` };
+  latestPoint = { cents: medianCents, alpha, note: currentNote };
   noPitchFrames = 0;
 
   if (learnAActive) {
     const aCandidate = estimateAFromFrequency(f);
     if (aCandidate) learnASamples.push(aCandidate);
   }
+}
+
+function updateSelfTestState() {
+  if (selfTestMidi.length === 0) buildSelfTestMidi();
+  const now = performance.now();
+  const elapsed = now - selfTestStartTs;
+  const total = selfTestMidi.length;
+  const noteIndex = Math.floor(elapsed / selfTestNoteMs) % total;
+  if (!selfTestOsc || noteIndex === selfTestLastNoteIndex) return;
+  selfTestLastNoteIndex = noteIndex;
+  const midiA = selfTestMidi[noteIndex];
+  const f = freqFromMidi(midiA);
+  selfTestOsc.frequency.cancelScheduledValues(audioCtx.currentTime);
+  selfTestOsc.frequency.setValueAtTime(f, audioCtx.currentTime);
 }
 
 function drawFrame() {
@@ -647,6 +829,8 @@ function drawFrame() {
 
 function animate() {
   if (learnAActive && performance.now() >= learnADeadline) finalizeLearnA();
+  if (learnRmsActive && performance.now() >= learnRmsDeadline) finalizeLearnRms();
+  if (selfTestActive) updateSelfTestState();
   updatePitchState();
 
   offsetX -= speed;
@@ -725,27 +909,16 @@ async function requestFullscreenNow() {
   }
 }
 
-function closeStartupPanel() {
-  if (dontShowStartupInput.checked) localStorage.setItem('tuner_hide_startup', '1');
-  startupPanel.classList.add('hidden');
-}
-
-function showBookmarkHint() {
+function bookmarkHintText() {
   const isMac = /Mac|iPhone|iPad/.test(navigator.platform);
-  const hotkey = isMac ? 'Cmd+D' : 'Ctrl+D';
-  bookmarkHint.textContent = `Use ${hotkey} to add this page to bookmarks.`;
+  return `Use ${isMac ? 'Cmd+D' : 'Ctrl+D'} to add bookmark.`;
 }
 
-async function tryFullscreenAuto() {
-  if (fullscreenAutoTried) return;
-  fullscreenAutoTried = true;
-  const ok = await requestFullscreenNow();
-  if (ok) {
-    bookmarkHint.textContent = 'Fullscreen enabled.';
+async function ensureAudioInitialized() {
+  if (audioCtx && analyser && timeBuffer) {
+    if (audioCtx.state === 'suspended') await audioCtx.resume();
+    return true;
   }
-}
-
-async function startTuner() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: {
@@ -755,7 +928,7 @@ async function startTuner() {
       }
     });
 
-    audioCtx = new AudioContext({ sampleRate });
+    audioCtx = new AudioContext({ sampleRate: preferredSampleRate });
     const source = audioCtx.createMediaStreamSource(stream);
     analyser = audioCtx.createAnalyser();
     analyser.fftSize = 2048;
@@ -763,14 +936,121 @@ async function startTuner() {
     timeBuffer = new Float32Array(analyser.fftSize);
 
     if (audioCtx.state === 'suspended') await audioCtx.resume();
-    requestAnimationFrame(animate);
+    return true;
   } catch (err) {
     noteEl.textContent = 'No microphone access';
     centsEl.textContent = 'Allow microphone in browser and reload the page';
     dbEl.textContent = '-- dB';
     bar.style.left = '50%';
     bar.style.background = '#888';
+    return false;
   }
+}
+
+function applyAutoAFromSamples(samples) {
+  if (samples.length < 8) return false;
+  const sorted = [...samples].sort((a, b) => a - b);
+  const median = sorted[Math.floor(sorted.length / 2)];
+  tuningA = Math.round(median * 10) / 10;
+  a4Input.value = tuningA.toFixed(1);
+  a4Range.value = tuningA.toFixed(1);
+  return true;
+}
+
+function applyAutoRmsFromSamples(samples) {
+  if (samples.length < 20) return false;
+  const sorted = [...samples].sort((a, b) => a - b);
+  const p20 = sorted[Math.floor(sorted.length * 0.2)];
+  const p80 = sorted[Math.floor(sorted.length * 0.8)];
+  silenceRms = Math.max(0.001, Math.min(0.05, p20 * 0.7));
+  loudRms = Math.max(silenceRms + 0.005, Math.min(0.3, p80 * 1.05));
+  silenceInput.value = silenceRms.toFixed(3);
+  silenceRange.value = silenceInput.value;
+  loudInput.value = loudRms.toFixed(3);
+  loudRange.value = loudInput.value;
+  return true;
+}
+
+async function runStartupCalibration() {
+  const needASamples = 8;
+  const needRmsSamples = 20;
+  const hardTimeoutMs = 12000;
+  const aSamples = [];
+  const rmsSamples = [];
+  const startedAt = performance.now();
+
+  while (true) {
+    analyser.getFloatTimeDomainData(timeBuffer);
+    const rms = getRms(timeBuffer);
+    if (rms > 0.002) rmsSamples.push(rms);
+    const pitch = detectPitch(timeBuffer);
+    if (pitch) {
+      const a = estimateAFromFrequency(pitch.freq);
+      if (a) aSamples.push(a);
+    }
+
+    const aOkNow = aSamples.length >= needASamples;
+    const rmsOkNow = rmsSamples.length >= needRmsSamples;
+    const elapsedMs = performance.now() - startedAt;
+
+    launchStatus.textContent = `Calibrating... A ${Math.min(aSamples.length, needASamples)}/${needASamples}, RMS ${Math.min(rmsSamples.length, needRmsSamples)}/${needRmsSamples}`;
+
+    if (aOkNow && rmsOkNow) break;
+    if (elapsedMs >= hardTimeoutMs) break;
+    await new Promise(resolve => setTimeout(resolve, 33));
+  }
+
+  const aOk = applyAutoAFromSamples(aSamples);
+  const rmsOk = applyAutoRmsFromSamples(rmsSamples);
+  if (!aOk || !rmsOk) {
+    launchStatus.textContent = 'Calibration quality is low. You can tune manually in settings.';
+  } else {
+    launchStatus.textContent = `Ready. A4 ${tuningA.toFixed(1)} Hz, gate ${silenceRms.toFixed(3)}, full ${loudRms.toFixed(3)}.`;
+  }
+}
+
+async function waitForFirstSound(timeoutMs = 12000) {
+  const deadline = performance.now() + timeoutMs;
+  let stableFrames = 0;
+  while (performance.now() < deadline) {
+    analyser.getFloatTimeDomainData(timeBuffer);
+    const rms = getRms(timeBuffer);
+    const pitch = detectPitch(timeBuffer);
+    const hasSignal = rms > 0.006 && !!pitch;
+    stableFrames = hasSignal ? stableFrames + 1 : 0;
+
+    if (stableFrames >= 5) return true;
+    await new Promise(resolve => setTimeout(resolve, 33));
+  }
+  return false;
+}
+
+async function runStartupFlow() {
+  if (startupFlowRunning || started) return;
+  startupFlowRunning = true;
+  launchStatus.textContent = 'Requesting microphone...';
+  const ok = await ensureAudioInitialized();
+  if (!ok) {
+    launchStatus.textContent = 'Microphone access is required.';
+    startupFlowRunning = false;
+    return;
+  }
+
+  launchStatus.textContent = 'Mic ready. Waiting for first sound...';
+  const heard = await waitForFirstSound();
+  if (!heard) {
+    launchStatus.textContent = 'No stable sound detected. Play your A to continue.';
+    startupFlowRunning = false;
+    runStartupFlow();
+    return;
+  }
+
+  await runStartupCalibration();
+  launchScreen.classList.add('hidden');
+  menuPanel.classList.add('hidden');
+  advancedPanel.classList.add('hidden');
+  started = true;
+  requestAnimationFrame(animate);
 }
 
 noteEl.addEventListener('click', () => menuPanel.classList.toggle('hidden'));
@@ -786,51 +1066,73 @@ bindPair(silenceInput, silenceRange);
 bindPair(loudInput, loudRange);
 bindPair(zoneDiameterInput, zoneDiameterRange);
 centerZoneEnabledInput.addEventListener('change', applySettingsFromUI);
-fullscreenBtn.addEventListener('click', async () => {
-  const ok = await requestFullscreenNow();
-  bookmarkHint.textContent = ok
-    ? 'Fullscreen enabled.'
-    : 'Fullscreen was blocked. You can still continue.';
-});
-bookmarkBtn.addEventListener('click', showBookmarkHint);
 advancedFullscreenBtn.addEventListener('click', async () => {
   const ok = await requestFullscreenNow();
-  bookmarkHint.textContent = ok
+  learnAStatus.textContent = ok
     ? 'Fullscreen enabled.'
     : 'Fullscreen was blocked. You can still continue.';
 });
-advancedBookmarkBtn.addEventListener('click', showBookmarkHint);
-installBtn.addEventListener('click', async () => {
-  if (!deferredInstallPrompt) return;
-  deferredInstallPrompt.prompt();
-  await deferredInstallPrompt.userChoice;
-  deferredInstallPrompt = null;
-  installBtn.classList.add('hidden');
+advancedBookmarkBtn.addEventListener('click', () => {
+  learnAStatus.textContent = bookmarkHintText();
 });
-startupCloseBtn.addEventListener('click', closeStartupPanel);
-startupCloseBtn.addEventListener('pointerdown', closeStartupPanel);
-window.addEventListener('beforeinstallprompt', (event) => {
-  event.preventDefault();
-  deferredInstallPrompt = event;
-  installBtn.classList.remove('hidden');
+launchFullscreenBtn.addEventListener('click', async () => {
+  const ok = await requestFullscreenNow();
+  launchStatus.textContent = ok ? 'Fullscreen enabled.' : 'Fullscreen was blocked by browser.';
 });
-tryFullscreenAuto();
-window.addEventListener('pointerdown', tryFullscreenAuto, { once: true });
-window.addEventListener('keydown', tryFullscreenAuto, { once: true });
-if (localStorage.getItem('tuner_hide_startup') === '1') {
-  startupPanel.classList.add('hidden');
-}
 learnABtn.addEventListener('click', () => {
   learnAActive = true;
   learnASamples = [];
   learnADeadline = performance.now() + 2500;
   learnAStatus.textContent = 'Play A for ~2.5 sec...';
 });
-
-startTuner();
+learnRmsBtn.addEventListener('click', () => {
+  learnRmsActive = true;
+  learnRmsSamples = [];
+  learnRmsDeadline = performance.now() + 3000;
+  learnAStatus.textContent = 'Play your normal loudness for ~3 sec...';
+});
+selfTestBtn.addEventListener('click', async () => {
+  const ready = await ensureAudioInitialized();
+  if (!ready) return;
+  selfTestActive = !selfTestActive;
+  if (selfTestActive) {
+    if (audioCtx.state === 'suspended') await audioCtx.resume();
+    selfTestStartTs = performance.now();
+    selfTestLastNoteIndex = -1;
+    buildSelfTestMidi();
+    trail = [];
+    lastCents = [];
+    latestPoint = null;
+    smoothedPitchHz = null;
+    if (!selfTestGain) {
+      selfTestGain = audioCtx.createGain();
+      selfTestGain.gain.value = 0.025;
+      selfTestGain.connect(audioCtx.destination);
+      selfTestGain.connect(analyser);
+    }
+    selfTestOsc = audioCtx.createOscillator();
+    selfTestOsc.type = 'sine';
+    selfTestOsc.frequency.value = freqFromMidi(selfTestMidi[0]);
+    selfTestOsc.connect(selfTestGain);
+    selfTestOsc.start();
+    learnAStatus.textContent = 'Self-check running: chromatic C4 -> C5 loop.';
+    selfTestBtn.textContent = 'Stop Self-check';
+  } else {
+    if (selfTestOsc) {
+      try { selfTestOsc.stop(); } catch {}
+      try { selfTestOsc.disconnect(); } catch {}
+      selfTestOsc = null;
+    }
+    if (selfTestGain) {
+      try { selfTestGain.disconnect(); } catch {}
+      selfTestGain = null;
+    }
+    selfTestLastNoteIndex = -1;
+    learnAStatus.textContent = 'Self-check stopped.';
+    selfTestBtn.textContent = 'Self-check';
+  }
+});
+runStartupFlow();
 </script>
 </body>
 </html>
-
-
-
