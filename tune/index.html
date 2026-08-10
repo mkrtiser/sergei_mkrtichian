@@ -176,6 +176,20 @@
     accent-color: #d8be6f;
   }
 
+  .menuRowSelect {
+    grid-template-columns: 1fr 154px;
+  }
+
+  .menuRow select {
+    width: 154px;
+    background: #17140d;
+    border: 1px solid #5a523c;
+    color: #f6eed9;
+    border-radius: 7px;
+    padding: 5px 7px;
+    font-size: 0.82rem;
+  }
+
   .menuActions {
     display: flex;
     gap: 8px;
@@ -388,6 +402,17 @@
     box-shadow: 0 0 0 5px rgba(119, 215, 219, 0.09);
   }
 
+  .liveBadge.off {
+    color: #9a9b95;
+    border-color: rgba(180, 180, 172, 0.18);
+    background: rgba(80, 80, 74, 0.16);
+  }
+
+  .liveBadge.off::before {
+    background: #777a74;
+    box-shadow: none;
+  }
+
   .spectrumPanel {
     border: 1px solid rgba(245, 236, 208, 0.11);
     border-radius: 22px;
@@ -515,7 +540,37 @@
     cursor: pointer;
   }
   .clipButton.processed { border-color: rgba(119, 215, 219, 0.32); color: #bce8e8; background: rgba(119, 215, 219, 0.07); }
-  #reviewStatus { min-height: 1.2em; margin-top: 10px; color: #a8aaa3; font-size: 0.77rem; }
+  .clipErrors { grid-column: 1 / -1; display: grid; gap: 6px; }
+
+  .errorItem {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 9px;
+    padding: 9px 10px;
+    border: 1px solid rgba(245, 236, 208, 0.08);
+    border-radius: 10px;
+    background: rgba(10, 11, 9, 0.24);
+  }
+
+  .errorTitle { color: #e2dccc; font-size: 0.78rem; font-weight: 650; }
+  .errorTitle.mild { color: #d8be6f; }
+  .errorTitle.medium { color: #e79b65; }
+  .errorTitle.strong { color: #ef746f; }
+  .errorAdvice { margin-top: 3px; color: #858a83; font-size: 0.72rem; line-height: 1.42; }
+  .errorPlay { align-self: start; white-space: nowrap; }
+  .noErrors { grid-column: 1 / -1; color: #7f857e; font-size: 0.74rem; }
+
+  .reviewFooter { display: flex; align-items: center; gap: 9px; margin-top: 10px; }
+  #reviewStatus { flex: 1; min-height: 1.2em; color: #a8aaa3; font-size: 0.77rem; }
+  #stopReviewBtn {
+    border: 1px solid rgba(239, 116, 111, 0.28);
+    border-radius: 8px;
+    padding: 6px 9px;
+    color: #e7b1ae;
+    background: rgba(239, 116, 111, 0.07);
+    cursor: pointer;
+  }
+  #stopReviewBtn:disabled { opacity: 0.38; cursor: default; }
 
   .analyzerFootnote {
     margin-top: 16px;
@@ -563,7 +618,7 @@
 </div>
 <div id="menuPanel" class="hidden">
   <div class="menuTitle">Quick Settings</div>
-  <div class="menuHint">Pitch range is fixed: 150-3000 Hz</div>
+  <div class="menuHint">Pitch range: 150–5000 Hz</div>
   <div class="menuRow"><label for="a4Input">Reference A</label><input id="a4Range" type="range" min="380" max="500" step="0.1" value="440" /><input id="a4Input" type="number" min="380" max="500" step="0.1" value="440" /></div>
   <div class="menuActions" style="margin-top: 2px; margin-bottom: 8px;">
     <button id="learnABtn" type="button">Auto A</button>
@@ -574,6 +629,18 @@
     <div><strong>Noise gate (RMS):</strong> minimum level to treat sound as valid.</div>
     <div><strong>Full opacity RMS:</strong> level where the line reaches maximum visibility.</div>
   </div>
+  <div class="menuRow menuRowSelect">
+    <label for="analyzerModeInput">Обновление спектра</label>
+    <select id="analyzerModeInput">
+      <option value="normal" selected>Обычное · 60 fps</option>
+      <option value="eco">Экономное · 15 fps</option>
+      <option value="off">Выключено</option>
+    </select>
+  </div>
+  <div class="menuRowCheckbox"><label for="autoRecordEnabledInput">Автозапись последних фраз</label><input id="autoRecordEnabledInput" type="checkbox" /></div>
+  <div class="menuRowCheckbox"><label for="autoCoachEnabledInput">Авторазбор ошибок A → B</label><input id="autoCoachEnabledInput" type="checkbox" /></div>
+  <div class="menuRowCheckbox"><label for="normalizePlaybackInput">Выравнивать тихие записи</label><input id="normalizePlaybackInput" type="checkbox" checked /></div>
+  <div class="menuHelp">Авторазбор включает запись фраз и после паузы проигрывает каждую найденную ошибку: сначала A, затем исправленный вариант B. Выравнивание повышает только громкость прослушивания.</div>
   <button id="advancedToggleBtn" class="menuAdvancedToggle" type="button">Advanced settings</button>
   <div class="menuActions" style="margin-top: 6px; margin-bottom: 8px;">
     <button id="advancedFullscreenBtn" type="button">Go Fullscreen</button>
@@ -612,7 +679,7 @@
     <section class="spectrumPanel" aria-label="График частотного спектра">
       <div class="spectrumTopline">
         <div class="spectrumLegend">
-          <span class="legendItem"><span class="legendSwatch"></span>живой спектр</span>
+          <span class="legendItem"><span class="legendSwatch"></span>живой спектр · 40 Гц–20 кГц</span>
           <span class="legendItem"><span class="legendSwatch profile"></span>коррекция A/B</span>
         </div>
         <div id="toneSummary">Ожидаю звук…</div>
@@ -669,15 +736,18 @@
       <section class="reviewPanel" aria-labelledby="reviewTitle">
         <div class="sectionKicker">Разбор после фразы</div>
         <h2 class="panelTitle" id="reviewTitle">Последние звуки</h2>
-        <p class="panelCopy">После короткой паузы здесь появится сыгранный фрагмент. A — как было, B — та же запись с профилем слева.</p>
+        <p class="panelCopy">Авторазбор найдёт устойчивые ошибки интонации и тембра. После паузы он проиграет каждый фрагмент A → B и подскажет, что изменить в работе смычка или левой руки.</p>
         <div id="recentClips">
-          <div class="emptyClips">Сыграйте фразу длиной от одной секунды<br />и сделайте небольшую паузу.</div>
+          <div class="emptyClips">Автозапись выключена.<br />Её можно включить в меню тюнера.</div>
         </div>
-        <div id="reviewStatus" aria-live="polite"></div>
+        <div class="reviewFooter">
+          <div id="reviewStatus" aria-live="polite"></div>
+          <button id="stopReviewBtn" type="button" disabled>Стоп</button>
+        </div>
       </section>
     </div>
 
-    <p class="analyzerFootnote">Показатели спектра зависят от ноты, комнаты, расстояния и микрофона. Это инструмент для сравнения своих дублей в одинаковых условиях, а не универсальная оценка «хорошего» звука.</p>
+    <p class="analyzerFootnote">Вариант B — слуховой ориентир: для интонации запись цифровым способом сдвигается к центру ноты, для тембра применяется выбранный профиль эквалайзера. Он показывает направление исправления, но не имитирует новую технику исполнения. Спектр зависит от ноты, комнаты, расстояния и микрофона.</p>
   </main>
 </section>
 </div>
@@ -689,8 +759,10 @@
 
 <script type="module">
 const minFreq = 150;
-const maxFreq = 3000;
+const maxFreq = 5000;
 const preferredSampleRate = 48000;
+const spectrumMinHz = 40;
+const spectrumMaxHz = 20000;
 let smoothing = 5;
 let centsRange = 50;
 let silenceRms = 0.01;
@@ -750,6 +822,11 @@ const presenceGainValue = document.getElementById('presenceGainValue');
 const airGainValue = document.getElementById('airGainValue');
 const recentClipsEl = document.getElementById('recentClips');
 const reviewStatusEl = document.getElementById('reviewStatus');
+const analyzerModeInput = document.getElementById('analyzerModeInput');
+const autoRecordEnabledInput = document.getElementById('autoRecordEnabledInput');
+const autoCoachEnabledInput = document.getElementById('autoCoachEnabledInput');
+const normalizePlaybackInput = document.getElementById('normalizePlaybackInput');
+const stopReviewBtn = document.getElementById('stopReviewBtn');
 
 let centerY = 0;
 let speed = 2;
@@ -814,7 +891,11 @@ let timeBuffer = null;
 let mediaStream = null;
 let spectrumAnalyser = null;
 let frequencyBuffer = null;
-let spectrumFrame = 0;
+let analyzerEnabled = true;
+let analyzerRefreshFps = 60;
+let lastSpectrumUpdateAt = 0;
+let spectrumPeakDb = -20;
+let spectrumHasSignal = false;
 let currentBandLevels = { body: -100, mid: -100, presence: -100, air: -100 };
 let phraseRecorder = null;
 let phraseStopping = false;
@@ -824,6 +905,9 @@ let activePhraseMetrics = null;
 let recentClips = [];
 let currentReviewSource = null;
 let reviewPlaying = false;
+let reviewSequenceToken = 0;
+let autoReviewTimer = null;
+let captureBlockedUntil = 0;
 
 function setActiveView(view) {
   if (!started) return;
@@ -905,10 +989,74 @@ function updateProfileUI() {
   input.addEventListener('input', updateProfileUI);
 });
 
+function refreshAnalyzerStatus() {
+  analyzerLiveStatus.classList.toggle('off', !analyzerEnabled);
+  if (!analyzerEnabled) {
+    analyzerLiveStatus.textContent = 'Спектр выключен';
+  } else if (phraseRecorder && phraseRecorder.state === 'recording') {
+    analyzerLiveStatus.textContent = 'Записываю фразу';
+  } else if (autoCoachEnabledInput.checked) {
+    analyzerLiveStatus.textContent = 'Микрофон активен · авторазбор';
+  } else if (autoRecordEnabledInput.checked) {
+    analyzerLiveStatus.textContent = 'Микрофон активен · автозапись';
+  } else {
+    analyzerLiveStatus.textContent = 'Микрофон активен · без записи';
+  }
+}
+
+function updateEmptyClipsMessage() {
+  if (recentClips.length) return;
+  recentClipsEl.innerHTML = autoRecordEnabledInput.checked
+    ? '<div class="emptyClips">Сыграйте фразу длиной от одной секунды<br />и сделайте небольшую паузу.</div>'
+    : '<div class="emptyClips">Автозапись выключена.<br />Её можно включить в меню тюнера.</div>';
+}
+
+function applyAnalyzerPreferences() {
+  analyzerEnabled = analyzerModeInput.value !== 'off';
+  analyzerRefreshFps = analyzerModeInput.value === 'eco' ? 15 : 60;
+  lastSpectrumUpdateAt = 0;
+  if (!analyzerEnabled) {
+    spectrumHasSignal = false;
+    bodyLevelEl.textContent = '— dB';
+    presenceLevelEl.textContent = '— dB';
+    airLevelEl.textContent = '— dB';
+    toneSummaryEl.textContent = 'Спектральный анализ выключен';
+  }
+  refreshAnalyzerStatus();
+  if (activeView === 'analyzer') drawSpectrum();
+}
+
+analyzerModeInput.addEventListener('change', applyAnalyzerPreferences);
+autoRecordEnabledInput.addEventListener('change', () => {
+  if (!autoRecordEnabledInput.checked) finishPhraseRecording();
+  if (!autoRecordEnabledInput.checked) autoCoachEnabledInput.checked = false;
+  updateEmptyClipsMessage();
+  refreshAnalyzerStatus();
+});
+autoCoachEnabledInput.addEventListener('change', () => {
+  if (autoCoachEnabledInput.checked) autoRecordEnabledInput.checked = true;
+  if (autoCoachEnabledInput.checked && audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume().catch(() => {});
+  }
+  if (!autoCoachEnabledInput.checked && autoReviewTimer) {
+    clearTimeout(autoReviewTimer);
+    autoReviewTimer = null;
+  }
+  updateEmptyClipsMessage();
+  refreshAnalyzerStatus();
+});
+normalizePlaybackInput.addEventListener('change', () => {
+  reviewStatusEl.textContent = normalizePlaybackInput.checked
+    ? 'Тихие записи будут автоматически подняты до удобной громкости.'
+    : 'Воспроизведение оставлено на исходном уровне микрофона.';
+});
+stopReviewBtn.addEventListener('click', () => {
+  stopReview();
+  reviewStatusEl.textContent = 'Автоматическое воспроизведение остановлено.';
+});
+
 function spectrumX(freq, left, width) {
-  const min = 80;
-  const max = 12000;
-  return left + (Math.log(freq / min) / Math.log(max / min)) * width;
+  return left + (Math.log(freq / spectrumMinHz) / Math.log(spectrumMaxHz / spectrumMinHz)) * width;
 }
 
 function correctionAtFrequency(freq) {
@@ -936,8 +1084,16 @@ function bandAverageDb(minHz, maxHz) {
 }
 
 function updateSpectrumData() {
-  if (!spectrumAnalyser || !frequencyBuffer) return;
+  if (!analyzerEnabled || !spectrumAnalyser || !frequencyBuffer) return;
   spectrumAnalyser.getFloatFrequencyData(frequencyBuffer);
+  const binHz = audioCtx.sampleRate / spectrumAnalyser.fftSize;
+  const firstVisibleBin = Math.max(1, Math.ceil(spectrumMinHz / binHz));
+  const lastVisibleBin = Math.min(frequencyBuffer.length - 1, Math.floor(spectrumMaxHz / binHz));
+  spectrumPeakDb = -100;
+  for (let i = firstVisibleBin; i <= lastVisibleBin; i++) {
+    if (Number.isFinite(frequencyBuffer[i])) spectrumPeakDb = Math.max(spectrumPeakDb, frequencyBuffer[i]);
+  }
+  spectrumHasSignal = latestRms > Math.max(0.0008, silenceRms * 0.2);
   currentBandLevels = {
     body: bandAverageDb(200, 350),
     mid: bandAverageDb(700, 1800),
@@ -945,15 +1101,14 @@ function updateSpectrumData() {
     air: bandAverageDb(6000, 12000)
   };
 
-  if (activePhraseMetrics && latestRms > Math.max(0.004, silenceRms * 1.25)) {
+  if (activePhraseMetrics && latestRms > Math.max(0.0015, silenceRms * 0.85)) {
     activePhraseMetrics.body += currentBandLevels.body - currentBandLevels.mid;
     activePhraseMetrics.presence += currentBandLevels.presence - currentBandLevels.mid;
     activePhraseMetrics.air += currentBandLevels.air - currentBandLevels.mid;
     activePhraseMetrics.count += 1;
   }
 
-  if (spectrumFrame % 4 !== 0) return;
-  const hasSignal = latestRms > Math.max(0.003, silenceRms * 0.75);
+  const hasSignal = spectrumHasSignal;
   if (!hasSignal) {
     bodyLevelEl.textContent = '— dB';
     presenceLevelEl.textContent = '— dB';
@@ -1001,9 +1156,9 @@ function drawSpectrum() {
   spectrumCtx.font = '11px Segoe UI';
   spectrumCtx.textBaseline = 'middle';
   spectrumCtx.textAlign = 'right';
-  for (const db of [-20, -40, -60, -80, -100]) {
-    const y = top + ((-20 - db) / 80) * graphH;
-    spectrumCtx.strokeStyle = db === -60 ? 'rgba(230, 225, 211, 0.12)' : 'rgba(230, 225, 211, 0.065)';
+  for (const db of [0, -20, -40, -60, -80]) {
+    const y = top + (-db / 80) * graphH;
+    spectrumCtx.strokeStyle = db === -40 ? 'rgba(230, 225, 211, 0.12)' : 'rgba(230, 225, 211, 0.065)';
     spectrumCtx.lineWidth = 1;
     spectrumCtx.beginPath();
     spectrumCtx.moveTo(left, y);
@@ -1013,7 +1168,7 @@ function drawSpectrum() {
     spectrumCtx.fillText(String(db), left - 7, y);
   }
 
-  const ticks = [100, 200, 500, 1000, 2000, 5000, 10000];
+  const ticks = [50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000];
   spectrumCtx.textAlign = 'center';
   spectrumCtx.textBaseline = 'top';
   for (const freq of ticks) {
@@ -1027,17 +1182,26 @@ function drawSpectrum() {
     spectrumCtx.fillText(freq >= 1000 ? `${freq / 1000}k` : String(freq), x, top + graphH + 9);
   }
 
-  if (frequencyBuffer && audioCtx && spectrumAnalyser) {
+  if (!analyzerEnabled) {
+    spectrumCtx.fillStyle = '#8d918a';
+    spectrumCtx.font = '600 14px Segoe UI';
+    spectrumCtx.textAlign = 'center';
+    spectrumCtx.textBaseline = 'middle';
+    spectrumCtx.fillText('Спектр выключен в меню тюнера', left + graphW / 2, top + graphH * 0.28);
+  }
+
+  if (analyzerEnabled && spectrumHasSignal && frequencyBuffer && audioCtx && spectrumAnalyser) {
     const binHz = audioCtx.sampleRate / spectrumAnalyser.fftSize;
     spectrumCtx.beginPath();
     spectrumCtx.moveTo(left, top + graphH);
     let startedPath = false;
     for (let x = Math.round(left); x <= w - right; x += 2) {
       const ratio = (x - left) / graphW;
-      const freq = 80 * Math.pow(12000 / 80, ratio);
+      const freq = spectrumMinHz * Math.pow(spectrumMaxHz / spectrumMinHz, ratio);
       const index = Math.min(frequencyBuffer.length - 1, Math.round(freq / binHz));
-      const db = Math.max(-100, Math.min(-20, frequencyBuffer[index] || -100));
-      const y = top + ((-20 - db) / 80) * graphH;
+      const db = Number.isFinite(frequencyBuffer[index]) ? frequencyBuffer[index] : -100;
+      const relativeDb = Math.max(-80, Math.min(0, db - spectrumPeakDb));
+      const y = top + (-relativeDb / 80) * graphH;
       if (!startedPath) {
         spectrumCtx.lineTo(x, y);
         startedPath = true;
@@ -1056,10 +1220,11 @@ function drawSpectrum() {
     spectrumCtx.beginPath();
     for (let x = Math.round(left); x <= w - right; x += 2) {
       const ratio = (x - left) / graphW;
-      const freq = 80 * Math.pow(12000 / 80, ratio);
+      const freq = spectrumMinHz * Math.pow(spectrumMaxHz / spectrumMinHz, ratio);
       const index = Math.min(frequencyBuffer.length - 1, Math.round(freq / binHz));
-      const db = Math.max(-100, Math.min(-20, frequencyBuffer[index] || -100));
-      const y = top + ((-20 - db) / 80) * graphH;
+      const db = Number.isFinite(frequencyBuffer[index]) ? frequencyBuffer[index] : -100;
+      const relativeDb = Math.max(-80, Math.min(0, db - spectrumPeakDb));
+      const y = top + (-relativeDb / 80) * graphH;
       if (x === Math.round(left)) spectrumCtx.moveTo(x, y);
       else spectrumCtx.lineTo(x, y);
     }
@@ -1071,7 +1236,7 @@ function drawSpectrum() {
   spectrumCtx.beginPath();
   for (let x = Math.round(left); x <= w - right; x += 3) {
     const ratio = (x - left) / graphW;
-    const freq = 80 * Math.pow(12000 / 80, ratio);
+    const freq = spectrumMinHz * Math.pow(spectrumMaxHz / spectrumMinHz, ratio);
     const correction = Math.max(-8, Math.min(8, correctionAtFrequency(freq)));
     const y = top + graphH * 0.5 - (correction / 16) * graphH * 0.72;
     if (x === Math.round(left)) spectrumCtx.moveTo(x, y);
@@ -1091,6 +1256,158 @@ function supportedRecorderOptions() {
   return mimeType ? { mimeType } : {};
 }
 
+function calculatePlaybackGain(buffer) {
+  let peak = 0;
+  let sumSquares = 0;
+  let samples = 0;
+  const stride = Math.max(1, Math.floor(buffer.sampleRate / 12000));
+  for (let channel = 0; channel < buffer.numberOfChannels; channel++) {
+    const data = buffer.getChannelData(channel);
+    for (let i = 0; i < data.length; i += stride) {
+      const value = Math.abs(data[i]);
+      peak = Math.max(peak, value);
+      sumSquares += value * value;
+      samples += 1;
+    }
+  }
+  const rms = Math.sqrt(sumSquares / Math.max(1, samples));
+  if (peak < 1e-5 || rms < 1e-6) return 1;
+  const gainForRms = 0.14 / rms;
+  const gainForPeak = 0.92 / peak;
+  return Math.max(0.5, Math.min(6, gainForRms, gainForPeak));
+}
+
+function median(values) {
+  if (!values.length) return 0;
+  const sorted = [...values].sort((a, b) => a - b);
+  const middle = Math.floor(sorted.length / 2);
+  return sorted.length % 2 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2;
+}
+
+function errorSeverity(value, mildLimit, mediumLimit) {
+  const amount = Math.abs(value);
+  if (amount <= mildLimit) return { key: 'mild', label: 'небольшая' };
+  if (amount <= mediumLimit) return { key: 'medium', label: 'заметная' };
+  return { key: 'strong', label: 'сильная' };
+}
+
+function dominantNote(samples) {
+  const counts = new Map();
+  samples.forEach(sample => counts.set(sample.note, (counts.get(sample.note) || 0) + 1));
+  return [...counts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || 'нота';
+}
+
+function intonationAdvice(signedCents) {
+  if (signedCents > 0) {
+    return 'Нота выше центра. Передвиньте палец совсем немного к порожку и завитку. Большой палец держите мягко, не зажимайте шейку; сначала найдите центр без вибрато, затем верните вибрато вокруг него.';
+  }
+  return 'Нота ниже центра. Передвиньте палец совсем немного в сторону подставки. Не дотягивайте только кончиком пальца: слегка перенесите рамку кисти, оставляя большой палец свободным.';
+}
+
+function buildIntonationErrors(samples, bufferDuration) {
+  if (!samples.length) return [];
+  const errors = [];
+  let group = [];
+
+  const finishGroup = () => {
+    if (group.length < 8) {
+      group = [];
+      return;
+    }
+    const first = group[0];
+    const last = group[group.length - 1];
+    if (last.timeMs - first.timeMs < 240) {
+      group = [];
+      return;
+    }
+    const signedCents = median(group.map(sample => sample.cents));
+    const magnitude = Math.abs(signedCents);
+    if (magnitude < 8) {
+      group = [];
+      return;
+    }
+    const severity = errorSeverity(magnitude, 12, 25);
+    const start = Math.max(0, first.timeMs / 1000 - 0.22);
+    const end = Math.min(bufferDuration, last.timeMs / 1000 + 0.34);
+    errors.push({
+      type: 'intonation',
+      note: dominantNote(group),
+      signedCents,
+      magnitude,
+      start,
+      duration: Math.max(0.45, end - start),
+      severity,
+      advice: intonationAdvice(signedCents)
+    });
+    group = [];
+  };
+
+  for (const sample of samples) {
+    const previous = group[group.length - 1];
+    const continues = previous && sample.note === previous.note && sample.timeMs - previous.timeMs < 190;
+    if (group.length && !continues) finishGroup();
+    group.push(sample);
+  }
+  finishGroup();
+  return errors.slice(0, 8);
+}
+
+function buildToneErrors(metrics, bufferDuration) {
+  if (!metrics.analyzed) return [];
+  const errors = [];
+  if (metrics.presence > 0) {
+    const severity = errorSeverity(metrics.presence, 3, 7);
+    errors.push({
+      type: 'tone',
+      toneKind: 'presence',
+      label: 'Жёсткость 2–4 кГц',
+      value: metrics.presence,
+      start: 0,
+      duration: Math.min(bufferDuration, 6),
+      severity,
+      advice: 'Попробуйте вести смычок немного дальше от подставки, слегка уменьшить нажим указательного пальца и добавить скорости. Держите смычок параллельно подставке; небольшой наклон трости оставит на струне меньше волоса и смягчит атаку.'
+    });
+  }
+  if (metrics.air > -5) {
+    const severity = errorSeverity(metrics.air + 5, 3, 7);
+    errors.push({
+      type: 'tone',
+      toneKind: 'air',
+      label: 'Шумный верх 6–12 кГц',
+      value: metrics.air,
+      start: 0,
+      duration: Math.min(bufferDuration, 6),
+      severity,
+      advice: 'Проверьте чистое начало ноты и прямую траекторию смычка. Уберите лишнее давление пальцами, чуть увеличьте скорость ведения и не меняйте точку контакта внутри одного штриха.'
+    });
+  }
+  if (metrics.body < -18) {
+    const severity = errorSeverity(metrics.body + 18, 5, 10);
+    errors.push({
+      type: 'tone',
+      toneKind: 'body',
+      label: 'Недостаток тела 200–350 Гц',
+      value: metrics.body,
+      start: 0,
+      duration: Math.min(bufferDuration, 6),
+      severity,
+      advice: 'Для более плотного ядра попробуйте немного приблизить точку контакта к подставке, замедлить смычок и передать естественный вес руки без зажатия большого пальца и мизинца. Смычок должен оставаться параллельным подставке.'
+    });
+  }
+  return errors;
+}
+
+function buildClipErrors(metrics, bufferDuration) {
+  const intonation = buildIntonationErrors(metrics.pitchSamples, bufferDuration);
+  const toneMetrics = {
+    body: metrics.body / Math.max(1, metrics.count),
+    presence: metrics.presence / Math.max(1, metrics.count),
+    air: metrics.air / Math.max(1, metrics.count),
+    analyzed: metrics.count > 0
+  };
+  return [...intonation, ...buildToneErrors(toneMetrics, bufferDuration)];
+}
+
 function startPhraseRecording(now) {
   if (!mediaStream || phraseRecorder || phraseStopping || reviewPlaying || selfTestActive) return;
   const options = supportedRecorderOptions();
@@ -1100,7 +1417,7 @@ function startPhraseRecording(now) {
   }
 
   const chunks = [];
-  const metrics = { body: 0, presence: 0, air: 0, count: 0, cents: 0, centsCount: 0 };
+  const metrics = { body: 0, presence: 0, air: 0, count: 0, cents: 0, centsCount: 0, pitchSamples: [] };
   let recorder;
   try {
     recorder = new MediaRecorder(mediaStream, options);
@@ -1119,7 +1436,7 @@ function startPhraseRecording(now) {
   recorder.addEventListener('stop', async () => {
     phraseRecorder = null;
     phraseStopping = false;
-    analyzerLiveStatus.textContent = 'Микрофон активен';
+    refreshAnalyzerStatus();
     if (!chunks.length || !audioCtx) return;
     try {
       const blob = new Blob(chunks, { type: recorder.mimeType || chunks[0].type });
@@ -1127,19 +1444,26 @@ function startPhraseRecording(now) {
       const audioBuffer = await audioCtx.decodeAudioData(encoded.slice(0));
       if (audioBuffer.duration < 0.75) return;
       const divisor = Math.max(1, metrics.count);
-      recentClips.unshift({
+      const clip = {
         buffer: audioBuffer,
+        playbackGain: calculatePlaybackGain(audioBuffer),
         recordedAt: new Date(),
+        errors: buildClipErrors(metrics, audioBuffer.duration),
         metrics: {
           body: metrics.body / divisor,
           presence: metrics.presence / divisor,
           air: metrics.air / divisor,
-          cents: metrics.cents / Math.max(1, metrics.centsCount)
+          cents: metrics.cents / Math.max(1, metrics.centsCount),
+          analyzed: metrics.count > 0
         }
-      });
+      };
+      recentClips.unshift(clip);
       recentClips = recentClips.slice(0, 3);
       renderRecentClips();
-      reviewStatusEl.textContent = 'Фраза готова: послушайте A, затем B.';
+      reviewStatusEl.textContent = clip.errors.length
+        ? `Найдено ошибок: ${clip.errors.length}. Готово к сравнению A → B.`
+        : 'Устойчивых ошибок в этой фразе не найдено.';
+      scheduleAutomaticReview(clip);
     } catch {
       reviewStatusEl.textContent = 'Браузер записал фразу, но не смог открыть её для сравнения.';
     }
@@ -1152,7 +1476,7 @@ function startPhraseRecording(now) {
   });
   try {
     recorder.start();
-    analyzerLiveStatus.textContent = 'Записываю фразу';
+    refreshAnalyzerStatus();
   } catch {
     phraseRecorder = null;
     activePhraseMetrics = null;
@@ -1175,8 +1499,13 @@ function finishPhraseRecording() {
 
 function updatePhraseCapture(rms) {
   if (!started || !mediaStream || reviewPlaying || selfTestActive) return;
+  if (performance.now() < captureBlockedUntil) return;
+  if (!autoRecordEnabledInput.checked) {
+    finishPhraseRecording();
+    return;
+  }
   const now = performance.now();
-  const sounding = rms > Math.max(0.004, silenceRms * 1.25);
+  const sounding = rms > Math.max(0.0015, silenceRms * 0.85);
   if (sounding) {
     lastPhraseSoundAt = now;
     if (!phraseRecorder && !phraseStopping) startPhraseRecording(now);
@@ -1189,9 +1518,18 @@ function updatePhraseCapture(rms) {
 }
 
 function clipObservation(metrics) {
+  if (!metrics.analyzed) return 'спектр был выключен';
   if (metrics.presence > -1 || metrics.air > -8) return 'яркий верх';
   if (metrics.body < -12) return 'мало тела в этом диапазоне';
   return 'спокойный баланс';
+}
+
+function errorTitle(error) {
+  if (error.type === 'intonation') {
+    const direction = error.signedCents > 0 ? 'выше' : 'ниже';
+    return `${error.note}: ${error.severity.label} · ${formatSignedDb(error.signedCents).replace(' dB', ' ¢')} ${direction}`;
+  }
+  return `${error.label}: ${error.severity.label} · ${formatSignedDb(error.value)} к середине`;
 }
 
 function renderRecentClips() {
@@ -1206,7 +1544,9 @@ function renderRecentClips() {
     title.textContent = `Фраза ${clip.recordedAt.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
     const meta = document.createElement('div');
     meta.className = 'clipMeta';
-    meta.textContent = `${clip.buffer.duration.toFixed(1)} с · ${clipObservation(clip.metrics)} · ср. отклонение ${clip.metrics.cents.toFixed(0)} ¢`;
+    const intonationCount = clip.errors.filter(error => error.type === 'intonation').length;
+    const toneCount = clip.errors.filter(error => error.type === 'tone').length;
+    meta.textContent = `${clip.buffer.duration.toFixed(1)} с · интонация ${intonationCount} · тембр ${toneCount}`;
     info.append(title, meta);
 
     const actions = document.createElement('div');
@@ -1227,70 +1567,205 @@ function renderRecentClips() {
     processedBtn.addEventListener('click', () => playClip(index, true));
     actions.append(originalBtn, processedBtn);
     row.append(info, actions);
+
+    const errors = document.createElement('div');
+    errors.className = 'clipErrors';
+    if (!clip.errors.length) {
+      const clear = document.createElement('div');
+      clear.className = 'noErrors';
+      clear.textContent = 'Устойчивых ошибок выше порога не найдено.';
+      errors.append(clear);
+    } else {
+      clip.errors.forEach((error, errorIndex) => {
+        const item = document.createElement('div');
+        item.className = 'errorItem';
+        const copy = document.createElement('div');
+        const heading = document.createElement('div');
+        heading.className = `errorTitle ${error.severity.key}`;
+        heading.textContent = errorTitle(error);
+        const advice = document.createElement('div');
+        advice.className = 'errorAdvice';
+        advice.textContent = error.advice;
+        copy.append(heading, advice);
+        const play = document.createElement('button');
+        play.type = 'button';
+        play.className = 'clipButton processed errorPlay';
+        play.textContent = 'A → B';
+        play.setAttribute('aria-label', `Прослушать ошибку ${errorIndex + 1}, затем исправленный вариант`);
+        play.addEventListener('click', () => playErrorSequence(index, [errorIndex]));
+        item.append(copy, play);
+        errors.append(item);
+      });
+    }
+    row.append(errors);
     recentClipsEl.append(row);
   });
 }
 
+function createReviewOutput(clip) {
+  const output = audioCtx.createGain();
+  output.gain.value = normalizePlaybackInput.checked ? clip.playbackGain : 1;
+  const limiter = audioCtx.createDynamicsCompressor();
+  limiter.threshold.value = -2;
+  limiter.knee.value = 0;
+  limiter.ratio.value = 20;
+  limiter.attack.value = 0.003;
+  limiter.release.value = 0.12;
+  output.connect(limiter);
+  limiter.connect(audioCtx.destination);
+  return output;
+}
+
+function connectToneProfile(source, output) {
+  const gains = profileGains();
+  const bodyFilter = audioCtx.createBiquadFilter();
+  bodyFilter.type = 'peaking';
+  bodyFilter.frequency.value = 250;
+  bodyFilter.Q.value = 0.8;
+  bodyFilter.gain.value = gains.body;
+
+  const presenceFilter = audioCtx.createBiquadFilter();
+  presenceFilter.type = 'peaking';
+  presenceFilter.frequency.value = 3200;
+  presenceFilter.Q.value = 0.9;
+  presenceFilter.gain.value = gains.presence;
+
+  const airFilter = audioCtx.createBiquadFilter();
+  airFilter.type = 'highshelf';
+  airFilter.frequency.value = 6000;
+  airFilter.gain.value = gains.air;
+
+  source.connect(bodyFilter);
+  bodyFilter.connect(presenceFilter);
+  presenceFilter.connect(airFilter);
+  airFilter.connect(output);
+}
+
 function stopReview() {
+  reviewSequenceToken += 1;
+  if (autoReviewTimer) {
+    clearTimeout(autoReviewTimer);
+    autoReviewTimer = null;
+  }
   if (currentReviewSource) {
     try { currentReviewSource.stop(); } catch {}
     try { currentReviewSource.disconnect(); } catch {}
   }
   currentReviewSource = null;
   reviewPlaying = false;
+  captureBlockedUntil = performance.now() + 450;
+  stopReviewBtn.disabled = true;
 }
 
 async function playClip(index, processed) {
   const clip = recentClips[index];
   if (!clip || !audioCtx) return;
   stopReview();
+  const token = reviewSequenceToken;
   if (audioCtx.state === 'suspended') await audioCtx.resume();
+  if (token !== reviewSequenceToken) return;
 
   const source = audioCtx.createBufferSource();
   source.buffer = clip.buffer;
-  const output = audioCtx.createGain();
-  output.gain.value = processed ? 0.88 : 1;
+  const output = createReviewOutput(clip);
+  if (processed) connectToneProfile(source, output);
+  else source.connect(output);
 
-  if (processed) {
-    const gains = profileGains();
-    const bodyFilter = audioCtx.createBiquadFilter();
-    bodyFilter.type = 'peaking';
-    bodyFilter.frequency.value = 250;
-    bodyFilter.Q.value = 0.8;
-    bodyFilter.gain.value = gains.body;
-
-    const presenceFilter = audioCtx.createBiquadFilter();
-    presenceFilter.type = 'peaking';
-    presenceFilter.frequency.value = 3200;
-    presenceFilter.Q.value = 0.9;
-    presenceFilter.gain.value = gains.presence;
-
-    const airFilter = audioCtx.createBiquadFilter();
-    airFilter.type = 'highshelf';
-    airFilter.frequency.value = 6000;
-    airFilter.gain.value = gains.air;
-
-    source.connect(bodyFilter);
-    bodyFilter.connect(presenceFilter);
-    presenceFilter.connect(airFilter);
-    airFilter.connect(output);
-  } else {
-    source.connect(output);
-  }
-
-  output.connect(audioCtx.destination);
   currentReviewSource = source;
   reviewPlaying = true;
+  stopReviewBtn.disabled = false;
   reviewStatusEl.textContent = processed
-    ? 'B — играет версия «Мягче и глубже».'
-    : 'A — играет исходная запись.';
+    ? 'B — играет версия «Мягче и глубже» без дополнительного приглушения.'
+    : 'A — играет исходная запись без частотной обработки.';
   source.addEventListener('ended', () => {
-    if (currentReviewSource !== source) return;
+    if (currentReviewSource !== source || token !== reviewSequenceToken) return;
     currentReviewSource = null;
     reviewPlaying = false;
+    captureBlockedUntil = performance.now() + 700;
+    stopReviewBtn.disabled = true;
     reviewStatusEl.textContent = 'Готово. Для сравнения переключайтесь между A и B.';
   });
   source.start();
+}
+
+function playErrorVariant(clip, error, corrected, token) {
+  return new Promise(resolve => {
+    if (token !== reviewSequenceToken || !audioCtx) {
+      resolve();
+      return;
+    }
+    const source = audioCtx.createBufferSource();
+    source.buffer = clip.buffer;
+    if (corrected && error.type === 'intonation') {
+      source.playbackRate.value = Math.pow(2, -error.signedCents / 1200);
+    }
+    const output = createReviewOutput(clip);
+    if (corrected && error.type === 'tone') connectToneProfile(source, output);
+    else source.connect(output);
+    currentReviewSource = source;
+    source.addEventListener('ended', () => {
+      if (currentReviewSource === source) currentReviewSource = null;
+      resolve();
+    }, { once: true });
+    const start = Math.max(0, Math.min(error.start, clip.buffer.duration - 0.05));
+    const duration = Math.max(0.05, Math.min(error.duration, clip.buffer.duration - start));
+    try {
+      source.start(0, start, duration);
+    } catch {
+      resolve();
+    }
+  });
+}
+
+function reviewGap(milliseconds) {
+  return new Promise(resolve => setTimeout(resolve, milliseconds));
+}
+
+async function playErrorSequence(index, errorIndexes = null) {
+  const clip = recentClips[index];
+  if (!clip || !clip.errors.length || !audioCtx) return;
+  stopReview();
+  const token = reviewSequenceToken;
+  const indexes = errorIndexes || clip.errors.map((_, errorIndex) => errorIndex);
+  reviewPlaying = true;
+  stopReviewBtn.disabled = false;
+  if (audioCtx.state === 'suspended') await audioCtx.resume();
+
+  for (let order = 0; order < indexes.length; order++) {
+    if (token !== reviewSequenceToken) return;
+    const error = clip.errors[indexes[order]];
+    if (!error) continue;
+    reviewStatusEl.textContent = `Ошибка ${order + 1}/${indexes.length}: A — как прозвучало.`;
+    await playErrorVariant(clip, error, false, token);
+    if (token !== reviewSequenceToken) return;
+    await reviewGap(420);
+    if (token !== reviewSequenceToken) return;
+    reviewStatusEl.textContent = error.type === 'intonation'
+      ? `Ошибка ${order + 1}/${indexes.length}: B — высота исправлена на ${formatSignedDb(-error.signedCents).replace(' dB', ' ¢')}.`
+      : `Ошибка ${order + 1}/${indexes.length}: B — тембр скорректирован профилем.`;
+    await playErrorVariant(clip, error, true, token);
+    if (token !== reviewSequenceToken) return;
+    if (order < indexes.length - 1) await reviewGap(650);
+  }
+
+  if (token === reviewSequenceToken) {
+    currentReviewSource = null;
+    reviewPlaying = false;
+    captureBlockedUntil = performance.now() + 900;
+    stopReviewBtn.disabled = true;
+    reviewStatusEl.textContent = 'Авторазбор завершён. Подсказки для каждой ошибки показаны выше.';
+  }
+}
+
+function scheduleAutomaticReview(clip) {
+  if (!autoCoachEnabledInput.checked || !clip.errors.length) return;
+  if (autoReviewTimer) clearTimeout(autoReviewTimer);
+  autoReviewTimer = setTimeout(() => {
+    autoReviewTimer = null;
+    const index = recentClips.indexOf(clip);
+    if (index < 0 || phraseRecorder || phraseStopping || !autoCoachEnabledInput.checked) return;
+    playErrorSequence(index);
+  }, 800);
 }
 
 updateProfileUI();
@@ -1688,6 +2163,11 @@ function updatePitchState() {
   if (activePhraseMetrics) {
     activePhraseMetrics.cents += Math.abs(medianCents);
     activePhraseMetrics.centsCount += 1;
+    activePhraseMetrics.pitchSamples.push({
+      timeMs: performance.now() - phraseStartedAt,
+      cents: medianCents,
+      note: currentNote
+    });
   }
 
   if (learnAActive) {
@@ -1720,13 +2200,18 @@ function drawFrame() {
   drawTrail();
 }
 
-function animate() {
+function animate(timestamp) {
   if (learnAActive && performance.now() >= learnADeadline) finalizeLearnA();
   if (learnRmsActive && performance.now() >= learnRmsDeadline) finalizeLearnRms();
   if (selfTestActive) updateSelfTestState();
   updatePitchState();
-  spectrumFrame += 1;
-  updateSpectrumData();
+  let spectrumUpdated = false;
+  const spectrumInterval = 1000 / analyzerRefreshFps;
+  if (analyzerEnabled && (!lastSpectrumUpdateAt || timestamp - lastSpectrumUpdateAt >= spectrumInterval - 1)) {
+    updateSpectrumData();
+    lastSpectrumUpdateAt = timestamp;
+    spectrumUpdated = true;
+  }
 
   offsetX -= speed;
   const maxLen = Math.ceil(canvas.width / speed) + 10;
@@ -1752,7 +2237,7 @@ function animate() {
   }
 
   if (activeView === 'tuner') drawFrame();
-  else drawSpectrum();
+  else if (spectrumUpdated) drawSpectrum();
   requestAnimationFrame(animate);
 }
 
@@ -1840,7 +2325,7 @@ async function ensureAudioInitialized() {
     spectrumAnalyser.maxDecibels = -20;
     source.connect(spectrumAnalyser);
     frequencyBuffer = new Float32Array(spectrumAnalyser.frequencyBinCount);
-    analyzerLiveStatus.textContent = 'Микрофон активен';
+    refreshAnalyzerStatus();
 
     if (audioCtx.state === 'suspended') await audioCtx.resume();
     return true;
@@ -1924,7 +2409,7 @@ async function waitForFirstSound(timeoutMs = 12000) {
     analyser.getFloatTimeDomainData(timeBuffer);
     const rms = getRms(timeBuffer);
     const pitch = detectPitch(timeBuffer);
-    const hasSignal = rms > 0.006 && !!pitch;
+    const hasSignal = rms > 0.0025 && !!pitch;
     stableFrames = hasSignal ? stableFrames + 1 : 0;
 
     if (stableFrames >= 5) return true;
