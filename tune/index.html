@@ -629,18 +629,13 @@
     <div><strong>Noise gate (RMS):</strong> minimum level to treat sound as valid.</div>
     <div><strong>Full opacity RMS:</strong> level where the line reaches maximum visibility.</div>
   </div>
-  <div class="menuRow menuRowSelect">
-    <label for="analyzerModeInput">Обновление спектра</label>
-    <select id="analyzerModeInput">
-      <option value="normal" selected>Обычное · 60 fps</option>
-      <option value="eco">Экономное · 15 fps</option>
-      <option value="off">Выключено</option>
-    </select>
+  <div id="automationState" hidden>
+    <select id="analyzerModeInput"><option value="normal" selected>Автоматически</option></select>
+    <input id="autoRecordEnabledInput" type="checkbox" checked />
+    <input id="autoCoachEnabledInput" type="checkbox" checked />
+    <input id="normalizePlaybackInput" type="checkbox" checked />
   </div>
-  <div class="menuRowCheckbox"><label for="autoRecordEnabledInput">Автозапись последних фраз</label><input id="autoRecordEnabledInput" type="checkbox" /></div>
-  <div class="menuRowCheckbox"><label for="autoCoachEnabledInput">Авторазбор ошибок A → B</label><input id="autoCoachEnabledInput" type="checkbox" /></div>
-  <div class="menuRowCheckbox"><label for="normalizePlaybackInput">Выравнивать тихие записи</label><input id="normalizePlaybackInput" type="checkbox" checked /></div>
-  <div class="menuHelp">Авторазбор включает запись фраз и после паузы проигрывает каждую найденную ошибку: сначала A, затем исправленный вариант B. Выравнивание повышает только громкость прослушивания.</div>
+  <div class="menuHelp"><strong>Автопилот включён.</strong> Просто играйте. После естественной паузы приложение само разберёт уверенные ошибки, проиграет A → B и даст короткую голосовую подсказку.</div>
   <button id="advancedToggleBtn" class="menuAdvancedToggle" type="button">Advanced settings</button>
   <div class="menuActions" style="margin-top: 6px; margin-bottom: 8px;">
     <button id="advancedFullscreenBtn" type="button">Go Fullscreen</button>
@@ -671,7 +666,7 @@
       <div>
         <div class="analyzerEyebrow">Тембр в реальном времени</div>
         <h1>Спектр скрипки</h1>
-        <p class="analyzerIntro">Смотрите, где живут тело, жёсткость и воздух звука. Проведите вправо, чтобы вернуться к интонации.</p>
+        <p class="analyzerIntro">Просто играйте: приложение слушает, ждёт паузу и само даёт короткий разбор. Проведите вправо, чтобы вернуться к интонации.</p>
       </div>
       <div class="liveBadge" id="analyzerLiveStatus">Микрофон активен</div>
     </header>
@@ -736,9 +731,9 @@
       <section class="reviewPanel" aria-labelledby="reviewTitle">
         <div class="sectionKicker">Разбор после фразы</div>
         <h2 class="panelTitle" id="reviewTitle">Последние звуки</h2>
-        <p class="panelCopy">Авторазбор найдёт устойчивые ошибки интонации и тембра. После паузы он проиграет каждый фрагмент A → B и подскажет, что изменить в работе смычка или левой руки.</p>
+        <p class="panelCopy">Авторазбор найдёт устойчивые ошибки интонации и тембра. После паузы он сам выберет до трёх самых важных, проиграет A → B и голосом подскажет, что изменить.</p>
         <div id="recentClips">
-          <div class="emptyClips">Автозапись выключена.<br />Её можно включить в меню тюнера.</div>
+          <div class="emptyClips">Автопилот слушает.<br />Сыграйте фразу и сделайте естественную паузу.</div>
         </div>
         <div class="reviewFooter">
           <div id="reviewStatus" aria-live="polite"></div>
@@ -894,6 +889,7 @@ let frequencyBuffer = null;
 let analyzerEnabled = true;
 let analyzerRefreshFps = 60;
 let lastSpectrumUpdateAt = 0;
+let lastPitchUpdateAt = 0;
 let spectrumPeakDb = -20;
 let spectrumHasSignal = false;
 let currentBandLevels = { body: -100, mid: -100, presence: -100, air: -100 };
@@ -908,6 +904,8 @@ let reviewPlaying = false;
 let reviewSequenceToken = 0;
 let autoReviewTimer = null;
 let captureBlockedUntil = 0;
+let activeSpeechResolve = null;
+const deviceCoreCount = navigator.hardwareConcurrency || 4;
 
 function setActiveView(view) {
   if (!started) return;
@@ -1105,6 +1103,10 @@ function updateSpectrumData() {
     activePhraseMetrics.body += currentBandLevels.body - currentBandLevels.mid;
     activePhraseMetrics.presence += currentBandLevels.presence - currentBandLevels.mid;
     activePhraseMetrics.air += currentBandLevels.air - currentBandLevels.mid;
+    if (Number.isFinite(smoothedPitchHz) && smoothedPitchHz > 0) {
+      activePhraseMetrics.pitchHzSum += smoothedPitchHz;
+      activePhraseMetrics.pitchHzCount += 1;
+    }
     activePhraseMetrics.count += 1;
   }
 
@@ -1320,9 +1322,28 @@ function buildIntonationErrors(samples, bufferDuration) {
       group = [];
       return;
     }
-    const signedCents = median(group.map(sample => sample.cents));
+    const trimmed = group.filter(sample => sample.timeMs >= first.timeMs + 80 && sample.timeMs <= last.timeMs - 60);
+    const analysisSamples = trimmed.length >= 6 ? trimmed : group;
+    const centValues = analysisSamples.map(sample => sample.cents).sort((a, b) => a - b);
+    const medianCents = median(centValues);
+    const lowerCents = centValues[Math.floor((centValues.length - 1) * 0.15)];
+    const upperCents = centValues[Math.ceil((centValues.length - 1) * 0.85)];
+    const vibratoSpan = upperCents - lowerCents;
+    const signedCents = vibratoSpan >= 10 ? (lowerCents + upperCents) / 2 : medianCents;
     const magnitude = Math.abs(signedCents);
     if (magnitude < 8) {
+      group = [];
+      return;
+    }
+    const averageClarity = analysisSamples.reduce((sum, sample) => sum + (Number.isFinite(sample.clarity) ? sample.clarity : 0.9), 0) / analysisSamples.length;
+    const variance = analysisSamples.reduce((sum, sample) => sum + Math.pow(sample.cents - signedCents, 2), 0) / analysisSamples.length;
+    const spread = Math.sqrt(variance);
+    const clarityScore = Math.max(0, Math.min(1, (averageClarity - 0.35) / 0.5));
+    const consistencyScore = Math.max(0, Math.min(1, 1 - spread / 38));
+    const durationScore = Math.max(0, Math.min(1, (last.timeMs - first.timeMs) / 700));
+    const sampleScore = Math.max(0, Math.min(1, analysisSamples.length / 12));
+    const confidence = 0.36 * clarityScore + 0.28 * consistencyScore + 0.2 * durationScore + 0.16 * sampleScore;
+    if (confidence < 0.6) {
       group = [];
       return;
     }
@@ -1337,6 +1358,7 @@ function buildIntonationErrors(samples, bufferDuration) {
       start,
       duration: Math.max(0.45, end - start),
       severity,
+      confidence,
       advice: intonationAdvice(signedCents)
     });
     group = [];
@@ -1355,8 +1377,12 @@ function buildIntonationErrors(samples, bufferDuration) {
 function buildToneErrors(metrics, bufferDuration) {
   if (!metrics.analyzed) return [];
   const errors = [];
-  if (metrics.presence > 0) {
-    const severity = errorSeverity(metrics.presence, 3, 7);
+  const toneConfidence = Math.max(0.58, Math.min(0.82, 0.58 + metrics.sampleCount / 240));
+  const highRegister = metrics.averagePitch > 700;
+  const presenceThreshold = highRegister ? 4 : 0;
+  const airThreshold = highRegister ? -2 : -5;
+  if (metrics.presence > presenceThreshold) {
+    const severity = errorSeverity(metrics.presence - presenceThreshold, 3, 7);
     errors.push({
       type: 'tone',
       toneKind: 'presence',
@@ -1365,11 +1391,12 @@ function buildToneErrors(metrics, bufferDuration) {
       start: 0,
       duration: Math.min(bufferDuration, 6),
       severity,
-      advice: 'Попробуйте вести смычок немного дальше от подставки, слегка уменьшить нажим указательного пальца и добавить скорости. Держите смычок параллельно подставке; небольшой наклон трости оставит на струне меньше волоса и смягчит атаку.'
+      confidence: toneConfidence,
+      advice: 'Возможная причина — лишний нажим или слишком близкая точка контакта. Попробуйте вести смычок немного дальше от подставки, слегка уменьшить нажим указательного пальца и добавить скорости. Держите смычок параллельно подставке.'
     });
   }
-  if (metrics.air > -5) {
-    const severity = errorSeverity(metrics.air + 5, 3, 7);
+  if (metrics.air > airThreshold) {
+    const severity = errorSeverity(metrics.air - airThreshold, 3, 7);
     errors.push({
       type: 'tone',
       toneKind: 'air',
@@ -1378,10 +1405,11 @@ function buildToneErrors(metrics, bufferDuration) {
       start: 0,
       duration: Math.min(bufferDuration, 6),
       severity,
-      advice: 'Проверьте чистое начало ноты и прямую траекторию смычка. Уберите лишнее давление пальцами, чуть увеличьте скорость ведения и не меняйте точку контакта внутри одного штриха.'
+      confidence: toneConfidence,
+      advice: 'Возможная причина — шумная атака или меняющаяся точка контакта. Проверьте чистое начало ноты и прямую траекторию смычка. Уберите лишнее давление пальцами и чуть увеличьте скорость ведения.'
     });
   }
-  if (metrics.body < -18) {
+  if (metrics.averagePitch > 0 && metrics.averagePitch < 380 && metrics.body < -18) {
     const severity = errorSeverity(metrics.body + 18, 5, 10);
     errors.push({
       type: 'tone',
@@ -1391,7 +1419,8 @@ function buildToneErrors(metrics, bufferDuration) {
       start: 0,
       duration: Math.min(bufferDuration, 6),
       severity,
-      advice: 'Для более плотного ядра попробуйте немного приблизить точку контакта к подставке, замедлить смычок и передать естественный вес руки без зажатия большого пальца и мизинца. Смычок должен оставаться параллельным подставке.'
+      confidence: toneConfidence,
+      advice: 'Возможная причина — слишком лёгкий или быстрый смычок. Для более плотного ядра попробуйте немного приблизить точку контакта к подставке, замедлить смычок и передать естественный вес руки без зажатия большого пальца и мизинца.'
     });
   }
   return errors;
@@ -1403,7 +1432,9 @@ function buildClipErrors(metrics, bufferDuration) {
     body: metrics.body / Math.max(1, metrics.count),
     presence: metrics.presence / Math.max(1, metrics.count),
     air: metrics.air / Math.max(1, metrics.count),
-    analyzed: metrics.count > 0
+    averagePitch: metrics.pitchHzSum / Math.max(1, metrics.pitchHzCount),
+    sampleCount: metrics.count,
+    analyzed: metrics.count > 0 && metrics.pitchHzCount > 0
   };
   return [...intonation, ...buildToneErrors(toneMetrics, bufferDuration)];
 }
@@ -1417,7 +1448,17 @@ function startPhraseRecording(now) {
   }
 
   const chunks = [];
-  const metrics = { body: 0, presence: 0, air: 0, count: 0, cents: 0, centsCount: 0, pitchSamples: [] };
+  const metrics = {
+    body: 0,
+    presence: 0,
+    air: 0,
+    count: 0,
+    cents: 0,
+    centsCount: 0,
+    pitchHzSum: 0,
+    pitchHzCount: 0,
+    pitchSamples: []
+  };
   let recorder;
   try {
     recorder = new MediaRecorder(mediaStream, options);
@@ -1525,11 +1566,12 @@ function clipObservation(metrics) {
 }
 
 function errorTitle(error) {
+  const confidence = `${Math.round((error.confidence || 0) * 100)}% уверенности`;
   if (error.type === 'intonation') {
     const direction = error.signedCents > 0 ? 'выше' : 'ниже';
-    return `${error.note}: ${error.severity.label} · ${formatSignedDb(error.signedCents).replace(' dB', ' ¢')} ${direction}`;
+    return `${error.note}: ${error.severity.label} · ${formatSignedDb(error.signedCents).replace(' dB', ' ¢')} ${direction} · ${confidence}`;
   }
-  return `${error.label}: ${error.severity.label} · ${formatSignedDb(error.value)} к середине`;
+  return `${error.label}: ${error.severity.label} · ${formatSignedDb(error.value)} к середине · ${confidence}`;
 }
 
 function renderRecentClips() {
@@ -1643,6 +1685,11 @@ function connectToneProfile(source, output) {
 
 function stopReview() {
   reviewSequenceToken += 1;
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  if (activeSpeechResolve) {
+    activeSpeechResolve();
+    activeSpeechResolve = null;
+  }
   if (autoReviewTimer) {
     clearTimeout(autoReviewTimer);
     autoReviewTimer = null;
@@ -1721,6 +1768,57 @@ function reviewGap(milliseconds) {
   return new Promise(resolve => setTimeout(resolve, milliseconds));
 }
 
+function spokenAdviceFor(error) {
+  if (error.type === 'intonation') {
+    const cents = Math.round(error.magnitude);
+    if (error.signedCents > 0) {
+      return `${error.note} выше на ${cents} центов. Чуть сдвиньте палец к завитку и ослабьте большой палец.`;
+    }
+    return `${error.note} ниже на ${cents} центов. Чуть сдвиньте палец к подставке, сохраняя свободную кисть.`;
+  }
+  if (error.toneKind === 'presence') {
+    return 'Звук немного жёсткий. Ослабьте нажим указательного пальца, добавьте скорости смычка и ведите чуть дальше от подставки.';
+  }
+  if (error.toneKind === 'air') {
+    return 'Слышен шумный верх. Ведите смычок ровнее, уберите лишнее давление и сохраняйте одну точку контакта.';
+  }
+  return 'Звуку не хватает плотности. Немного замедлите смычок, приблизьтесь к подставке и используйте свободный вес руки.';
+}
+
+function speakCoachAdvice(error, token) {
+  if (token !== reviewSequenceToken || !('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined') {
+    return Promise.resolve();
+  }
+  const text = spokenAdviceFor(error);
+  reviewStatusEl.textContent = `Совет: ${text}`;
+  return new Promise(resolve => {
+    let finished = false;
+    let timeoutId = null;
+    const done = () => {
+      if (finished) return;
+      finished = true;
+      if (timeoutId) clearTimeout(timeoutId);
+      activeSpeechResolve = null;
+      resolve();
+    };
+    activeSpeechResolve = done;
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'ru-RU';
+    utterance.rate = 0.94;
+    utterance.pitch = 1;
+    utterance.volume = 0.78;
+    const russianVoice = window.speechSynthesis.getVoices().find(voice => voice.lang.toLowerCase().startsWith('ru'));
+    if (russianVoice) utterance.voice = russianVoice;
+    utterance.addEventListener('end', done, { once: true });
+    utterance.addEventListener('error', done, { once: true });
+    window.speechSynthesis.speak(utterance);
+    timeoutId = setTimeout(() => {
+      window.speechSynthesis.cancel();
+      done();
+    }, Math.min(9000, 1800 + text.length * 55));
+  });
+}
+
 async function playErrorSequence(index, errorIndexes = null) {
   const clip = recentClips[index];
   if (!clip || !clip.errors.length || !audioCtx) return;
@@ -1745,6 +1843,10 @@ async function playErrorSequence(index, errorIndexes = null) {
       : `Ошибка ${order + 1}/${indexes.length}: B — тембр скорректирован профилем.`;
     await playErrorVariant(clip, error, true, token);
     if (token !== reviewSequenceToken) return;
+    await reviewGap(260);
+    if (token !== reviewSequenceToken) return;
+    await speakCoachAdvice(error, token);
+    if (token !== reviewSequenceToken) return;
     if (order < indexes.length - 1) await reviewGap(650);
   }
 
@@ -1759,13 +1861,27 @@ async function playErrorSequence(index, errorIndexes = null) {
 
 function scheduleAutomaticReview(clip) {
   if (!autoCoachEnabledInput.checked || !clip.errors.length) return;
+  const confidentIndexes = clip.errors
+    .map((error, index) => ({ error, index }))
+    .filter(item => (item.error.confidence || 0) >= 0.64)
+    .sort((a, b) => {
+      const severityRank = { strong: 3, medium: 2, mild: 1 };
+      return (severityRank[b.error.severity.key] || 0) - (severityRank[a.error.severity.key] || 0);
+    })
+    .slice(0, 3)
+    .map(item => item.index);
+  if (!confidentIndexes.length) {
+    reviewStatusEl.textContent = 'Фраза сохранена, но уверенных ошибок для голосового разбора нет.';
+    return;
+  }
   if (autoReviewTimer) clearTimeout(autoReviewTimer);
   autoReviewTimer = setTimeout(() => {
     autoReviewTimer = null;
     const index = recentClips.indexOf(clip);
-    if (index < 0 || phraseRecorder || phraseStopping || !autoCoachEnabledInput.checked) return;
-    playErrorSequence(index);
-  }, 800);
+    const currentlyPlaying = latestRms > Math.max(0.0015, silenceRms * 0.85);
+    if (index < 0 || phraseRecorder || phraseStopping || currentlyPlaying || !autoCoachEnabledInput.checked) return;
+    playErrorSequence(index, confidentIndexes);
+  }, 1350);
 }
 
 updateProfileUI();
@@ -2074,7 +2190,7 @@ function finalizeLearnRms() {
   learnAStatus.textContent = `RMS auto-set: gate=${silenceRms.toFixed(3)}, full=${loudRms.toFixed(3)}`;
 }
 
-function updatePitchState() {
+function updatePitchState(shouldDetectPitch = true) {
   if (!analyser || !timeBuffer) return;
   analyser.getFloatTimeDomainData(timeBuffer);
   const rms = getRms(timeBuffer);
@@ -2115,6 +2231,7 @@ function updatePitchState() {
   }
 
   silentFrames = 0;
+  if (!shouldDetectPitch) return;
   const pitch = detectPitch(timeBuffer);
   if (!pitch) {
     latestPoint = null;
@@ -2166,7 +2283,8 @@ function updatePitchState() {
     activePhraseMetrics.pitchSamples.push({
       timeMs: performance.now() - phraseStartedAt,
       cents: medianCents,
-      note: currentNote
+      note: currentNote,
+      clarity
     });
   }
 
@@ -2200,13 +2318,28 @@ function drawFrame() {
   drawTrail();
 }
 
+function automaticPitchFps() {
+  if (document.hidden) return 5;
+  if (selfTestActive) return 30;
+  if (deviceCoreCount <= 4) return activeView === 'tuner' ? 22 : 18;
+  return activeView === 'tuner' ? 30 : 24;
+}
+
+function automaticSpectrumFps() {
+  if (document.hidden) return 2;
+  return activeView === 'analyzer' ? 24 : 8;
+}
+
 function animate(timestamp) {
   if (learnAActive && performance.now() >= learnADeadline) finalizeLearnA();
   if (learnRmsActive && performance.now() >= learnRmsDeadline) finalizeLearnRms();
   if (selfTestActive) updateSelfTestState();
-  updatePitchState();
+  const pitchInterval = 1000 / automaticPitchFps();
+  const shouldDetectPitch = !lastPitchUpdateAt || timestamp - lastPitchUpdateAt >= pitchInterval - 1;
+  updatePitchState(shouldDetectPitch);
+  if (shouldDetectPitch) lastPitchUpdateAt = timestamp;
   let spectrumUpdated = false;
-  const spectrumInterval = 1000 / analyzerRefreshFps;
+  const spectrumInterval = 1000 / automaticSpectrumFps();
   if (analyzerEnabled && (!lastSpectrumUpdateAt || timestamp - lastSpectrumUpdateAt >= spectrumInterval - 1)) {
     updateSpectrumData();
     lastSpectrumUpdateAt = timestamp;
