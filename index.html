@@ -92,6 +92,7 @@
     }
 
     body.menu-open { overflow: hidden; }
+    body.subscribe-open { overflow: hidden; }
 
     [hidden] { display: none !important; }
     main > section { scroll-margin-top: var(--header-h); }
@@ -674,6 +675,13 @@
 
     .concert-description { max-width: 650px; margin-top: 7px; }
 
+    .concert-actions {
+      min-width: 190px;
+      display: grid;
+      gap: 8px;
+      justify-items: stretch;
+    }
+
     .concert-action {
       min-width: 148px;
       background: var(--ink);
@@ -692,6 +700,69 @@
       border-color: var(--ink);
       background: var(--ink);
       color: var(--white);
+    }
+
+    .concert-reminder {
+      position: relative;
+      overflow: hidden;
+      border-color: var(--amber);
+      background: var(--amber);
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+      box-shadow: 0 10px 28px rgba(132, 75, 43, .13);
+      animation: reminder-breathe 3.8s ease-in-out infinite;
+    }
+
+    .concert-reminder::after {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(110deg, transparent 22%, rgba(255,255,255,.28) 48%, transparent 72%);
+      content: "";
+      transform: translateX(-130%);
+      animation: reminder-shimmer 5.4s 1.1s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    .concert-reminder:hover {
+      border-color: var(--ink);
+      background: var(--ink);
+      color: var(--white);
+      box-shadow: 0 13px 34px rgba(17, 14, 12, .18);
+    }
+
+    .concert-reminder-note {
+      margin: -1px 2px 1px;
+      color: var(--muted-dark);
+      font-size: 9px;
+      line-height: 1.35;
+      text-align: center;
+    }
+
+    .concert-calendar {
+      min-height: 38px;
+      border: 0;
+      background: transparent;
+      color: var(--muted-dark);
+      cursor: pointer;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      text-decoration: underline;
+      text-decoration-color: rgba(96, 80, 70, .34);
+      text-underline-offset: 4px;
+    }
+
+    .concert-calendar:hover { color: var(--ink); }
+
+    @keyframes reminder-breathe {
+      0%, 100% { box-shadow: 0 10px 28px rgba(132, 75, 43, .13); }
+      50% { box-shadow: 0 12px 34px rgba(189, 117, 76, .28); }
+    }
+
+    @keyframes reminder-shimmer {
+      0%, 70%, 100% { transform: translateX(-130%); }
+      84% { transform: translateX(130%); }
     }
 
     .concert-status {
@@ -1085,6 +1156,336 @@
 
     .cv-band .button-secondary:hover { border-color: var(--ink); background: var(--ink); color: var(--white); }
 
+    .letters {
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 78% 22%, rgba(189,117,76,.18), transparent 29%),
+        var(--ink-soft);
+    }
+
+    .letters::before,
+    .letters::after {
+      position: absolute;
+      right: -8vw;
+      left: 48%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(224,160,105,.42), transparent);
+      content: "";
+      transform: rotate(-7deg);
+      pointer-events: none;
+    }
+
+    .letters::before { top: 36%; }
+    .letters::after { top: 42%; opacity: .48; }
+
+    .letters-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(290px, .65fr);
+      gap: clamp(50px, 10vw, 150px);
+      align-items: end;
+    }
+
+    .letters-title {
+      max-width: 760px;
+      margin: 0;
+      font-family: var(--serif);
+      font-size: clamp(52px, 7vw, 100px);
+      font-weight: 400;
+      letter-spacing: -.052em;
+      line-height: .94;
+    }
+
+    .letters-title em { color: var(--amber-bright); font-weight: 400; }
+
+    .letters-copy {
+      padding-top: 25px;
+      border-top: 1px solid rgba(255,253,248,.18);
+    }
+
+    .letters-copy p {
+      margin: 0 0 25px;
+      color: rgba(255,253,248,.7);
+      font-family: var(--serif);
+      font-size: 20px;
+      line-height: 1.55;
+    }
+
+    .letters-button {
+      width: 100%;
+      border-color: var(--amber);
+      background: var(--amber);
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+    }
+
+    .letters-button:hover { border-color: var(--white); background: var(--white); }
+
+    .letters-promise {
+      display: block;
+      margin-top: 12px;
+      color: rgba(255,253,248,.44);
+      font-size: 10px;
+      letter-spacing: .06em;
+      text-align: center;
+    }
+
+    .subscribe-layer {
+      position: fixed;
+      z-index: 3000;
+      inset: 0;
+      display: grid;
+      align-items: end;
+      justify-items: center;
+      opacity: 0;
+      transition: opacity .28s ease;
+    }
+
+    .subscribe-layer.is-open { opacity: 1; }
+
+    .subscribe-backdrop {
+      position: absolute;
+      inset: 0;
+      border: 0;
+      background: rgba(8, 7, 6, .72);
+      cursor: default;
+      backdrop-filter: blur(7px);
+      -webkit-backdrop-filter: blur(7px);
+    }
+
+    .subscribe-sheet {
+      position: relative;
+      width: min(620px, 100%);
+      max-height: min(820px, calc(100dvh - 18px));
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding: 18px 24px calc(25px + env(safe-area-inset-bottom));
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 25px 25px 0 0;
+      background: var(--paper);
+      color: var(--ink);
+      box-shadow: 0 -24px 70px rgba(0,0,0,.35);
+      transform: translateY(28px);
+      transition: transform .42s cubic-bezier(.2,.8,.2,1);
+    }
+
+    .subscribe-layer.is-open .subscribe-sheet { transform: translateY(0); }
+
+    .subscribe-handle {
+      width: 43px;
+      height: 4px;
+      margin: 0 auto 20px;
+      border-radius: 999px;
+      background: rgba(17,14,12,.18);
+    }
+
+    .subscribe-string {
+      position: absolute;
+      top: 58px;
+      right: 90px;
+      left: 24px;
+      height: 1px;
+      background: linear-gradient(90deg, var(--amber), rgba(189,117,76,.15));
+      transform-origin: left center;
+    }
+
+    .subscribe-sheet.is-sent .subscribe-string { animation: subscribe-pluck .65s cubic-bezier(.2,.8,.2,1); }
+
+    @keyframes subscribe-pluck {
+      0%, 100% { transform: scaleY(1) rotate(0); }
+      28% { transform: scaleY(8) rotate(.5deg); }
+      55% { transform: scaleY(3) rotate(-.25deg); }
+    }
+
+    .subscribe-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 42px;
+      height: 42px;
+      border: 1px solid var(--line-light);
+      border-radius: 50%;
+      background: transparent;
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+      font-size: 22px;
+    }
+
+    .subscribe-kicker {
+      margin: 35px 0 12px;
+      color: var(--amber);
+      font-size: 10px;
+      font-weight: 750;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+    }
+
+    .subscribe-title {
+      max-width: 480px;
+      margin: 0 0 11px;
+      font-family: var(--serif);
+      font-size: clamp(37px, 9vw, 52px);
+      font-weight: 400;
+      letter-spacing: -.04em;
+      line-height: .98;
+    }
+
+    .subscribe-intro {
+      max-width: 470px;
+      margin: 0 0 24px;
+      color: var(--muted-dark);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .subscribe-event {
+      margin: 0 0 21px;
+      padding: 11px 13px;
+      border: 1px solid var(--line-light);
+      border-radius: 12px;
+      color: var(--muted-dark);
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    .subscribe-form { display: grid; gap: 12px; }
+
+    .subscribe-label {
+      color: var(--muted-dark);
+      font-size: 10px;
+      font-weight: 750;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .subscribe-email {
+      width: 100%;
+      min-height: 57px;
+      padding: 0 16px;
+      border: 1px solid rgba(17,14,12,.25);
+      border-radius: 13px;
+      outline: none;
+      background: var(--white);
+      color: var(--ink);
+      font: inherit;
+      font-size: 16px;
+    }
+
+    .subscribe-email:focus { border-color: var(--amber); box-shadow: 0 0 0 3px rgba(189,117,76,.13); }
+
+    .subscribe-choice {
+      display: grid;
+      grid-template-columns: 20px 1fr;
+      gap: 11px;
+      align-items: start;
+      padding: 13px;
+      border: 1px solid var(--line-light);
+      border-radius: 13px;
+      background: rgba(255,253,248,.52);
+      cursor: pointer;
+    }
+
+    .subscribe-choice input { width: 18px; height: 18px; margin: 1px 0 0; accent-color: var(--amber); }
+    .subscribe-choice strong { display: block; margin-bottom: 3px; font-size: 13px; }
+    .subscribe-choice small { display: block; color: var(--muted-dark); font-size: 10px; line-height: 1.45; }
+
+    .subscribe-submit {
+      width: 100%;
+      min-height: 56px;
+      margin-top: 2px;
+      border: 1px solid var(--ink);
+      border-radius: 999px;
+      background: var(--ink);
+      color: var(--white);
+      cursor: pointer;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .subscribe-submit:hover { background: var(--amber); border-color: var(--amber); color: var(--ink); }
+
+    .subscribe-submit:disabled {
+      cursor: wait;
+      opacity: .62;
+    }
+
+    .subscribe-privacy,
+    .subscribe-status {
+      margin: 0;
+      color: var(--muted-dark);
+      font-size: 9px;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .subscribe-status { min-height: 15px; color: var(--amber); font-weight: 700; }
+
+    .subscribe-trap {
+      position: absolute;
+      left: -10000px;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .subscribe-success {
+      display: grid;
+      justify-items: center;
+      gap: 10px;
+      padding: 12px 0 8px;
+      text-align: center;
+    }
+
+    .subscribe-success[hidden] { display: none; }
+
+    .subscribe-success-mark {
+      display: grid;
+      width: 64px;
+      height: 64px;
+      place-items: center;
+      margin-bottom: 4px;
+      border: 1px solid rgba(189,117,76,.45);
+      border-radius: 50%;
+      background: rgba(255,253,248,.65);
+      color: var(--amber);
+      font-family: var(--serif);
+      font-size: 32px;
+      animation: subscribe-note 1.1s cubic-bezier(.2,.8,.2,1) both;
+    }
+
+    @keyframes subscribe-note {
+      0% { opacity: 0; transform: scale(.72) rotate(-8deg); }
+      60% { opacity: 1; transform: scale(1.08) rotate(3deg); }
+      100% { opacity: 1; transform: scale(1) rotate(0); }
+    }
+
+    .subscribe-success-title {
+      margin: 0;
+      font-family: var(--serif);
+      font-size: clamp(31px, 8vw, 42px);
+      font-weight: 400;
+      letter-spacing: -.035em;
+      line-height: 1;
+    }
+
+    .subscribe-success-copy {
+      max-width: 390px;
+      margin: 0 0 8px;
+      color: var(--muted-dark);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .subscribe-success-close { max-width: 330px; }
+    }
+
     .contact {
       position: relative;
       overflow: hidden;
@@ -1195,6 +1596,11 @@
     }
 
     .reveal.is-visible { opacity: 1; transform: translateY(0); }
+
+    @media (min-width: 761px) {
+      .subscribe-layer { align-items: center; padding: 24px; }
+      .subscribe-sheet { border-radius: 25px; }
+    }
 
     @media (max-width: 1000px) {
       :root { --page: min(100% - 40px, 920px); }
@@ -1471,7 +1877,10 @@
       .concert-date { gap: 3px 7px; }
       .concert-title { font-size: 25px; }
       .concert-card > :last-child { grid-column: 2; width: 100%; }
+      .concert-actions { gap: 9px; }
       .concert-action { width: 100%; min-height: 48px; }
+      .concert-reminder { min-height: 54px; font-size: 14px; }
+      .concert-calendar { min-height: 42px; }
 
       .about-meta {
         gap: 10px;
@@ -1536,6 +1945,14 @@
       .cv-band-inner { grid-template-columns: 1fr; }
       .cv-band { padding: 58px 0; }
       .cv-band .button { width: 100%; justify-self: stretch; }
+
+      .letters-grid { grid-template-columns: 1fr; gap: 42px; }
+      .letters::before,
+      .letters::after { left: 25%; }
+      .letters-copy { max-width: none; }
+      .letters-title { font-size: clamp(50px, 15vw, 75px); }
+
+      .subscribe-sheet { width: 100%; max-height: calc(100dvh - 10px); }
 
       .contact-title { font-size: clamp(50px, 15vw, 78px); }
 
@@ -1642,6 +2059,12 @@
       html:not(.force-motion) .hero-copy > :nth-child(4) { animation-delay: .36s; }
       html:not(.force-motion) .hero-copy > :nth-child(5) { animation-delay: .44s; }
       html:not(.force-motion) .button-arrow { animation: none; }
+      html:not(.force-motion) .concert-reminder,
+      html:not(.force-motion) .concert-reminder::after { animation: none; }
+      html:not(.force-motion) .subscribe-layer,
+      html:not(.force-motion) .subscribe-sheet { transition: none; }
+      html:not(.force-motion) .subscribe-sheet.is-sent .subscribe-string,
+      html:not(.force-motion) .subscribe-success-mark { animation: none; }
       html:not(.force-motion) .hero-strings { display: none; }
       html:not(.force-motion) .reveal {
         opacity: 0;
@@ -1845,6 +2268,20 @@
       </div>
     </section>
 
+    <section class="section letters" id="letters" aria-labelledby="letters-title">
+      <div class="section-shell letters-grid">
+        <div class="reveal">
+          <p class="section-kicker">Concert updates</p>
+          <h2 class="letters-title" id="letters-title">Never miss<br>the <em>music.</em></h2>
+        </div>
+        <div class="letters-copy reveal">
+          <p>Leave your email and I’ll let you know when a new concert is coming up.</p>
+          <button class="button letters-button" type="button" data-open-subscribe>Notify me about concerts <span aria-hidden="true">→</span></button>
+          <span class="letters-promise">Only concert updates. No spam. Unsubscribe anytime.</span>
+        </div>
+      </div>
+    </section>
+
     <section class="section contact" id="contact" aria-labelledby="contact-title">
       <div class="section-shell contact-grid">
         <div class="reveal">
@@ -1853,7 +2290,7 @@
         </div>
         <div class="contact-aside reveal">
           <p>For concerts, festivals, masterclasses, collaborations — or simply to say hello:</p>
-          <a class="email-link" href="mailto:mkrtiart1959@gmail.com"><span class="email-action-label">Write to me</span><span>mkrtiart1959@gmail.com</span></a>
+          <a class="email-link" href="mailto:concerts@sergeiviolin.com"><span class="email-action-label">Write to me</span><span>concerts@sergeiviolin.com</span></a>
           <div class="social-links" aria-label="Social media">
             <a href="https://www.instagram.com/sergeiviolin/" target="_blank" rel="noopener noreferrer">Instagram ↗</a>
             <a href="https://www.youtube.com/@sergeiviolin" target="_blank" rel="noopener noreferrer">YouTube ↗</a>
@@ -1871,6 +2308,48 @@
       <span>Thank you for visiting</span>
     </div>
   </footer>
+
+  <div class="subscribe-layer" id="subscribeLayer" hidden>
+    <button class="subscribe-backdrop" type="button" data-close-subscribe aria-label="Close subscription form"></button>
+    <section class="subscribe-sheet" id="subscribeSheet" role="dialog" aria-modal="true" aria-labelledby="subscribeTitle">
+      <div class="subscribe-handle" aria-hidden="true"></div>
+      <span class="subscribe-string" aria-hidden="true"></span>
+      <button class="subscribe-close" type="button" data-close-subscribe aria-label="Close">×</button>
+      <p class="subscribe-kicker" id="subscribeKicker">Concert updates</p>
+      <h2 class="subscribe-title" id="subscribeTitle">Never miss a concert.</h2>
+      <p class="subscribe-intro" id="subscribeIntro">Leave your email and I’ll let you know about upcoming performances.</p>
+      <p class="subscribe-event" id="subscribeEvent"></p>
+
+      <form class="subscribe-form" id="subscribeForm" novalidate>
+        <label class="subscribe-label" for="subscribeEmail">Email address</label>
+        <input class="subscribe-email" id="subscribeEmail" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" required>
+
+        <div class="subscribe-trap" aria-hidden="true">
+          <label for="subscribeWebsite">Leave this field empty</label>
+          <input id="subscribeWebsite" name="website" type="text" tabindex="-1" autocomplete="off">
+        </div>
+
+        <label class="subscribe-choice" for="subscribeConsent">
+          <input id="subscribeConsent" type="checkbox" required>
+          <span>
+            <strong>I’d like to hear about upcoming concerts.</strong>
+            <small>A few thoughtful emails a year. Unsubscribe anytime.</small>
+          </span>
+        </label>
+
+        <button class="subscribe-submit" id="subscribeSubmit" type="submit">Notify me about concerts</button>
+        <p class="subscribe-privacy">Your email is used only for Sergei Mkrtichian’s concert updates.</p>
+        <p class="subscribe-status" id="subscribeStatus" aria-live="polite"></p>
+      </form>
+
+      <div class="subscribe-success" id="subscribeSuccess" hidden aria-live="polite">
+        <span class="subscribe-success-mark" aria-hidden="true">♪</span>
+        <h3 class="subscribe-success-title" id="subscribeSuccessTitle">Almost there.</h3>
+        <p class="subscribe-success-copy" id="subscribeSuccessCopy">Check your inbox and confirm your email to join the concert list.</p>
+        <button class="subscribe-submit subscribe-success-close" type="button" data-close-subscribe>Done</button>
+      </div>
+    </section>
+  </div>
 
   <script>
     const header = document.getElementById('siteHeader');
@@ -2129,6 +2608,26 @@
     const nextConcertPlace = document.getElementById('nextConcertPlace');
     const nextConcertTitle = document.getElementById('nextConcertTitle');
     const concertsPreviewNote = document.getElementById('concertsPreviewNote');
+    const subscribeLayer = document.getElementById('subscribeLayer');
+    const subscribeSheet = document.getElementById('subscribeSheet');
+    const subscribeKicker = document.getElementById('subscribeKicker');
+    const subscribeTitle = document.getElementById('subscribeTitle');
+    const subscribeIntro = document.getElementById('subscribeIntro');
+    const subscribeEvent = document.getElementById('subscribeEvent');
+    const subscribeForm = document.getElementById('subscribeForm');
+    const subscribeEmail = document.getElementById('subscribeEmail');
+    const subscribeWebsite = document.getElementById('subscribeWebsite');
+    const subscribeConsent = document.getElementById('subscribeConsent');
+    const subscribeSubmit = document.getElementById('subscribeSubmit');
+    const subscribeStatus = document.getElementById('subscribeStatus');
+    const subscribeSuccess = document.getElementById('subscribeSuccess');
+    const subscribeSuccessTitle = document.getElementById('subscribeSuccessTitle');
+    const subscribeSuccessCopy = document.getElementById('subscribeSuccessCopy');
+    let mailingConfig = {
+      subscriptionEndpoint: '',
+      fallbackEmail: 'concerts@sergeiviolin.com'
+    };
+    let lastSubscribeTrigger = null;
 
     const parseConcertDate = value => {
       const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(value || ''));
@@ -2160,6 +2659,222 @@
       nextConcertTitle.textContent = title;
       nextConcertTeaser.setAttribute('aria-label', `Next concert: ${title}, ${place}, ${dateLabel}`);
       nextConcertTeaser.hidden = false;
+    };
+
+    const getPublicFormUrl = key => {
+      const raw = String(mailingConfig[key] || '').trim();
+      if (!raw) return '';
+      try {
+        const url = new URL(raw, window.location.href);
+        return ['http:', 'https:'].includes(url.protocol) ? url.href : '';
+      } catch {
+        return '';
+      }
+    };
+
+    const closeSubscriptionSheet = () => {
+      if (subscribeLayer.hidden) return;
+      subscribeLayer.classList.remove('is-open');
+      document.body.classList.remove('subscribe-open');
+      window.setTimeout(() => {
+        subscribeLayer.hidden = true;
+        subscribeForm.hidden = false;
+        subscribeSuccess.hidden = true;
+        if (lastSubscribeTrigger) lastSubscribeTrigger.focus();
+      }, 300);
+    };
+
+    const openSubscriptionSheet = (mode, concert, trigger) => {
+      lastSubscribeTrigger = trigger || document.activeElement;
+      subscribeSheet.classList.remove('is-sent');
+      subscribeStatus.textContent = '';
+      subscribeEmail.value = '';
+      subscribeWebsite.value = '';
+      subscribeConsent.checked = false;
+      subscribeSubmit.disabled = false;
+      subscribeForm.removeAttribute('aria-busy');
+      subscribeForm.hidden = false;
+      subscribeSuccess.hidden = true;
+
+      subscribeEvent.hidden = true;
+      subscribeKicker.textContent = 'Concert updates';
+      subscribeTitle.textContent = 'Never miss a concert.';
+      subscribeIntro.textContent = 'Leave your email and I’ll let you know about upcoming performances.';
+      subscribeSubmit.textContent = 'Notify me about concerts';
+
+      subscribeLayer.hidden = false;
+      document.body.classList.add('subscribe-open');
+      window.requestAnimationFrame(() => {
+        subscribeLayer.classList.add('is-open');
+        subscribeEmail.focus({ preventScroll: true });
+      });
+    };
+
+    const showSubscriptionSuccess = confirmed => {
+      subscribeForm.hidden = true;
+      subscribeSuccess.hidden = false;
+      subscribeSheet.classList.remove('is-sent');
+      void subscribeSheet.offsetWidth;
+      subscribeSheet.classList.add('is-sent');
+      subscribeSuccessTitle.textContent = confirmed ? 'You’re on the list.' : 'Almost there.';
+      subscribeSuccessCopy.textContent = confirmed
+        ? 'Thank you. I’ll write when a new concert is coming up.'
+        : 'Check your inbox and confirm your email to join the concert list.';
+    };
+
+    subscribeLayer.querySelectorAll('[data-close-subscribe]').forEach(button => {
+      button.addEventListener('click', closeSubscriptionSheet);
+    });
+
+    document.querySelectorAll('[data-open-subscribe]').forEach(button => {
+      button.addEventListener('click', () => openSubscriptionSheet(button.dataset.subscribeMode, null, button));
+    });
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && !subscribeLayer.hidden) closeSubscriptionSheet();
+    });
+
+    subscribeForm.addEventListener('submit', async event => {
+      event.preventDefault();
+      const subscriberEmail = subscribeEmail.value.trim();
+
+      if (!subscribeEmail.checkValidity()) {
+        subscribeStatus.textContent = 'Please enter a valid email address.';
+        subscribeEmail.focus();
+        return;
+      }
+
+      if (!subscribeConsent.checked) {
+        subscribeStatus.textContent = 'Please confirm that you’d like to receive concert updates.';
+        subscribeConsent.focus();
+        return;
+      }
+
+      const subscriptionEndpoint = getPublicFormUrl('subscriptionEndpoint');
+      if (subscriptionEndpoint) {
+        subscribeSubmit.disabled = true;
+        subscribeSubmit.textContent = 'Joining…';
+        subscribeForm.setAttribute('aria-busy', 'true');
+        subscribeStatus.textContent = '';
+
+        try {
+          const response = await fetch(subscriptionEndpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: subscriberEmail,
+              website: subscribeWebsite.value
+            })
+          });
+          const result = await response.json().catch(() => ({}));
+          if (!response.ok || !result.ok) throw new Error(result.message || 'Subscription failed');
+          showSubscriptionSuccess(false);
+        } catch {
+          subscribeStatus.textContent = 'Something went wrong. Please try again in a moment.';
+        } finally {
+          subscribeSubmit.disabled = false;
+          subscribeSubmit.textContent = 'Notify me about concerts';
+          subscribeForm.removeAttribute('aria-busy');
+        }
+        return;
+      }
+
+      const recipient = String(
+        mailingConfig.fallbackEmail
+          || 'concerts@sergeiviolin.com'
+      ).trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipient)) {
+        subscribeStatus.textContent = 'Subscriptions are being prepared. Please try again soon.';
+        return;
+      }
+
+      const subject = 'Concert updates subscription';
+      const body = [
+        'Hello,',
+        '',
+        `Subscriber email: ${subscriberEmail}`,
+        'Subscription: Future concert updates',
+        '',
+        'I requested concert updates and understand that I can unsubscribe at any time.'
+      ].filter(Boolean).join('\n');
+
+      subscribeSheet.classList.remove('is-sent');
+      void subscribeSheet.offsetWidth;
+      subscribeSheet.classList.add('is-sent');
+      subscribeStatus.textContent = 'Your email app is opening — send the prepared message to finish.';
+      window.setTimeout(() => {
+        window.location.href = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      }, 180);
+    });
+
+    const escapeCalendarText = value => String(value || '')
+      .replace(/\\/g, '\\\\')
+      .replace(/\r?\n/g, '\\n')
+      .replace(/,/g, '\\,')
+      .replace(/;/g, '\\;');
+
+    const formatCalendarDate = date => [
+      date.getFullYear(),
+      String(date.getMonth() + 1).padStart(2, '0'),
+      String(date.getDate()).padStart(2, '0'),
+      'T',
+      String(date.getHours()).padStart(2, '0'),
+      String(date.getMinutes()).padStart(2, '0'),
+      '00'
+    ].join('');
+
+    const downloadCalendarInvite = concert => {
+      const dateMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(concert.date || ''));
+      const timeMatch = /^(\d{2}):(\d{2})$/.exec(String(concert.time || ''));
+      if (!dateMatch || !timeMatch) return;
+
+      const start = new Date(
+        Number(dateMatch[1]),
+        Number(dateMatch[2]) - 1,
+        Number(dateMatch[3]),
+        Number(timeMatch[1]),
+        Number(timeMatch[2])
+      );
+      const duration = Number.isFinite(Number(concert.durationMinutes))
+        ? Math.max(30, Number(concert.durationMinutes))
+        : 120;
+      const end = new Date(start.getTime() + duration * 60000);
+      const officialUrl = String(concert.externalUrl || concert.registrationUrl || '').trim();
+      const description = [concert.description, officialUrl].filter(Boolean).join('\n\n');
+      const location = [concert.venue, concert.city, concert.country].filter(Boolean).join(', ');
+      const uidSeed = concert.id || `${concert.date}-${concert.city || 'concert'}`;
+      const uid = `${String(uidSeed).replace(/[^a-z0-9-]/gi, '-')}@sergeiviolin.com`;
+      const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+      const calendar = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//Sergei Mkrtichian//Concert reminder//EN',
+        'CALSCALE:GREGORIAN',
+        'METHOD:PUBLISH',
+        'BEGIN:VEVENT',
+        `UID:${uid}`,
+        `DTSTAMP:${stamp}`,
+        `DTSTART;TZID=Europe/Zurich:${formatCalendarDate(start)}`,
+        `DTEND;TZID=Europe/Zurich:${formatCalendarDate(end)}`,
+        `SUMMARY:${escapeCalendarText(concert.title || 'Sergei Mkrtichian in concert')}`,
+        `LOCATION:${escapeCalendarText(location)}`,
+        `DESCRIPTION:${escapeCalendarText(description)}`,
+        'BEGIN:VALARM',
+        'TRIGGER:-PT3H',
+        'ACTION:DISPLAY',
+        'DESCRIPTION:Concert this evening',
+        'END:VALARM',
+        'END:VEVENT',
+        'END:VCALENDAR'
+      ].join('\r\n');
+      const blobUrl = URL.createObjectURL(new Blob([calendar], { type: 'text/calendar;charset=utf-8' }));
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = `${String(concert.id || 'sergei-mkrtichian-concert').replace(/[^a-z0-9-]/gi, '-')}.ics`;
+      document.body.append(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
     };
 
     const createConcertCard = concert => {
@@ -2221,7 +2936,24 @@
         postponed: 'Postponed'
       };
       const status = String(concert.status || 'upcoming').toLowerCase();
+      const actions = document.createElement('div');
+      actions.className = 'concert-actions';
       let action;
+
+      if (concert.reminderEnabled && !statusLabels[status]) {
+        const reminder = document.createElement('button');
+        reminder.className = 'button concert-reminder';
+        reminder.type = 'button';
+        reminder.textContent = concert.reminderLabel || 'Concert updates';
+        reminder.setAttribute('aria-label', 'Subscribe to future concert updates');
+        reminder.addEventListener('click', () => openSubscriptionSheet('letters', null, reminder));
+        actions.append(reminder);
+
+        const reminderNote = document.createElement('p');
+        reminderNote.className = 'concert-reminder-note';
+        reminderNote.textContent = 'Upcoming concerts. No spam.';
+        actions.append(reminderNote);
+      }
 
       const externalActionUrl = concert.registrationUrl || concert.externalUrl || concert.actionUrl;
       const internalActionUrl = concert.id
@@ -2254,7 +2986,19 @@
         action.textContent = statusLabels[status] || 'Details soon';
       }
 
-      article.append(dateBlock, info, action);
+      actions.append(action);
+
+      if (!statusLabels[status] && concert.date && concert.time) {
+        const calendar = document.createElement('button');
+        calendar.className = 'concert-calendar';
+        calendar.type = 'button';
+        calendar.textContent = 'Add to calendar +';
+        calendar.setAttribute('aria-label', `Add ${concert.title || 'this concert'} to your calendar`);
+        calendar.addEventListener('click', () => downloadCalendarInvite(concert));
+        actions.append(calendar);
+      }
+
+      article.append(dateBlock, info, actions);
       return article;
     };
 
@@ -2264,6 +3008,9 @@
         return response.json();
       })
       .then(data => {
+        if (data && typeof data.mailing === 'object') {
+          mailingConfig = { ...mailingConfig, ...data.mailing };
+        }
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         const previewMode = new URLSearchParams(window.location.search).get('concerts') === 'preview';
@@ -2291,6 +3038,13 @@
       })
       .catch(() => {
         concertsSection.hidden = true;
+      })
+      .finally(() => {
+        if (new URLSearchParams(window.location.search).get('subscription') !== 'confirmed') return;
+        window.setTimeout(() => {
+          openSubscriptionSheet('letters', null, document.querySelector('[data-open-subscribe]'));
+          showSubscriptionSuccess(true);
+        }, 450);
       });
 
     const revealItems = document.querySelectorAll('.reveal');

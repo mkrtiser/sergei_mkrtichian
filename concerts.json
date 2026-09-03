@@ -1,4 +1,9 @@
 {
+  "mailing": {
+    "provider": "brevo",
+    "subscriptionEndpoint": "https://sergei-concert-subscribe.blacksirius481.workers.dev/subscribe",
+    "fallbackEmail": "concerts@sergeiviolin.com"
+  },
   "concerts": [
     {
       "id": "ticino-docg-mendrisio-2026-09-16",
@@ -13,6 +18,11 @@
       "organizer": "Associazione Musica nel Mendrisiotto",
       "admission": "Free entrance",
       "admissionShort": "Free entrance",
+      "reminderEnabled": true,
+      "reminderLabel": "Concert updates",
+      "reminderFormUrl": "",
+      "reminderEmail": "concerts@sergeiviolin.com",
+      "durationMinutes": 120,
       "actionLabel": "Official event page ↗",
       "externalUrl": "https://mendrisio.ch/home/vivere-e-visitare/eventi/agenda-della-citta/2026/settembre/2026-09-16-Concerto-sinfonico.html",
       "status": "upcoming",
