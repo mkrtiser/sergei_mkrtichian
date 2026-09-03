@@ -19,7 +19,7 @@
       "admission": "Free entrance",
       "admissionShort": "Free entrance",
       "reminderEnabled": true,
-      "reminderLabel": "Concert updates",
+      "reminderLabel": "Upcoming concert reminders",
       "reminderFormUrl": "",
       "reminderEmail": "concerts@sergeiviolin.com",
       "durationMinutes": 120,

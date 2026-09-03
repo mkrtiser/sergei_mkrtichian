@@ -1377,6 +1377,23 @@
 
     .subscribe-email:focus { border-color: var(--amber); box-shadow: 0 0 0 3px rgba(189,117,76,.13); }
 
+    .subscribe-helper {
+      display: block;
+      margin: -6px 1px 2px;
+      color: var(--muted-dark);
+      font-size: 10px;
+      line-height: 1.45;
+    }
+
+    .subscribe-required { color: var(--amber); }
+
+    .subscribe-consent-label {
+      margin: 3px 0 -5px;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
     .subscribe-choice {
       display: grid;
       grid-template-columns: 20px 1fr;
@@ -2276,7 +2293,7 @@
         </div>
         <div class="letters-copy reveal">
           <p>Leave your email and I’ll let you know when a new concert is coming up.</p>
-          <button class="button letters-button" type="button" data-open-subscribe>Notify me about concerts <span aria-hidden="true">→</span></button>
+          <button class="button letters-button" type="button" data-open-subscribe>Upcoming concert reminders <span aria-hidden="true">→</span></button>
           <span class="letters-promise">Only concert updates. No spam. Unsubscribe anytime.</span>
         </div>
       </div>
@@ -2315,30 +2332,31 @@
       <div class="subscribe-handle" aria-hidden="true"></div>
       <span class="subscribe-string" aria-hidden="true"></span>
       <button class="subscribe-close" type="button" data-close-subscribe aria-label="Close">×</button>
-      <p class="subscribe-kicker" id="subscribeKicker">Concert updates</p>
-      <h2 class="subscribe-title" id="subscribeTitle">Never miss a concert.</h2>
-      <p class="subscribe-intro" id="subscribeIntro">Leave your email and I’ll let you know about upcoming performances.</p>
+      <p class="subscribe-kicker" id="subscribeKicker">Upcoming concert reminders</p>
+      <h2 class="subscribe-title" id="subscribeTitle">Upcoming concerts subscription</h2>
+      <p class="subscribe-intro" id="subscribeIntro">Be the first to hear.</p>
       <p class="subscribe-event" id="subscribeEvent"></p>
 
       <form class="subscribe-form" id="subscribeForm" novalidate>
-        <label class="subscribe-label" for="subscribeEmail">Email address</label>
-        <input class="subscribe-email" id="subscribeEmail" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" required>
+        <label class="subscribe-label" for="subscribeEmail">Enter your email address to subscribe<span class="subscribe-required" aria-hidden="true">*</span></label>
+        <input class="subscribe-email" id="subscribeEmail" name="email" type="email" inputmode="email" autocomplete="email" placeholder="Email address" required>
+        <small class="subscribe-helper">Provide your email address to subscribe. For e.g abc@xyz.com</small>
 
         <div class="subscribe-trap" aria-hidden="true">
           <label for="subscribeWebsite">Leave this field empty</label>
           <input id="subscribeWebsite" name="website" type="text" tabindex="-1" autocomplete="off">
         </div>
 
+        <p class="subscribe-consent-label">I agree<span class="subscribe-required" aria-hidden="true">*</span></p>
         <label class="subscribe-choice" for="subscribeConsent">
           <input id="subscribeConsent" type="checkbox" required>
           <span>
-            <strong>I’d like to hear about upcoming concerts.</strong>
-            <small>A few thoughtful emails a year. Unsubscribe anytime.</small>
+            <strong>I agree to receive email updates about upcoming concerts.</strong>
+            <small>You may unsubscribe at any time using the link in our newsletter.</small>
           </span>
         </label>
 
-        <button class="subscribe-submit" id="subscribeSubmit" type="submit">Notify me about concerts</button>
-        <p class="subscribe-privacy">Your email is used only for Sergei Mkrtichian’s concert updates.</p>
+        <button class="subscribe-submit" id="subscribeSubmit" type="submit">SUBSCRIBE</button>
         <p class="subscribe-status" id="subscribeStatus" aria-live="polite"></p>
       </form>
 
@@ -2697,10 +2715,10 @@
       subscribeSuccess.hidden = true;
 
       subscribeEvent.hidden = true;
-      subscribeKicker.textContent = 'Concert updates';
-      subscribeTitle.textContent = 'Never miss a concert.';
-      subscribeIntro.textContent = 'Leave your email and I’ll let you know about upcoming performances.';
-      subscribeSubmit.textContent = 'Notify me about concerts';
+      subscribeKicker.textContent = 'Upcoming concert reminders';
+      subscribeTitle.textContent = 'Upcoming concerts subscription';
+      subscribeIntro.textContent = 'Be the first to hear.';
+      subscribeSubmit.textContent = 'SUBSCRIBE';
 
       subscribeLayer.hidden = false;
       document.body.classList.add('subscribe-open');
@@ -2773,7 +2791,7 @@
           subscribeStatus.textContent = 'Something went wrong. Please try again in a moment.';
         } finally {
           subscribeSubmit.disabled = false;
-          subscribeSubmit.textContent = 'Notify me about concerts';
+          subscribeSubmit.textContent = 'SUBSCRIBE';
           subscribeForm.removeAttribute('aria-busy');
         }
         return;
@@ -2788,7 +2806,7 @@
         return;
       }
 
-      const subject = 'Concert updates subscription';
+      const subject = 'Upcoming concerts subscription';
       const body = [
         'Hello,',
         '',
@@ -2944,8 +2962,8 @@
         const reminder = document.createElement('button');
         reminder.className = 'button concert-reminder';
         reminder.type = 'button';
-        reminder.textContent = concert.reminderLabel || 'Concert updates';
-        reminder.setAttribute('aria-label', 'Subscribe to future concert updates');
+        reminder.textContent = concert.reminderLabel || 'Upcoming concert reminders';
+        reminder.setAttribute('aria-label', 'Subscribe for upcoming concert reminders');
         reminder.addEventListener('click', () => openSubscriptionSheet('letters', null, reminder));
         actions.append(reminder);
 
