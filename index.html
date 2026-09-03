@@ -1,813 +1,2320 @@
-<!DOCTYPE html>
-<html lang="ru">
+<!doctype html>
+<html lang="en" class="force-motion">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<!-- Мета-теги для PWA и полноэкранного режима -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#0b0b0b">
-<meta name="apple-mobile-web-app-title" content="Sergei Mkrtichian">
-<meta name="application-name" content="Sergei Mkrtichian">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/site.webmanifest">
-<title>Sergei Violin | Sergei Mkrtichian — Official Website</title>
-<style>
-  :root{
-    --black: #000000;
-    --frame: #1B1A16;
-    --dark-gray: #0b0b0b;
-    --light-cream: #fbf8f4;
-    --muted: #7a7a7a;
-    --accent: #B8860B;
-    --accent-light: #DAA520;
-    --hero-fp-x: 33.3%;
-    --hero-fp-y: 37.8%;
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0a09">
+  <meta name="description" content="Welcome to the official website of concert violinist Sergei Mkrtichian — music, performances, personal story and upcoming work.">
+  <meta name="author" content="Sergei Mkrtichian">
+  <meta name="robots" content="index, follow">
 
-    /* header scale (1 == normal). Меняется JS: --hs */
-    --hs: 1;
-    /* стандартные размеры — используем переменные, умножаем на --hs */
-    --header-base-height: 80px;
-    --logo-base-height: 56px;
-    --nav-font-base: 16px;
-    --header-padding-base: 28px;
-    --nav-gap-base: 18px;
+  <title>Sergei Mkrtichian — Concert Violinist</title>
+  <link rel="canonical" href="https://sergeiviolin.com/">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="preload" as="image" href="/s.JPG" fetchpriority="high">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sergeiviolin.com/">
+  <meta property="og:title" content="Sergei Mkrtichian — Concert Violinist">
+  <meta property="og:description" content="Welcome to my website — discover my music, performances, story and latest work.">
+  <meta property="og:image" content="https://sergeiviolin.com/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Sergei Mkrtichian with his violin">
+  <meta property="og:site_name" content="Sergei Mkrtichian">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Sergei Mkrtichian — Concert Violinist">
+  <meta name="twitter:description" content="Discover my music, performances, story and latest work.">
+  <meta name="twitter:image" content="https://sergeiviolin.com/og.png">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Sergei Mkrtichian",
+    "url": "https://sergeiviolin.com/",
+    "image": "https://sergeiviolin.com/s.JPG",
+    "jobTitle": "Concert violinist",
+    "sameAs": [
+      "https://www.instagram.com/sergeiviolin/",
+      "https://www.facebook.com/profile.php?id=100095484424565",
+      "https://www.youtube.com/@sergeiviolin"
+    ]
   }
+  </script>
 
-  /* Исправляем 100vh для мобильных устройств */
-  html {
-    height: -webkit-fill-available;
-  }
+  <script>
+    if (new URLSearchParams(window.location.search).get('motion') === 'system') {
+      document.documentElement.classList.remove('force-motion');
+    }
+  </script>
 
-  html,body{
-    height:100%;margin:0;padding:0;
-    background:var(--black);
-    font-family:"Georgia",serif;color:#fff;
-    scroll-behavior:smooth;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-y: none;
-  }
+  <style>
+    :root {
+      --ink: #110e0c;
+      --ink-soft: #1c1713;
+      --paper: #f5efe7;
+      --paper-deep: #e9ded1;
+      --white: #fffdf8;
+      --muted: #aaa49a;
+      --muted-dark: #6d685f;
+      --amber: #bd754c;
+      --amber-bright: #e0a069;
+      --line-dark: rgba(255, 253, 248, .16);
+      --line-light: rgba(10, 10, 9, .15);
+      --serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+      --sans: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      --page: min(1240px, calc(100vw - 48px));
+      --header-h: calc(82px + env(safe-area-inset-top));
+    }
 
-  /* Header: используем --hs */
-  header{
-    position:fixed;top:0;left:0;width:100%;
-    /* высота учитывает safe-area и масштаб */
-    height: calc((var(--header-base-height) * var(--hs)) + env(safe-area-inset-top));
-    background:rgba(0,0,0,0);
-    color:#fff;
-    display:flex;align-items:center;justify-content:space-between;
-    padding:0 calc(var(--header-padding-base) * var(--hs));
-    z-index:1100;box-sizing:border-box;
-    transition: transform .25s ease, opacity .25s ease, background .25s ease, height .18s ease, padding .18s ease;
-    padding-top: env(safe-area-inset-top);
-    flex-wrap: nowrap;
-    gap: calc(var(--nav-gap-base) * var(--hs));
-    min-width: 0;
-  }
+    *, *::before, *::after { box-sizing: border-box; }
 
-  header img.logo{
-    height: calc(var(--logo-base-height) * var(--hs));
-    opacity: 0;
-    transform: translateY(-20px);
-    transition: opacity 0.36s ease, transform 0.36s ease, height .18s ease;
-    max-width: 40%;
-    width: auto;
-    flex: 0 0 auto;
-    margin: 0;
-    box-sizing: border-box;
-    object-fit: contain;
-  }
-  header img.logo.visible{ opacity: 1; transform: translateY(0); }
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: var(--header-h);
+      overflow-x: hidden;
+      background: var(--ink);
+    }
 
-  nav{
-    display:flex;
-    gap: calc(var(--nav-gap-base) * var(--hs));
-    /* font-size привязан к --hs */
-    font-size: calc(var(--nav-font-base) * var(--hs));
-    align-items:center;
-    min-width:0;
-    white-space: nowrap;
-  }
-  nav a{
-    color:#fff;
-    text-decoration:none;
-    font-weight:500;
-    transition:opacity .25s;
-    box-sizing: border-box;
-  }
-  nav a:hover{ opacity:.85 }
+    body {
+      margin: 0;
+      min-width: 0;
+      overflow-x: hidden;
+      background: var(--ink);
+      color: var(--white);
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
 
-  /* ADDED animation (kept as before) */
-  header img.logo,
-  nav a {
-    opacity: 0;
-    transform: translateY(50px);
-    transition: opacity 1.2s ease, transform 1.2s ease;
-    will-change: opacity, transform;
-  }
-  header img.logo.visible,
-  nav a.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
+    body.menu-open { overflow: hidden; }
 
-  /* HERO: keep header-height padding to avoid content jumping */
-  .hero{
-    display:block;
-    background:var(--black);
-    height:100vh;
-    overflow:hidden;
-    position:relative;
-    /* используем CSS-переменную --header-height в JS, но для безопасности можно задавать паддинг */
-    padding-top: calc(var(--header-base-height) * var(--hs));
-    box-sizing: border-box;
-  }
-  .hero-frame{width:100%;height:100%;position:relative;overflow:hidden;background:#000}
-  .hero-frame img{
-    width:100%;height:100%;object-fit:cover;object-position: var(--hero-fp-x) var(--hero-fp-y);
-    transform-origin:center center;transition:transform 1.6s ease,opacity 1.2s ease;
-    display:block; opacity:0;
-  }
-  .hero-frame img.loaded{ opacity:1 }
+    [hidden] { display: none !important; }
+    main > section { scroll-margin-top: var(--header-h); }
 
-  /* Rest styles unchanged (copied from your file) */
-  .text-reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; will-change: opacity, transform; }
-  .text-reveal.visible { opacity: 1; transform: translateY(0); }
+    a { color: inherit; }
+    img { max-width: 100%; }
+    button, a {
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
 
-  .text-block{ background:var(--light-cream);color:#05053b;padding:120px 20px 60px;text-align:center; position: relative; }
-  .text-block:before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--accent), var(--accent-light)); }
-  .text-block h1{ font-size:42px;font-weight:400;margin:0 0 14px; }
-  .text-block p{ font-size:18px;color:var(--muted);max-width:900px; margin:0 auto 16px;line-height:1.6; }
-  .text-block em{ display:block;margin-top:14px;font-style:normal;color:#444;font-size:17px }
+    button:active,
+    a:active { transform: scale(.975); }
 
-  .socials{ display:flex;flex-direction:column;align-items:center;gap:16px;margin-top:46px }
-  .socials a{ display:flex;align-items:center;justify-content:center;gap:12px; text-decoration:none;font-weight:500;font-size:18px;color:#fff; border-radius:50px;padding:14px 48px;width:260px;text-align:center; transition:transform .25s ease,opacity .25s; opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease, transform 0.8s ease, background .25s; }
-  .socials a.visible{ opacity: 1; transform: translateY(0); }
-  .socials a svg{width:22px;height:22px;fill:currentColor}
-  .socials a.instagram{background:linear-gradient(45deg,#f58529,#dd2a7b,#8134af,#515bd4)}
-  .socials a.facebook{background:#1877f2}
-  .socials a.youtube{background:#ff0000}
-  .socials a.email{background:linear-gradient(45deg,var(--accent),var(--accent-light))}
-  .socials a:hover{transform:scale(1.04);opacity:.95}
+    :focus-visible {
+      outline: 2px solid var(--amber-bright);
+      outline-offset: 4px;
+    }
 
-  .bio-photos{ margin-top:34px;display:flex;flex-wrap:wrap;gap:14px;justify-content:center }
-  .bio-photos button{ background:transparent;border:0;padding:0;cursor:pointer; border-radius:10px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.6); transition:transform .25s ease,opacity .25s; opacity: 0; transform: translateY(20px); }
-  .bio-photos button.visible{ opacity: 1; transform: translateY(0); }
-  .bio-photos button img{ display:block;width:180px;height:120px;object-fit:cover;background:var(--black) }
-  .bio-photos button:hover{transform:scale(1.03);opacity:.95}
+    ::selection {
+      background: var(--amber);
+      color: var(--ink);
+    }
 
-  #cv{ background:var(--dark-gray); padding:90px 20px 120px; color:#fff; text-align:center; position: relative; }
-  #cv:before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--accent), var(--accent-light)); }
-  #cv h2{ font-size:38px; font-weight:400; margin-bottom:12px; opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease, transform 0.8s ease; }
-  #cv h2.visible{ opacity: 1; transform: translateY(0); }
-  #cv p.lead{ max-width:900px; margin:0 auto 20px; color:#ccc; font-size:18px; line-height:1.6; opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease 0.1s, transform 0.8s ease 0.1s; }
-  #cv p.lead.visible{ opacity: 1; transform: translateY(0); }
-  .cv-actions{ display:flex; gap:16px; justify-content:center; margin:30px 0 50px; flex-wrap: wrap; }
-  .cv-actions a.btn{ display:inline-flex; align-items:center; gap:10px; text-decoration:none; color:#fff; border-radius:50px; padding:14px 36px; font-weight:500; font-size:16px; transition: all 0.3s ease; opacity: 0; transform: translateY(15px); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-  .cv-actions a.btn.visible{ opacity: 1; transform: translateY(0); }
-  .cv-actions a.btn.download{ background:var(--dark-gray); border:1px solid rgba(255,255,255,0.1); }
-  .cv-actions a.btn.view{ background:linear-gradient(45deg,var(--accent),var(--accent-light)); }
-  .cv-actions a.btn:hover{ transform:translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
-  .cv-actions a.btn svg{width:20px;height:20px;fill:currentColor}
+    .skip-link {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      z-index: 2000;
+      padding: 10px 14px;
+      background: var(--paper);
+      color: var(--ink);
+      transform: translateY(-150%);
+      transition: transform .2s ease;
+    }
 
-  .cv-details{ display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:40px; max-width:1100px; margin:0 auto; text-align:left }
-  .cv-block{ opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease, transform 0.8s ease; padding: 30px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
-  .cv-block.visible{ opacity: 1; transform: translateY(0); }
-  .cv-block h3{ color:#fff; margin-top:0; margin-bottom:15px; font-size:20px; font-weight:600; display: flex; align-items: center; gap: 10px; }
-  .cv-block h3:before { content: ''; width: 4px; height: 20px; background: var(--accent); border-radius: 2px; }
-  .cv-block ul{ margin:0; padding-left:20px; color:#cfcfcf; line-height:1.8; font-size: 16px; }
-  .cv-block ul li { margin-bottom: 8px; position: relative; }
+    .skip-link:focus { transform: translateY(0); }
 
-  #performances{ background:var(--black);padding:100px 20px 140px;text-align:center; position: relative; }
-  #performances:before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--accent), var(--accent-light)); }
-  #performances h2{ color:#fff;font-size:42px;font-weight:400;margin-bottom:60px; opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease, transform 0.8s ease; }
-  #performances h2.visible{ opacity: 1; transform: translateY(0); }
-  .video-grid{ display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:28px;justify-items:center;width:100%;max-width:1200px;margin:0 auto }
-  .video-wrapper { position: relative;width: 100%;padding-bottom: 56.25%;overflow: hidden;border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.6); background: #000; border: 1px solid rgba(255,255,255,0.03); opacity: 0; transform: translateY(30px); transition: opacity 1s ease, transform 1s ease; }
-  .video-wrapper.visible { opacity: 1; transform: translateY(0); }
-  .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; opacity: 0; transition: opacity 0.3s ease 0.1s; }
-  .video-wrapper.visible iframe { opacity: 1; }
+    .site-header {
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 1000;
+      height: var(--header-h);
+      border-bottom: 1px solid transparent;
+      transition: background .3s ease, border-color .3s ease, height .3s ease;
+    }
 
-  #contacts{ background:var(--light-cream); color:#05053b; padding:80px 20px; text-align:center; position: relative; }
-  #contacts:before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--accent), var(--accent-light)); }
-  #contacts h2{ font-size:30px; margin-bottom:12px; opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease, transform 0.8s ease; }
-  #contacts h2.visible{ opacity: 1; transform: translateY(0); }
-  .contact-inner{ max-width:800px; margin:0 auto }
-  .contact-inner p{ color:#333; margin-bottom:18px; opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease 0.1s, transform 0.8s ease 0.1s; }
-  .contact-inner p.visible{ opacity: 1; transform: translateY(0); }
-  .contact-actions{ display:flex; gap:16px; justify-content:center; flex-wrap:wrap }
-  .contact-actions a.email-btn{ display:inline-flex; align-items:center; justify-content:center; gap:10px; text-decoration:none; color:#fff; border-radius:50px; padding:14px 36px; font-weight:500; background:linear-gradient(45deg,var(--accent),var(--accent-light)); transition: all 0.3s ease; opacity: 0; transform: translateY(15px); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-  .contact-actions a.email-btn.visible{ opacity: 1; transform: translateY(0); }
-  .contact-actions a.email-btn:hover{ transform:translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
-  .contact-actions a.email-btn svg{ width:20px; height:20px; fill:currentColor }
+    .brand,
+    .menu-toggle {
+      animation: quiet-arrival .78s .45s cubic-bezier(.2,.7,.2,1) backwards;
+    }
 
-  footer { background:var(--frame); color:#ccc; text-align:center; font-size:15px; padding:40px 20px; border-top:1px solid rgba(255,255,255,0.05); position: relative; padding-bottom: calc(40px + env(safe-area-inset-bottom)); }
-  footer:before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--accent), var(--accent-light)); }
-  footer a { color: var(--accent); transition: color 0.3s ease; }
-  footer a:hover { color: var(--accent-light); }
+    .site-header.is-scrolled,
+    .site-header.is-open {
+      background: rgba(10, 10, 9, .9);
+      border-color: var(--line-dark);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
 
-  /* Loader */
-  #loader { position:fixed;top:0;left:0;width:100%;height:100%; background:var(--frame); display:flex;align-items:center;justify-content:center;z-index:9999; transition:opacity 0.8s ease; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); height: calc(100% + env(safe-area-inset-top) + env(safe-area-inset-bottom)); }
-  #loader.hidden { opacity:0; pointer-events:none; }
-  .loader-content { display:flex; flex-direction:column; align-items:center; gap:20px; }
-  .loader-logo { width:120px; height:auto; background:var(--frame); display:block; object-fit:contain; filter:none; }
-  .spinner { width:50px; height:50px; border:6px solid rgba(201, 163, 74, 0.15); border-top-color:var(--accent); border-radius:50%; animation: spin 1s linear infinite; }
-  @keyframes spin {to{transform:rotate(360deg)}}
+    .nav-shell {
+      width: var(--page);
+      height: 100%;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+      padding-top: env(safe-area-inset-top);
+    }
 
-  .modal-backdrop{ position:fixed;inset:0;background:rgba(0,0,0,0.85); display:none;align-items:center;justify-content:center;z-index:2000;padding:20px }
-  .modal-backdrop.visible{display:flex}
-  .modal-content{ max-width:1200px;max-height:90vh;overflow:auto; border-radius:8px;position:relative }
-  .modal-content img{ display:block;max-width:100%;height:auto;border-radius:6px }
-  .modal-close{ position:absolute;top:10px;right:10px;background:rgba(0,0,0,.5); border:0;color:#fff;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:16px }
-  .modal-caption{ color:#ddd;margin-top:8px;text-align:center }
-  .pdf-frame{ width:95vw;height:85vh;border:0;border-radius:6px;background:#fff }
-</style>
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 13px;
+      text-decoration: none;
+      flex: 0 0 auto;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border: 1px solid rgba(255, 253, 248, .72);
+      border-radius: 50%;
+      font-family: var(--serif);
+      font-size: 15px;
+      letter-spacing: -.04em;
+    }
+
+    .brand-name {
+      display: grid;
+      gap: 2px;
+      font-size: 11px;
+      line-height: 1.05;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+
+    .brand-name span:last-child { color: var(--muted); }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: clamp(20px, 2.5vw, 42px);
+    }
+
+    .nav-links a {
+      position: relative;
+      padding: 10px 0;
+      color: rgba(255, 253, 248, .82);
+      font-size: 13px;
+      font-weight: 550;
+      letter-spacing: .035em;
+      text-decoration: none;
+      transition: color .2s ease;
+    }
+
+    .nav-links a:not(.nav-cta)::after {
+      position: absolute;
+      right: 0;
+      bottom: 4px;
+      left: 0;
+      height: 1px;
+      background: var(--amber);
+      content: "";
+      transform: scaleX(0);
+      transform-origin: right;
+      transition: transform .25s ease;
+    }
+
+    .nav-links a:hover { color: var(--white); }
+    .nav-links a:hover::after { transform: scaleX(1); transform-origin: left; }
+
+    .nav-links .nav-cta {
+      padding: 11px 17px;
+      border: 1px solid rgba(255, 253, 248, .4);
+      border-radius: 999px;
+      color: var(--white);
+      transition: background .2s ease, border-color .2s ease, color .2s ease;
+    }
+
+    .nav-links .nav-cta:hover {
+      border-color: var(--amber);
+      background: var(--amber);
+      color: var(--ink);
+    }
+
+    .menu-toggle {
+      display: none;
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--white);
+      cursor: pointer;
+    }
+
+    .menu-toggle span,
+    .menu-toggle::before,
+    .menu-toggle::after {
+      display: block;
+      width: 24px;
+      height: 1px;
+      margin: 5px auto;
+      background: currentColor;
+      content: "";
+      transition: transform .25s ease, opacity .25s ease;
+    }
+
+    .menu-toggle[aria-expanded="true"] span { opacity: 0; }
+    .menu-toggle[aria-expanded="true"]::before { transform: translateY(6px) rotate(45deg); }
+    .menu-toggle[aria-expanded="true"]::after { transform: translateY(-6px) rotate(-45deg); }
+    .menu-toggle:focus-visible { border-radius: 50%; outline-offset: -4px; }
+
+    .hero {
+      position: relative;
+      min-height: 0;
+      height: 100svh;
+      max-height: none;
+      overflow: hidden;
+      background: #060605;
+      isolation: isolate;
+    }
+
+    .hero-media,
+    .hero-media::after,
+    .hero-media img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .hero-media {
+      z-index: -2;
+      will-change: clip-path, transform;
+      animation: stage-reveal 1.45s cubic-bezier(.16,.8,.2,1) backwards;
+    }
+
+    .hero-media img {
+      object-fit: cover;
+      object-position: 49% 42%;
+      filter: saturate(.96) contrast(1.02) brightness(1.04);
+      transform: translate3d(0, var(--hero-image-y, 0px), 0) scale(var(--hero-image-scale, 1.025));
+      transform-origin: 50% 44%;
+      will-change: transform;
+    }
+
+    .hero-media::after {
+      z-index: 1;
+      background:
+        linear-gradient(90deg, rgba(17,14,12,.04) 0%, rgba(17,14,12,.04) 36%, rgba(17,14,12,.44) 58%, rgba(17,14,12,.93) 100%),
+        linear-gradient(0deg, rgba(17,14,12,.94) 0%, transparent 30%, rgba(17,14,12,.2) 100%);
+      content: "";
+    }
+
+    .hero-strings {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      width: 100%;
+      height: 100%;
+      display: block;
+      opacity: .78;
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    @keyframes stage-reveal {
+      0% {
+        clip-path: inset(7% 19% 7% 19% round 34px);
+        opacity: .35;
+        transform: scale(.965);
+      }
+      35% { opacity: 1; }
+      100% {
+        clip-path: inset(0 round 0);
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes quiet-arrival {
+      from { opacity: 0; transform: translateY(-12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes copy-arrival {
+      from { opacity: 0; transform: translateY(28px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes mobile-stage-reveal {
+      from { opacity: .18; transform: scale(1.045); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes soft-appear {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes arrow-breathe {
+      0%, 100% { transform: translateY(-1px); }
+      50% { transform: translateY(5px); }
+    }
+
+    .hero-inner {
+      width: var(--page);
+      height: 100%;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(390px, .92fr);
+      align-items: center;
+      padding: var(--header-h) 0 42px;
+    }
+
+    .hero-copy {
+      grid-column: 2;
+      max-width: 610px;
+      padding: 0 0 0 clamp(24px, 4vw, 74px);
+      opacity: var(--hero-copy-opacity, 1);
+      transform: translate3d(0, var(--hero-copy-y, 0px), 0);
+      will-change: transform, opacity;
+    }
+
+    .hero-copy > * { animation: copy-arrival .88s cubic-bezier(.2,.7,.2,1) backwards; }
+    .hero-copy > :nth-child(1) { animation-delay: .4s; }
+    .hero-copy > :nth-child(2) { animation-delay: .5s; }
+    .hero-copy > :nth-child(3) { animation-delay: .61s; }
+    .hero-copy > :nth-child(4) { animation-delay: .72s; }
+    .hero-copy > :nth-child(5) { animation-delay: .82s; }
+
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0 0 22px;
+      color: var(--amber-bright);
+      font-family: var(--serif);
+      font-size: 16px;
+      font-weight: 400;
+      letter-spacing: .055em;
+    }
+
+    .eyebrow::before {
+      width: 38px;
+      height: 1px;
+      background: currentColor;
+      content: "";
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      margin-bottom: 24px;
+      font-family: var(--serif);
+      font-size: clamp(68px, 7.5vw, 128px);
+      font-weight: 400;
+      letter-spacing: -.055em;
+      line-height: .78;
+    }
+
+    h1 span { display: block; }
+    h1 span:last-child {
+      margin-left: .3em;
+      color: rgba(255,253,248,.07);
+      -webkit-text-stroke: 1.15px rgba(255,253,248,.84);
+    }
+
+    .hero-lead {
+      max-width: 530px;
+      margin-bottom: 34px;
+      color: rgba(255, 253, 248, .82);
+      font-family: var(--serif);
+      font-size: clamp(19px, 1.75vw, 25px);
+      line-height: 1.5;
+    }
+
+    @keyframes next-concert-arrival {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .next-concert-teaser {
+      position: relative;
+      width: min(100%, 520px);
+      min-height: 76px;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 16px;
+      align-items: center;
+      overflow: hidden;
+      margin: 0 0 18px;
+      padding: 12px 15px 12px 13px;
+      border: 1px solid rgba(255, 253, 248, .22);
+      border-radius: 17px;
+      background: rgba(13, 11, 9, .7);
+      color: var(--white);
+      text-decoration: none;
+      animation: next-concert-arrival .72s .08s cubic-bezier(.2,.7,.2,1) backwards;
+      transition: border-color .25s ease, background .25s ease, transform .25s ease;
+    }
+
+    .next-concert-teaser::after {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      height: 1px;
+      background: linear-gradient(90deg, var(--amber-bright), rgba(224, 160, 105, 0));
+      content: "";
+      transform-origin: left;
+      animation: next-concert-line 1.1s .45s cubic-bezier(.2,.7,.2,1) backwards;
+    }
+
+    @keyframes next-concert-line {
+      from { transform: scaleX(0); }
+      to { transform: scaleX(1); }
+    }
+
+    .next-concert-teaser:hover {
+      border-color: rgba(224, 160, 105, .62);
+      background: rgba(22, 17, 14, .86);
+      transform: translateY(-2px);
+    }
+
+    .next-concert-date {
+      min-width: 50px;
+      display: grid;
+      justify-items: center;
+      padding-right: 13px;
+      border-right: 1px solid rgba(255, 253, 248, .16);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .next-concert-day {
+      font-family: var(--serif);
+      font-size: 32px;
+      letter-spacing: -.04em;
+      line-height: .9;
+    }
+
+    .next-concert-month,
+    .next-concert-label {
+      color: var(--amber-bright);
+      font-size: 9px;
+      font-weight: 750;
+      letter-spacing: .14em;
+      line-height: 1.3;
+      text-transform: uppercase;
+    }
+
+    .next-concert-copy { min-width: 0; display: grid; gap: 3px; }
+    .next-concert-place,
+    .next-concert-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .next-concert-place { font-family: var(--serif); font-size: 18px; font-weight: 400; }
+    .next-concert-title { color: rgba(255, 253, 248, .66); font-size: 11px; }
+    .next-concert-arrow { color: var(--amber-bright); font-size: 21px; transition: transform .25s ease; }
+    .next-concert-teaser:hover .next-concert-arrow { transform: translate(2px, 2px); }
+
+    html.has-concerts .hero-lead { margin-bottom: 18px; }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .button {
+      min-height: 50px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 13px 21px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 650;
+      letter-spacing: .025em;
+      text-decoration: none;
+      transition: transform .2s ease, background .2s ease, border-color .2s ease, color .2s ease;
+    }
+
+    .button:hover { transform: translateY(-2px); }
+    .button-primary { background: var(--amber); color: var(--ink); }
+    .button-primary:hover { background: var(--amber-bright); }
+    .button-ghost { border-color: rgba(255,253,248,.34); color: var(--white); }
+    .button-ghost:hover { border-color: rgba(255,253,248,.7); background: rgba(255,253,248,.1); }
+    .button-secondary { border-color: rgba(255,253,248,.34); color: var(--white); }
+    .button-secondary:hover { border-color: var(--white); background: var(--white); color: var(--ink); }
+    .button-arrow {
+      display: inline-block;
+      font-size: 18px;
+      font-weight: 400;
+      line-height: 0;
+      animation: arrow-breathe 1.8s 2s ease-in-out infinite;
+    }
+
+    .concerts {
+      position: relative;
+      overflow: hidden;
+      background: var(--paper-deep);
+      color: var(--ink);
+    }
+
+    .concerts::after {
+      position: absolute;
+      top: -280px;
+      right: -240px;
+      width: 620px;
+      height: 620px;
+      border: 1px solid rgba(189, 117, 76, .18);
+      border-radius: 50%;
+      box-shadow: 0 0 0 90px rgba(189, 117, 76, .035), 0 0 0 180px rgba(189, 117, 76, .025);
+      content: "";
+      pointer-events: none;
+    }
+
+    .concerts .section-shell { position: relative; z-index: 1; }
+    .concerts .section-kicker { color: var(--amber); }
+
+    .concerts-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, .55fr);
+      gap: clamp(40px, 8vw, 120px);
+      align-items: end;
+      margin-bottom: clamp(48px, 7vw, 84px);
+    }
+
+    .concerts-intro {
+      justify-self: end;
+      max-width: 430px;
+      margin: 0;
+      color: var(--muted-dark);
+      font-family: var(--serif);
+      font-size: 20px;
+      line-height: 1.55;
+    }
+
+    .concerts-preview-note {
+      margin: -26px 0 28px;
+      padding: 11px 14px;
+      border: 1px solid rgba(189, 117, 76, .3);
+      border-radius: 10px;
+      color: var(--muted-dark);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .concert-list { border-top: 1px solid var(--line-light); }
+
+    .concert-card {
+      display: grid;
+      grid-template-columns: 160px minmax(0, 1fr) auto;
+      gap: clamp(28px, 5vw, 72px);
+      align-items: center;
+      padding: 30px 0;
+      border-bottom: 1px solid var(--line-light);
+    }
+
+    .concert-date {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 4px 10px;
+      align-items: center;
+      font-family: var(--serif);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .concert-day {
+      grid-row: span 2;
+      color: var(--amber);
+      font-size: 54px;
+      letter-spacing: -.055em;
+      line-height: .8;
+    }
+
+    .concert-month,
+    .concert-year {
+      font-family: var(--sans);
+      font-size: 10px;
+      font-weight: 750;
+      letter-spacing: .15em;
+      line-height: 1.15;
+      text-transform: uppercase;
+    }
+
+    .concert-year { color: var(--muted-dark); }
+
+    .concert-place {
+      margin-bottom: 7px;
+      color: var(--amber);
+      font-size: 10px;
+      font-weight: 750;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    .concert-title {
+      margin-bottom: 8px;
+      font-family: var(--serif);
+      font-size: clamp(24px, 2.5vw, 34px);
+      font-weight: 400;
+      letter-spacing: -.02em;
+      line-height: 1.15;
+    }
+
+    .concert-meta,
+    .concert-description {
+      margin: 0;
+      color: var(--muted-dark);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .concert-description { max-width: 650px; margin-top: 7px; }
+
+    .concert-action {
+      min-width: 148px;
+      background: var(--ink);
+      color: var(--white);
+    }
+
+    .concert-action:hover { background: var(--amber); color: var(--ink); }
+
+    .concert-card[data-concert-kind="external"] .concert-action {
+      border-color: rgba(17, 14, 12, .38);
+      background: transparent;
+      color: var(--ink);
+    }
+
+    .concert-card[data-concert-kind="external"] .concert-action:hover {
+      border-color: var(--ink);
+      background: var(--ink);
+      color: var(--white);
+    }
+
+    .concert-status {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      color: var(--muted-dark);
+      font-size: 10px;
+      font-weight: 750;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+    }
+
+    .section { padding: clamp(90px, 10vw, 150px) 0; }
+    .section-shell { width: var(--page); margin: 0 auto; }
+
+    .section-kicker {
+      margin-bottom: 26px;
+      color: var(--amber);
+      font-family: var(--serif);
+      font-size: 15px;
+      font-weight: 400;
+      letter-spacing: .055em;
+    }
+
+    .section-kicker::before { content: "— "; }
+    main { counter-reset: section; }
+    main > section:not(.hero) { counter-increment: section; }
+
+    .display-title {
+      margin-bottom: 0;
+      font-family: var(--serif);
+      font-size: clamp(46px, 6vw, 86px);
+      font-weight: 400;
+      letter-spacing: -.045em;
+      line-height: .98;
+    }
+
+    .about { background: var(--paper); color: var(--ink); }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: minmax(310px, .8fr) minmax(420px, 1.2fr);
+      gap: clamp(56px, 9vw, 140px);
+      align-items: start;
+    }
+
+    .about-intro { position: sticky; top: calc(var(--header-h) + 50px); }
+
+    .about .display-title span { color: var(--amber); font-style: italic; }
+
+    .about-copy {
+      padding-top: 43px;
+      border-top: 1px solid var(--line-light);
+    }
+
+    .about-copy .lead {
+      margin-bottom: 34px;
+      font-family: var(--serif);
+      font-size: clamp(25px, 2.7vw, 39px);
+      line-height: 1.28;
+      letter-spacing: -.02em;
+    }
+
+    .about-copy > p:not(.lead) {
+      max-width: 680px;
+      color: var(--muted-dark);
+      font-size: 16px;
+      line-height: 1.82;
+    }
+
+    .about-copy .signature {
+      margin: 8px 0 42px;
+      color: var(--ink);
+      font-family: var(--serif);
+      font-size: clamp(23px, 2.4vw, 32px);
+      font-style: italic;
+    }
+
+    .story-label {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 0 0 24px;
+      color: var(--amber);
+      font-family: var(--serif);
+      font-size: 15px;
+    }
+
+    .story-label::after {
+      height: 1px;
+      flex: 1;
+      background: var(--line-light);
+      content: "";
+    }
+
+    .about-meta {
+      margin-top: 50px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1px;
+      background: var(--line-light);
+      border: 1px solid var(--line-light);
+    }
+
+    .meta-card {
+      min-height: 150px;
+      padding: 26px;
+      background: rgba(255, 253, 248, .56);
+    }
+
+    .meta-card span {
+      display: block;
+      margin-bottom: 20px;
+      color: var(--amber);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+
+    .meta-card p {
+      margin: 0;
+      font-family: var(--serif);
+      font-size: 19px;
+      line-height: 1.45;
+    }
+
+    .highlights {
+      position: relative;
+      overflow: hidden;
+      background: var(--ink-soft);
+    }
+
+    .highlights::before {
+      position: absolute;
+      top: -300px;
+      right: -160px;
+      width: 700px;
+      height: 700px;
+      border: 1px solid rgba(199,134,63,.16);
+      border-radius: 50%;
+      box-shadow: 0 0 0 100px rgba(199,134,63,.025), 0 0 0 200px rgba(199,134,63,.02);
+      content: "";
+      pointer-events: none;
+    }
+
+    .highlights-head {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 50px;
+      align-items: end;
+      margin-bottom: clamp(58px, 8vw, 100px);
+    }
+
+    .highlights-note {
+      max-width: 450px;
+      justify-self: end;
+      margin: 0;
+      color: rgba(255,253,248,.72);
+      font-family: var(--serif);
+      font-size: 21px;
+      line-height: 1.55;
+    }
+
+    .timeline { border-top: 1px solid var(--line-dark); }
+
+    .timeline-item {
+      position: relative;
+      display: grid;
+      grid-template-columns: 150px minmax(230px, .72fr) 1fr;
+      gap: 40px;
+      align-items: center;
+      min-height: 144px;
+      padding: 28px 0;
+      border-bottom: 1px solid var(--line-dark);
+      transition: border-color .25s ease;
+    }
+
+    .timeline-item::after {
+      position: absolute;
+      right: 0;
+      bottom: -1px;
+      left: 0;
+      height: 1px;
+      background: linear-gradient(90deg, var(--amber-bright), transparent 78%);
+      content: "";
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 1.15s var(--reveal-delay, 0ms) cubic-bezier(.2,.7,.2,1);
+    }
+
+    .timeline-item.is-visible::after { transform: scaleX(1); }
+
+    .timeline-item:hover { border-color: rgba(199,134,63,.72); }
+
+    .timeline-year {
+      font-family: var(--serif);
+      font-size: clamp(38px, 4vw, 56px);
+      color: var(--amber-bright);
+    }
+
+    .timeline-item h3 {
+      margin-bottom: 0;
+      font-family: var(--serif);
+      font-size: clamp(23px, 2.2vw, 32px);
+      font-weight: 400;
+      line-height: 1.2;
+    }
+
+    .timeline-item p {
+      max-width: 540px;
+      justify-self: end;
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .performances { background: var(--ink); }
+
+    .performances-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 30px;
+      margin-bottom: 54px;
+    }
+
+    .text-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 7px;
+      border-bottom: 1px solid var(--amber);
+      color: var(--white);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 24px;
+    }
+
+    .video-card,
+    .video-card:first-child {
+      min-width: 0;
+      grid-column: span 4;
+    }
+
+    .video-card.reveal {
+      clip-path: inset(0 0 16% 0 round 18px);
+      transform: translateY(42px) scale(.975);
+      transition:
+        opacity 1s var(--reveal-delay, 0ms) ease,
+        transform 1.05s var(--reveal-delay, 0ms) cubic-bezier(.2,.7,.2,1),
+        clip-path 1.05s var(--reveal-delay, 0ms) cubic-bezier(.2,.7,.2,1);
+    }
+
+    .video-card.reveal.is-visible {
+      clip-path: inset(0 round 0);
+      transform: translateY(0) scale(1);
+    }
+
+    .video-trigger {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      display: block;
+      overflow: hidden;
+      padding: 0;
+      border: 0;
+      background: #1a1916;
+      color: var(--white);
+      cursor: pointer;
+    }
+
+    .video-trigger::after {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(0deg, rgba(5,5,4,.65), transparent 58%);
+      content: "";
+      transition: background .3s ease;
+    }
+
+    .video-trigger img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      filter: saturate(.72) contrast(1.08);
+      transition: transform .6s cubic-bezier(.2,.7,.2,1), filter .3s ease;
+    }
+
+    .video-trigger:hover img { transform: scale(1.035); filter: saturate(.95) contrast(1.04); }
+
+    .play {
+      position: absolute;
+      z-index: 2;
+      top: 50%;
+      left: 50%;
+      width: 68px;
+      height: 68px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(255,253,248,.72);
+      border-radius: 50%;
+      background: rgba(10,10,9,.28);
+      font-size: 18px;
+      transform: translate(-50%, -50%);
+      transition: background .25s ease, border-color .25s ease, transform .25s ease;
+    }
+
+    .video-trigger:hover .play {
+      border-color: var(--amber-bright);
+      background: var(--amber);
+      color: var(--ink);
+      transform: translate(-50%, -50%) scale(1.07);
+    }
+
+    .video-frame {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      display: block;
+      border: 0;
+      background: #000;
+    }
+
+    .video-caption {
+      padding: 18px 0 8px;
+      border-bottom: 1px solid var(--line-dark);
+    }
+
+    .video-caption span {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--amber);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+    }
+
+    .video-caption h3 {
+      margin: 0;
+      font-family: var(--serif);
+      font-size: clamp(18px, 1.8vw, 26px);
+      font-weight: 400;
+      line-height: 1.3;
+      overflow-wrap: anywhere;
+    }
+
+    .cv-band {
+      padding: 68px 0;
+      background: var(--paper-deep);
+      color: var(--ink);
+    }
+
+    .cv-band-inner {
+      width: var(--page);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .cv-band h2 {
+      margin-bottom: 8px;
+      font-family: var(--serif);
+      font-size: clamp(32px, 4vw, 53px);
+      font-weight: 400;
+      letter-spacing: -.03em;
+    }
+
+    .cv-band p {
+      margin-bottom: 0;
+      color: var(--muted-dark);
+      line-height: 1.65;
+    }
+
+    .cv-band .button-secondary {
+      border-color: rgba(10,10,9,.35);
+      color: var(--ink);
+    }
+
+    .cv-band .button-secondary:hover { border-color: var(--ink); background: var(--ink); color: var(--white); }
+
+    .contact {
+      position: relative;
+      overflow: hidden;
+      background: var(--amber);
+      color: var(--ink);
+    }
+
+    .contact::after {
+      position: absolute;
+      right: -70px;
+      bottom: -190px;
+      font-family: var(--serif);
+      font-size: clamp(250px, 35vw, 590px);
+      line-height: .8;
+      color: rgba(10,10,9,.055);
+      content: "S";
+      pointer-events: none;
+    }
+
+    .contact-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1.25fr .75fr;
+      gap: clamp(50px, 10vw, 160px);
+      align-items: end;
+    }
+
+    .contact .section-kicker { color: rgba(10,10,9,.6); }
+
+    .contact-title {
+      max-width: 850px;
+      margin-bottom: 0;
+      font-family: var(--serif);
+      font-size: clamp(54px, 7vw, 105px);
+      font-weight: 400;
+      letter-spacing: -.055em;
+      line-height: .92;
+    }
+
+    .contact-title em { font-weight: 400; color: var(--paper); }
+
+    .contact-aside {
+      padding-bottom: 5px;
+      border-top: 1px solid rgba(10,10,9,.25);
+    }
+
+    .contact-aside p {
+      padding-top: 26px;
+      color: rgba(10,10,9,.72);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .email-link {
+      display: inline-block;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--ink);
+      font-family: var(--serif);
+      font-size: clamp(19px, 2vw, 26px);
+      text-decoration: none;
+    }
+
+    .email-link:hover { color: var(--paper); border-color: var(--paper); }
+
+    .email-action-label { display: none; }
+
+    .social-links {
+      margin-top: 32px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 22px;
+    }
+
+    .social-links a {
+      font-size: 10px;
+      font-weight: 750;
+      letter-spacing: .16em;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .social-links a:hover { color: var(--paper); }
+
+    footer { background: var(--ink); }
+
+    .footer-inner {
+      width: var(--page);
+      min-height: 105px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 30px;
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: .08em;
+    }
+
+    .footer-inner a { color: var(--white); text-decoration: none; }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition:
+        opacity .75s var(--reveal-delay, 0ms) ease,
+        transform .88s var(--reveal-delay, 0ms) cubic-bezier(.2,.7,.2,1);
+    }
+
+    .reveal.is-visible { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 1000px) {
+      :root { --page: min(100% - 40px, 920px); }
+
+      .hero-inner { grid-template-columns: 45% 55%; }
+      .hero-copy { padding-left: 30px; }
+      h1 { font-size: clamp(64px, 9.5vw, 96px); }
+
+      .about-grid { grid-template-columns: 1fr; }
+      .about-intro { position: static; }
+      .about-copy { padding-top: 0; border-top: 0; }
+
+      .timeline-item { grid-template-columns: 110px minmax(220px, .8fr) 1fr; gap: 25px; }
+
+      .video-card, .video-card:first-child { grid-column: span 6; }
+      .video-card:last-child { grid-column: 4 / span 6; }
+
+      .contact-grid { grid-template-columns: 1fr; }
+      .contact-aside { max-width: 520px; }
+      .concert-card { grid-template-columns: 130px minmax(0, 1fr); }
+      .concert-card > :last-child { grid-column: 2; justify-self: start; }
+    }
+
+    @media (max-width: 760px) {
+      :root {
+        --page: calc(100% - 32px);
+        --header-h: calc(66px + env(safe-area-inset-top));
+      }
+
+      html { scrollbar-width: none; }
+      html::-webkit-scrollbar { display: none; }
+
+      .menu-toggle { display: block; }
+
+      .site-header.is-scrolled,
+      .site-header.is-open {
+        border-color: transparent;
+        background: transparent;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+      }
+
+      .nav-shell {
+        width: calc(100% - 20px);
+        height: 54px;
+        margin: calc(6px + env(safe-area-inset-top)) 10px 0;
+        padding: 0 5px 0 7px;
+        border: 1px solid transparent;
+        border-radius: 999px;
+        transition: background .3s ease, border-color .3s ease, box-shadow .3s ease;
+      }
+
+      .site-header.is-scrolled .nav-shell,
+      .site-header.is-open .nav-shell {
+        border-color: rgba(255, 253, 248, .13);
+        background: rgba(15, 12, 10, .84);
+        box-shadow: 0 12px 34px rgba(0, 0, 0, .16);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+      }
+
+      .brand-name {
+        display: block;
+        font-size: 9px;
+        letter-spacing: .135em;
+        white-space: nowrap;
+      }
+
+      .brand-name span:last-child { display: none; }
+
+      .brand-mark {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+      }
+
+      .brand {
+        min-width: 0;
+        min-height: 44px;
+        justify-content: flex-start;
+        padding: 4px;
+      }
+
+      .nav-shell { justify-content: space-between; gap: 10px; }
+
+      .nav-links {
+        position: fixed;
+        top: var(--header-h);
+        right: 0;
+        bottom: auto;
+        left: 0;
+        width: 100%;
+        height: calc(100dvh - var(--header-h));
+        min-height: calc(100svh - var(--header-h));
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 0;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        padding: 30px 24px calc(30px + env(safe-area-inset-bottom));
+        background:
+          radial-gradient(circle at 82% 16%, rgba(189,117,76,.12), transparent 34%),
+          rgba(17,14,12,.985);
+        visibility: hidden;
+        opacity: 0;
+        transform: translateY(-8px);
+        transition: opacity .3s ease, transform .35s cubic-bezier(.2,.7,.2,1), visibility .3s;
+      }
+
+      .nav-links.is-open { visibility: visible; opacity: 1; transform: translateY(0); }
+
+      .nav-links a,
+      .nav-links .nav-cta {
+        width: 100%;
+        padding: clamp(14px, 3.2vh, 25px) 0;
+        border: 0;
+        border-bottom: 1px solid var(--line-dark);
+        border-radius: 0;
+        font-family: var(--serif);
+        font-size: clamp(32px, 10vw, 48px);
+        font-weight: 400;
+        letter-spacing: -.02em;
+        text-transform: none;
+        opacity: 0;
+        transform: translateY(18px);
+        transition: opacity .45s ease, transform .55s cubic-bezier(.2,.7,.2,1), color .2s ease;
+      }
+
+      .nav-links.is-open a { opacity: 1; transform: translateY(0); }
+      .nav-links.is-open a:nth-child(1) { transition-delay: .06s; }
+      .nav-links.is-open a:nth-child(2) { transition-delay: .12s; }
+      .nav-links.is-open a:nth-child(3) { transition-delay: .18s; }
+      .nav-links.is-open a:nth-child(4) { transition-delay: .24s; }
+      .nav-links.is-open a:nth-child(5) { transition-delay: .3s; }
+
+      .hero {
+        min-height: 100svh;
+        height: 100svh;
+        max-height: none;
+      }
+
+      .hero-media {
+        clip-path: none;
+        will-change: opacity, transform;
+        animation: mobile-stage-reveal 1.05s cubic-bezier(.2,.7,.2,1) backwards;
+      }
+
+      .hero-media img {
+        object-position: 36% center;
+        filter: brightness(1.16) saturate(.9) contrast(1.02);
+      }
+
+      .hero-media::after {
+        background:
+          linear-gradient(0deg, rgba(17,14,12,.96) 0%, rgba(17,14,12,.72) 30%, rgba(17,14,12,.05) 64%, rgba(17,14,12,.12) 100%),
+          linear-gradient(90deg, rgba(17,14,12,0) 0%, rgba(17,14,12,.08) 100%);
+      }
+
+      .hero-strings { opacity: .9; }
+
+      .hero-inner {
+        display: flex;
+        align-items: flex-end;
+        min-height: 100svh;
+        height: 100%;
+        padding: max(50svh, 330px) 0 42px;
+      }
+
+      .hero-copy {
+        width: 100%;
+        max-width: 580px;
+        padding: 0;
+        opacity: 1;
+        transform: none;
+        will-change: auto;
+      }
+
+      .hero-copy > * { animation-duration: .72s; }
+      .hero-copy > :nth-child(1) { animation-delay: .22s; }
+      .hero-copy > :nth-child(2) { animation-delay: .31s; }
+      .hero-copy > :nth-child(3) { animation-delay: .41s; }
+      .hero-copy > :nth-child(4) { animation-delay: .51s; }
+      .hero-copy > :nth-child(5) { animation-delay: .61s; }
+
+      .eyebrow {
+        margin-bottom: 13px;
+        font-size: 12px;
+        letter-spacing: .065em;
+      }
+
+      .eyebrow::before { width: 28px; }
+
+      h1 {
+        margin-bottom: 17px;
+        font-size: clamp(54px, 17vw, 82px);
+        line-height: .82;
+      }
+
+      h1 span:last-child { margin-left: 0; }
+
+      .hero-lead {
+        max-width: 390px;
+        margin-bottom: 18px;
+        font-size: 18px;
+        line-height: 1.42;
+      }
+
+      html.has-concerts h1 { margin-bottom: 13px; font-size: clamp(51px, 16vw, 76px); }
+      html.has-concerts .hero-lead { margin-bottom: 12px; }
+
+      .next-concert-teaser {
+        min-height: 64px;
+        grid-template-columns: 46px minmax(0, 1fr) 24px;
+        gap: 11px;
+        margin-bottom: 8px;
+        padding: 9px 11px;
+        border-radius: 14px;
+        background: rgba(13, 11, 9, .78);
+      }
+
+      .next-concert-date { min-width: 0; padding-right: 10px; }
+      .next-concert-day { font-size: 28px; }
+      .next-concert-month,
+      .next-concert-label { font-size: 8px; }
+      .next-concert-place { font-size: 16px; }
+      .next-concert-title { font-size: 10px; }
+
+      .button-row {
+        display: flex;
+      }
+
+      .hero-copy .button {
+        width: auto;
+        min-height: 48px;
+        justify-content: flex-start;
+        padding: 10px 0;
+        border: 0;
+        border-bottom: 1px solid rgba(255,253,248,.52);
+        border-radius: 0;
+        background: transparent;
+        color: var(--white);
+        font-size: 12px;
+        letter-spacing: .02em;
+      }
+
+      .section { padding: 74px 0; }
+      .section-kicker { margin-bottom: 20px; }
+      .display-title { font-size: clamp(46px, 14vw, 67px); }
+
+      .concerts-head {
+        grid-template-columns: 1fr;
+        gap: 22px;
+        margin-bottom: 40px;
+      }
+
+      .concerts-intro {
+        justify-self: start;
+        max-width: 330px;
+        font-size: 18px;
+      }
+
+      .concerts-preview-note { margin-top: -18px; }
+
+      .concert-card {
+        grid-template-columns: 70px minmax(0, 1fr);
+        gap: 18px;
+        align-items: start;
+        padding: 25px 0;
+      }
+
+      .concert-day { font-size: 46px; }
+      .concert-date { gap: 3px 7px; }
+      .concert-title { font-size: 25px; }
+      .concert-card > :last-child { grid-column: 2; width: 100%; }
+      .concert-action { width: 100%; min-height: 48px; }
+
+      .about-meta {
+        gap: 10px;
+        border: 0;
+        background: transparent;
+      }
+
+      .meta-card {
+        border: 1px solid var(--line-light);
+        border-radius: 16px;
+      }
+
+      .about-copy .lead {
+        margin-bottom: 26px;
+        font-size: 27px;
+        line-height: 1.25;
+      }
+
+      .about-copy > p:not(.lead) {
+        font-size: 15px;
+        line-height: 1.72;
+      }
+
+      .about-copy .signature {
+        margin-bottom: 38px;
+        font-size: 25px;
+        line-height: 1.3;
+      }
+
+      .about-meta { margin-top: 38px; }
+      .about-meta { grid-template-columns: 1fr; }
+      .meta-card { min-height: auto; }
+
+      .highlights-head { grid-template-columns: 1fr; }
+      .highlights-note { justify-self: start; }
+
+      .timeline-item {
+        min-height: auto;
+        grid-template-columns: 78px 1fr;
+        gap: 8px 16px;
+        padding: 22px 0;
+      }
+
+      .timeline-year { font-size: 35px; }
+      .timeline-item h3 { font-size: 24px; }
+      .timeline-item p { grid-column: 2; justify-self: start; font-size: 13px; line-height: 1.6; }
+
+      .performances-head { display: block; }
+      .performances-head .text-link { margin-top: 28px; }
+      .video-grid { grid-template-columns: minmax(0, 1fr); gap: 34px; }
+      .video-card, .video-card:first-child, .video-card:last-child { grid-column: 1; }
+      .video-card {
+        overflow: hidden;
+        border: 1px solid rgba(255, 253, 248, .1);
+        border-radius: 17px;
+        background: var(--ink-soft);
+      }
+      .video-card.reveal { clip-path: none; }
+      .video-caption { padding: 17px 16px 19px; border-bottom: 0; }
+      .play { width: 58px; height: 58px; }
+
+      .cv-band-inner { grid-template-columns: 1fr; }
+      .cv-band { padding: 58px 0; }
+      .cv-band .button { width: 100%; justify-self: stretch; }
+
+      .contact-title { font-size: clamp(50px, 15vw, 78px); }
+
+      .contact-aside { max-width: none; }
+
+      .email-link {
+        width: 100%;
+        min-height: 68px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 5px;
+        padding: 13px 17px;
+        border: 1px solid var(--ink);
+        border-radius: 15px;
+        background: var(--ink);
+        color: var(--white);
+        font-size: 15px;
+      }
+
+      .email-link:hover { color: var(--white); border-color: var(--ink); }
+
+      .email-action-label {
+        display: block;
+        font-family: var(--sans);
+        font-size: 11px;
+        font-weight: 650;
+        letter-spacing: .025em;
+        color: var(--amber-bright);
+      }
+
+      .social-links {
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .social-links a { min-height: 44px; display: inline-flex; align-items: center; }
+
+      .footer-inner {
+        min-height: 210px;
+        flex-direction: column;
+        justify-content: center;
+        padding-bottom: calc(28px + env(safe-area-inset-bottom));
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 430px) {
+      .hero { min-height: 100svh; }
+      .hero-inner { padding-top: max(48svh, 320px); padding-bottom: 36px; }
+      .hero-lead { max-width: 330px; }
+      .timeline-item { grid-template-columns: 72px 1fr; }
+    }
+
+    @media (max-width: 360px) {
+      :root { --page: calc(100% - 24px); }
+      .brand-name { font-size: 8px; letter-spacing: .1em; }
+      h1 { font-size: 52px; }
+      .hero-lead { font-size: 15px; }
+      .timeline-item { grid-template-columns: 66px 1fr; }
+    }
+
+    @media (max-width: 430px) and (max-height: 650px) {
+      .hero {
+        min-height: 100svh;
+        height: 100svh;
+      }
+
+      .hero-inner {
+        min-height: 100svh;
+        padding: max(39svh, 205px) 0 28px;
+      }
+
+      .hero-lead { display: block; margin-bottom: 14px; }
+      html.has-concerts .hero-lead { display: none; }
+
+      .eyebrow { margin-bottom: 8px; }
+
+      h1 {
+        margin-bottom: 14px;
+        font-size: clamp(50px, 16vw, 60px);
+      }
+
+      .hero-copy .button { min-height: 44px; }
+      .next-concert-teaser { min-height: 56px; padding-top: 6px; padding-bottom: 6px; }
+    }
+
+    @media (orientation: landscape) and (max-height: 600px) and (min-width: 761px) {
+      .hero { min-height: 620px; height: auto; }
+      .hero-copy { padding-top: 105px; padding-bottom: 125px; }
+      h1 { font-size: 66px; }
+      .hero-lead { margin-bottom: 20px; font-size: 18px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html:not(.force-motion) { scroll-behavior: auto; }
+      html:not(.force-motion) .brand,
+      html:not(.force-motion) .menu-toggle { animation: soft-appear .4s ease backwards; }
+      html:not(.force-motion) .hero-media { clip-path: none; transform: none; animation: soft-appear .65s ease backwards; }
+      html:not(.force-motion) .hero-copy > * { animation: soft-appear .5s ease backwards; }
+      html:not(.force-motion) .hero-copy > :nth-child(1) { animation-delay: .12s; }
+      html:not(.force-motion) .hero-copy > :nth-child(2) { animation-delay: .2s; }
+      html:not(.force-motion) .hero-copy > :nth-child(3) { animation-delay: .28s; }
+      html:not(.force-motion) .hero-copy > :nth-child(4) { animation-delay: .36s; }
+      html:not(.force-motion) .hero-copy > :nth-child(5) { animation-delay: .44s; }
+      html:not(.force-motion) .button-arrow { animation: none; }
+      html:not(.force-motion) .hero-strings { display: none; }
+      html:not(.force-motion) .reveal {
+        opacity: 0;
+        filter: none;
+        transform: none;
+        transition: opacity .48s var(--reveal-delay, 0ms) ease;
+      }
+      html:not(.force-motion) .reveal.is-visible { opacity: 1; }
+      html:not(.force-motion) .video-card.reveal { clip-path: none; }
+    }
+  </style>
 </head>
+
 <body>
+  <a class="skip-link" href="#main">Skip to content</a>
 
-<!-- LOADER -->
-<div id="loader">
-  <div class="loader-content">
-    <img src="logo.jpg" alt="Logo" class="loader-logo">
-    <div class="spinner" aria-hidden="true"></div>
-  </div>
-</div>
-
-<header id="header">
-  <img src="logo.jpg" alt="Логотип" class="logo">
-  <nav>
-    <a href="#performances">Performances</a>
-    <a href="#cv">CV</a>
-    <a href="#text-block">About</a>
-    <a href="#contacts">Contacts</a>
-  </nav>
-</header>
-
-<!-- HERO -->
-<div class="hero" id="hero">
-  <div class="hero-frame" aria-hidden="false">
-    <img id="heroImg" src="s.JPG" alt="Sergei Mkrtichian — portrait">
-    <img id="heroImg" src="s.JPG" alt="Sergei Violin | Sergei Mkrtichian — portrait">
-  </div>
-</div>
-
-<!-- ABOUT -->
-<div class="text-block" id="text-block">
-  <h1 class="text-reveal">Dear Friends,</h1>
-  <p class="text-reveal">I've created this site so you can find out more about me, what I've done in the past, and what I'm up to currently. I look forward to connecting with you at my concerts.</p>
-  <em class="text-reveal">- Sergei Mkrtichian</em>
-
-  <!-- social buttons -->
-  <div class="socials" aria-hidden="false">
-    <a class="instagram text-reveal" href="https://www.instagram.com/sergeiviolin/" target="_blank" rel="noopener">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2Zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5A4.25 4.25 0 0 0 20.5 16.25v-8.5A4.25 4.25 0 0 0 16.25 3.5h-8.5Zm8.75 2.25a.75.75 0 1 1 0 1.5h-.01a.75.75 0 1 1 0-1.5h.01ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 1.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"/></svg>
-      Instagram
-    </a>
-
-    <a class="facebook text-reveal" href="https://www.facebook.com/profile.php?id=100095484424565" target="_blank" rel="noopener">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M22 12a10 10 0 1 0-11.5 9.9v-7H8v-3h2.5V9.5c0-2.4 1.4-3.8 3.6-3.8 1 0 2 .2 2 .2v2.2H15c-1.2 0-1.6.8-1.6 1.5V12H17l-.5 3h-3v7A10 10 0 0 0 22 12Z"/></svg>
-      Facebook
-    </a>
-
-    <a class="youtube text-reveal" href="https://www.youtube.com/@sergeiviolin" target="_blank" rel="noopener">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21.8 8s-.2-1.4-.8-2c-.8-.8-1.7-.8-2.2-.9C16.2 4.9 12 4.9 12 4.9h-.1s-4.2 0-6.8.2c-.5 0-1.5.1-2.2.9-.6.6-.8 2-.8 2S2 9.6 2 11.2v1.6c0 1.6.2 3.2.2 3.2s.2 1.4.8 2c.8.8 1.8.8 2.3.9 1.7.2 7 .2 7 .2s4.2 0 6.8-.2c.5 0 1.5-.1 2.2-.9.6-.6.8-2 .8-2s.2-1.6.2-3.2v-1.6c0-1.6-.2-3.2-.2-3.2ZM10 14.7V9.3l5.2 2.7L10 14.7Z"/></svg>
-      YouTube
-    </a>
-  </div>
-</div>
-
-<!-- CV - МОЯ ВЕРСИЯ -->
-<section id="cv" aria-labelledby="cv-heading">
-  <h2 id="cv-heading" class="text-reveal">Curriculum Vitae</h2>
-  <p class="lead text-reveal">Sergei Mkrtichian — concert violinist. Educated at leading conservatories, prize-winner of international competitions, performer in major halls across Europe and beyond.</p>
-
-  <div class="cv-actions">
-    <a class="btn download text-reveal" href="Sergei_Mkrtichian_CV.pdf" target="_blank" rel="noopener">
-      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 3v10m0 0 4-4m-4 4-4-4M4 21h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
-      Download CV (PDF)
-    </a>
-  </div>
-
-  <div class="cv-details">
-    <div class="cv-block text-reveal">
-      <h3>Education</h3>
-      <ul>
-        <li>Conservatory of the Italian Switzerland 2024 - Present Time.</li>
-        <li>Academic Music College of Moscow State Conservatory named after P.I. Tchaikovsky 2015 - Present time.</li>
-      </ul>
-    </div>
-
-    <div class="cv-block text-reveal">
-      <h3>Competitions & Awards</h3>
-      <ul>
-        <li>2024 – Second prize at the 20th Khachaturian International Competition</li>
-        <li>2023 – Third Prize at the Tchaikovsky Youth International Competition.</li>
-      </ul>
-    </div>
-
-    <div class="cv-block text-reveal">
-      <h3>Concert Highlights</h3>
-      <ul>
-        <li>Moscow State Kremlin Palace</li>
-        <li>Wiener Konzerthaus</li>
-        <li>Moscow Bolshoy Theatre</li>
-      </ul>
-    </div>
-  </div>
-</section>
-
-<!-- Performances -->
-<section id="performances">
-  <h2 class="text-reveal">Recent Performances</h2>
-  <div class="video-grid">
-    <div class="video-wrapper text-reveal"><iframe src="https://www.youtube.com/embed/nX7k7yeU0yM"></iframe></div>
-    <div class="video-wrapper text-reveal"><iframe src="https://www.youtube.com/embed/sCxiMHqT4Gc"></iframe></div>
-    <div class="video-wrapper text-reveal"><iframe src="https://www.youtube.com/embed/NjxJHLJn62E"></iframe></div>
-    <div class="video-wrapper text-reveal"><iframe src="https://www.youtube.com/embed/_C4V_rPluoY"></iframe></div>
-    <div class="video-wrapper text-reveal"><iframe src="https://www.youtube.com/embed/Lt-_bsNJqpI?si=57ZP8mrbL0duXH1N" allowfullscreen loading="lazy"></iframe></div>
-  </div>
-</section>
-
-<!-- Contacts - МОЯ ВЕРСИЯ -->
-<section id="contacts">
-  <h2 class="text-reveal">Contact</h2>
-  <div class="contact-inner">
-    <p class="text-reveal">For concert bookings, masterclasses, and collaborations please contact:</p>
-    <div class="contact-actions">
-      <a class="email-btn text-reveal" href="mailto:mkrtiart1959@gmail.com" rel="noopener">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm0 2v.01l8 5 8-5V6H4Zm16 12V8.24l-8 5-8-5V18h16Z"/></svg>
-        mkrtiart1959@gmail.com
+  <header class="site-header" id="siteHeader">
+    <div class="nav-shell">
+      <a class="brand" href="#top" aria-label="Sergei Mkrtichian — home">
+        <span class="brand-mark" aria-hidden="true">SM</span>
+        <span class="brand-name"><span>Sergei Mkrtichian</span><span>Concert violinist</span></span>
       </a>
+
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primaryNav" aria-label="Open navigation">
+        <span aria-hidden="true"></span>
+      </button>
+
+      <nav class="nav-links" id="primaryNav" aria-label="Primary navigation">
+        <a href="#concerts" data-concert-nav hidden>Concerts</a>
+        <a href="#about">About me</a>
+        <a href="#highlights">Highlights</a>
+        <a href="#performances">Listen</a>
+        <a class="nav-cta" href="#contact">Contact</a>
+      </nav>
     </div>
-  </div>
-</section>
+  </header>
 
-<!-- Footer - МОЯ ВЕРСИЯ -->
-<footer>
-  © 2025 Sergei Mkrtichian. This website is licensed under the
-  <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener">Apache License 2.0</a>.
-</footer>
+  <main id="main">
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="hero-media" aria-hidden="true">
+        <img src="s.JPG" width="6720" height="4480" alt="" fetchpriority="high">
+      </div>
+      <canvas class="hero-strings" id="heroStrings" aria-hidden="true"></canvas>
 
-<!-- Modal -->
-<div id="modal" class="modal-backdrop" role="dialog" aria-hidden="true">
-  <div class="modal-content" role="document">
-    <button class="modal-close" id="modalClose">✕</button>
-    <div id="modalInner" style="text-align:center;"></div>
-    <div class="modal-caption" id="modalCaption"></div>
-  </div>
-</div>
+      <div class="hero-inner">
+        <div class="hero-copy">
+          <p class="eyebrow">Concert violinist</p>
+          <h1 id="hero-title"><span>Sergei</span><span>Mkrtichian</span></h1>
+          <p class="hero-lead">Welcome. I’m glad you’re here.</p>
+          <a class="next-concert-teaser" id="nextConcertTeaser" href="#concerts" hidden>
+            <time class="next-concert-date" id="nextConcertDate">
+              <span class="next-concert-day" id="nextConcertDay"></span>
+              <span class="next-concert-month" id="nextConcertMonth"></span>
+            </time>
+            <span class="next-concert-copy">
+              <span class="next-concert-label" id="nextConcertLabel">Next concert</span>
+              <span class="next-concert-place" id="nextConcertPlace"></span>
+              <span class="next-concert-title" id="nextConcertTitle"></span>
+            </span>
+            <span class="next-concert-arrow" aria-hidden="true">↘</span>
+          </a>
+          <div class="button-row">
+            <a class="button button-primary" href="#about"><span>A little about me</span> <span class="button-arrow" aria-hidden="true">↓</span></a>
+          </div>
+        </div>
+      </div>
+    </section>
 
-<script>
-/* -------------------------
-   Variables & refs (unchanged)
-   ------------------------- */
-const hero = document.getElementById('hero');
-const heroImg = document.getElementById('heroImg');
-const header = document.getElementById('header');
-const loader = document.getElementById('loader');
-const maxScale = 1.2;
-let currentScale = 1;
+    <section class="section concerts" id="concerts" aria-labelledby="concerts-title" hidden>
+      <div class="section-shell">
+        <div class="concerts-head">
+          <div class="reveal">
+            <p class="section-kicker">Upcoming concerts</p>
+            <h2 class="display-title" id="concerts-title">Let’s meet<br>in music.</h2>
+          </div>
+          <p class="concerts-intro reveal">I would be very happy to see you at one of my next performances.</p>
+        </div>
+        <p class="concerts-preview-note" id="concertsPreviewNote" hidden>Preview only — add a real date to concerts.json to publish this section.</p>
+        <div class="concert-list" id="concertList" aria-live="polite"></div>
+      </div>
+    </section>
 
-/* -------------------------
-   Helper functions for header scaling
-   ------------------------- */
-function pxToNumber(px) {
-  if (!px) return 0;
-  return parseFloat(String(px).replace('px','')) || 0;
-}
-function getGapPx(el) {
-  if (!el) return 0;
-  const cs = getComputedStyle(el);
-  const gap = cs.gap || cs.columnGap || cs['column-gap'] || '0px';
-  return pxToNumber(gap);
-}
-function updateHeaderHeightCSS() {
-  if (!header) return;
-  const h = Math.ceil(header.getBoundingClientRect().height);
-  // также можно сохранять --header-height если нужно
-  document.documentElement.style.setProperty('--header-height', h + 'px');
-}
+    <section class="section about" id="about" aria-labelledby="about-title">
+      <div class="section-shell about-grid">
+        <div class="about-intro reveal">
+          <h2 class="display-title" id="about-title">Dear<br><span>friends,</span></h2>
+        </div>
 
-/* Main: computes required --hs so header content fits */
-function fitHeaderScale() {
-  const MIN_HS = 0.58;
-  if (!header) return;
+        <div class="about-copy reveal">
+          <p class="lead">I’ve created this site so you can find out more about me, what I’ve done in the past, and what I’m up to currently.</p>
+          <p>I look forward to connecting with you at my concerts.</p>
+          <p class="signature">— Sergei Mkrtichian</p>
 
-  header.style.setProperty('--hs', '1');
-  const headerClientWidth = header.clientWidth;
-  const logo = header.querySelector('img.logo');
-  const nav = header.querySelector('nav');
-  const anchors = nav ? Array.from(nav.querySelectorAll('a')) : [];
+          <p class="story-label">A little about me</p>
+          <p>I’m a concert violinist, and my playing brings together virtuosity, clarity and emotional directness. My musical path has taken me to the Conservatorio della Svizzera Italiana with Pavel Berman and Accademia Stauffer with Salvatore Accardo, following my studies at the Academic Music College of the Moscow State Conservatory and guidance from Suren Haknazarian.</p>
+          <p>I’ve been fortunate to perform in major halls across Europe, including the Grand Hall of the Moscow Conservatory, the Tchaikovsky Concert Hall, the State Kremlin Palace, Villa Bernasconi in Como and the Concert House in Vienna.</p>
 
-  const logoWidth = logo ? Math.ceil(logo.getBoundingClientRect().width) : 0;
-  let anchorsSum = 0;
-  anchors.forEach(a => { const r = a.getBoundingClientRect(); anchorsSum += Math.ceil(r.width); });
+          <div class="about-meta" aria-label="Education and artistic guidance">
+            <div class="meta-card">
+              <span>Studies</span>
+              <p>Conservatorio della Svizzera Italiana<br>Accademia Stauffer</p>
+            </div>
+            <div class="meta-card">
+              <span>Professors</span>
+              <p>Pavel Berman<br>Salvatore Accardo<br>Suren Haknazarian</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-  const navGap = nav ? getGapPx(nav) : 0;
-  const headerGap = getGapPx(header);
-  const navGapsTotal = Math.max(0, anchors.length - 1) * navGap;
-  let required = logoWidth + headerGap + anchorsSum + navGapsTotal;
-  if (!logo || anchors.length === 0) required = anchorsSum;
+    <section class="section highlights" id="highlights" aria-labelledby="highlights-title">
+      <div class="section-shell">
+        <div class="highlights-head">
+          <div class="reveal">
+            <p class="section-kicker">Selected distinctions</p>
+            <h2 class="display-title" id="highlights-title">Milestones.</h2>
+          </div>
+          <p class="highlights-note reveal">Each of these moments is part of my journey — and a reason to keep listening, learning and growing.</p>
+        </div>
 
-  const EPS = 1;
-  if (required <= headerClientWidth + EPS) {
-    header.style.setProperty('--hs', '1');
-    updateHeaderHeightCSS();
-    return;
-  }
+        <div class="timeline">
+          <article class="timeline-item reveal">
+            <span class="timeline-year">2026</span>
+            <h3>Massimo Marin</h3>
+            <p>First Prize at the 3rd Massimo Marin International Violin Competition.</p>
+          </article>
+          <article class="timeline-item reveal">
+            <span class="timeline-year">2025</span>
+            <h3>Valsesia Musica</h3>
+            <p>First Prize at the 41st VALSESIA MUSICA International Competition.</p>
+          </article>
+          <article class="timeline-item reveal">
+            <span class="timeline-year">2024</span>
+            <h3>Khachaturian</h3>
+            <p>Second Prize at the 20th Khachaturian International Competition.</p>
+          </article>
+          <article class="timeline-item reveal">
+            <span class="timeline-year">2023</span>
+            <h3>Tchaikovsky Youth</h3>
+            <p>Third Prize at the Tchaikovsky Youth International Competition.</p>
+          </article>
+        </div>
+      </div>
+    </section>
 
-  let needed = (headerClientWidth - EPS) / required;
-  needed = needed * 0.995;
-  if (needed < MIN_HS) needed = MIN_HS;
-  header.style.setProperty('--hs', String(needed));
+    <section class="section performances" id="performances" aria-labelledby="performances-title">
+      <div class="section-shell">
+        <div class="performances-head reveal">
+          <div>
+            <p class="section-kicker">Listen &amp; watch</p>
+            <h2 class="display-title" id="performances-title">Performances.</h2>
+          </div>
+          <a class="text-link" href="https://www.youtube.com/@sergeiviolin" target="_blank" rel="noopener noreferrer">YouTube channel <span aria-hidden="true">↗</span></a>
+        </div>
 
-  // iterate to converge (logo and link widths change when hs changes)
-  for (let i = 0; i < 6; i++) {
-    const newLogoWidth = logo ? Math.ceil(logo.getBoundingClientRect().width) : 0;
-    let newAnchorsSum = 0;
-    anchors.forEach(a => newAnchorsSum += Math.ceil(a.getBoundingClientRect().width));
-    const newNavGapsTotal = Math.max(0, anchors.length - 1) * getGapPx(nav);
-    const newRequired = newLogoWidth + headerGap + newAnchorsSum + newNavGapsTotal;
-    if (newRequired <= header.clientWidth + EPS) { updateHeaderHeightCSS(); return; }
-    let factor = (header.clientWidth - EPS) / newRequired;
-    factor = factor * 0.995;
-    let currentHs = parseFloat(getComputedStyle(header).getPropertyValue('--hs')) || needed;
-    let nextHs = currentHs * factor;
-    if (nextHs < MIN_HS) nextHs = MIN_HS;
-    if (Math.abs(nextHs - currentHs) < 0.002) break;
-    header.style.setProperty('--hs', String(nextHs));
-  }
-  updateHeaderHeightCSS();
-}
+        <div class="video-grid">
+          <article class="video-card reveal">
+            <button class="video-trigger" type="button" data-video="nX7k7yeU0yM" aria-label="Play Tchaikovsky Violin Concerto in D major">
+              <img src="https://i.ytimg.com/vi/nX7k7yeU0yM/hqdefault.jpg" alt="Sergei Mkrtichian performing Tchaikovsky's Violin Concerto" loading="lazy" width="480" height="360">
+              <span class="play" aria-hidden="true">▶</span>
+            </button>
+            <div class="video-caption">
+              <span>Featured performance</span>
+              <h3>Tchaikovsky — Violin Concerto in D major, Op. 35</h3>
+            </div>
+          </article>
 
-/* Debounced schedule */
-let fitTimeout = null;
-function scheduleFitHeader() {
-  if (fitTimeout) clearTimeout(fitTimeout);
-  fitTimeout = setTimeout(() => {
-    fitHeaderScale();
-    updateHeaderHeightCSS();
-  }, 60);
-}
+          <article class="video-card reveal">
+            <button class="video-trigger" type="button" data-video="sCxiMHqT4Gc" aria-label="Play Saint-Saëns Introduction and Rondo Capriccioso">
+              <img src="https://i.ytimg.com/vi/sCxiMHqT4Gc/maxresdefault.jpg" alt="Sergei Mkrtichian performing Saint-Saëns" loading="lazy" width="1280" height="720">
+              <span class="play" aria-hidden="true">▶</span>
+            </button>
+            <div class="video-caption">
+              <span>Live performance</span>
+              <h3>Saint-Saëns — Introduction and Rondo Capriccioso</h3>
+            </div>
+          </article>
 
-/* ResizeObserver to react on element changes */
-if (window.ResizeObserver) {
-  const ro = new ResizeObserver(() => scheduleFitHeader());
-  if (header) {
-    ro.observe(header);
-    const logo = header.querySelector('img.logo');
-    const nav = header.querySelector('nav');
-    if (logo) ro.observe(logo);
-    if (nav) {
-      ro.observe(nav);
-      nav.querySelectorAll('a').forEach(a => ro.observe(a));
-    }
-  }
-}
+          <article class="video-card reveal">
+            <button class="video-trigger" type="button" data-video="7I3nqvusYnE" aria-label="Play Mozart Violin Concerto No. 5 and Ysaÿe Sonata">
+              <img src="https://i.ytimg.com/vi/7I3nqvusYnE/maxresdefault.jpg" alt="Sergei Mkrtichian performing Mozart and Ysaÿe" loading="lazy" width="1280" height="720">
+              <span class="play" aria-hidden="true">▶</span>
+            </button>
+            <div class="video-caption">
+              <span>Live performance</span>
+              <h3>Mozart — Violin Concerto No. 5 &amp; Ysaÿe Sonata</h3>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
 
-/* When fonts ready */
-if (document.fonts && document.fonts.ready) {
-  document.fonts.ready.then(scheduleFitHeader).catch(()=>scheduleFitHeader());
-}
-document.addEventListener('DOMContentLoaded', () => {
-  scheduleFitHeader();
-  updateHeaderHeightCSS();
-});
+    <section class="cv-band" aria-labelledby="cv-title">
+      <div class="cv-band-inner reveal">
+        <div>
+          <h2 id="cv-title">My curriculum vitae</h2>
+          <p>More about my education, awards, masterclasses, concert halls and repertoire.</p>
+        </div>
+        <a class="button button-secondary" href="Sergei_Mkrtichian_CV.pdf" target="_blank" rel="noopener noreferrer">View CV <span aria-hidden="true">↗</span></a>
+      </div>
+    </section>
 
-/* Proportional nav shrink (improves visual of text/icons when very tight) */
-(function initProportionalNav(){
-  const headerEl = header;
-  if (!headerEl) return;
+    <section class="section contact" id="contact" aria-labelledby="contact-title">
+      <div class="section-shell contact-grid">
+        <div class="reveal">
+          <p class="section-kicker">Contact</p>
+          <h2 class="contact-title" id="contact-title">I’d love to <em>hear from you.</em></h2>
+        </div>
+        <div class="contact-aside reveal">
+          <p>For concerts, festivals, masterclasses, collaborations — or simply to say hello:</p>
+          <a class="email-link" href="mailto:mkrtiart1959@gmail.com"><span class="email-action-label">Write to me</span><span>mkrtiart1959@gmail.com</span></a>
+          <div class="social-links" aria-label="Social media">
+            <a href="https://www.instagram.com/sergeiviolin/" target="_blank" rel="noopener noreferrer">Instagram ↗</a>
+            <a href="https://www.youtube.com/@sergeiviolin" target="_blank" rel="noopener noreferrer">YouTube ↗</a>
+            <a href="https://www.facebook.com/profile.php?id=100095484424565" target="_blank" rel="noopener noreferrer">Facebook ↗</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
 
-  function ensureInner(link) {
-    let inner = link.querySelector('.link-inner');
-    if (inner) return inner;
+  <footer>
+    <div class="footer-inner">
+      <span>© <span id="year">2026</span> Sergei Mkrtichian</span>
+      <a href="#top">Back to top ↑</a>
+      <span>Thank you for visiting</span>
+    </div>
+  </footer>
 
-    inner = document.createElement('span');
-    inner.className = 'link-inner';
-    while (link.firstChild) inner.appendChild(link.firstChild);
-    inner.style.display = 'inline-block';
-    inner.style.whiteSpace = 'nowrap';
-    inner.style.lineHeight = '1';
-    link.appendChild(inner);
+  <script>
+    const header = document.getElementById('siteHeader');
+    const toggle = document.querySelector('.menu-toggle');
+    const nav = document.getElementById('primaryNav');
+    const heroSection = document.querySelector('.hero');
+    const heroImage = document.querySelector('.hero-media img');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      && !document.documentElement.classList.contains('force-motion');
+    const stringsCanvas = document.getElementById('heroStrings');
+    const stringsContext = stringsCanvas.getContext('2d');
+    let motionFrame = null;
+    let stringsFrame = null;
+    let stringsWidth = 0;
+    let stringsHeight = 0;
+    let stringsEnergy = 0;
+    let stringsLastScroll = window.scrollY;
+    let nextPluckIndex = 0;
+    const stringPluckTimes = [-Infinity, -Infinity, -Infinity, -Infinity];
+    const stringPluckStrengths = [0, 0, 0, 0];
+    const stringsStart = window.performance.now();
 
-    const svgs = inner.querySelectorAll('svg');
-    svgs.forEach(sv => {
-      sv.style.width = sv.style.width || '1em';
-      sv.style.height = sv.style.height || '1em';
-      sv.style.display = sv.style.display || 'inline-block';
-      sv.style.verticalAlign = sv.style.verticalAlign || 'middle';
-    });
-    const imgs = inner.querySelectorAll('img');
-    imgs.forEach(im => {
-      im.style.width = im.style.width || '1em';
-      im.style.height = im.style.height || '1em';
-      im.style.display = im.style.display || 'inline-block';
-      im.style.verticalAlign = im.style.verticalAlign || 'middle';
-    });
-
-    return inner;
-  }
-
-  function px(v){ return Number.parseFloat(v) || 0; }
-
-  function adjustNavProportional() {
-    const nav = headerEl.querySelector('nav');
-    if (!nav) return;
-    const links = Array.from(nav.querySelectorAll('a'));
-    if (links.length === 0) return;
-
-    const logo = headerEl.querySelector('img.logo');
-    if (logo && !logo.dataset.origHeight) {
-      logo.dataset.origHeight = getComputedStyle(logo).height || '';
-    }
-
-    links.forEach(l => {
-      const inner = ensureInner(l);
-      if (!inner.dataset.origFontSize) {
-        inner.dataset.origFontSize = getComputedStyle(inner).fontSize;
-      }
-      inner.style.fontSize = inner.dataset.origFontSize;
-      inner.style.transform = '';
-    });
-
-    const available = nav.clientWidth;
-    const navStyle = getComputedStyle(nav);
-    let gap = px(navStyle.gap || navStyle.columnGap || navStyle['column-gap']);
-    if (!gap) gap = 18;
-
-    let totalPadding = 0;
-    const contentWidths = links.map(l => {
-      const cs = getComputedStyle(l);
-      const pad = px(cs.paddingLeft) + px(cs.paddingRight);
-      totalPadding += pad;
-      const inner = ensureInner(l);
-      const rect = inner.getBoundingClientRect();
-      const w = rect && rect.width ? rect.width : Math.max(0, l.getBoundingClientRect().width - pad);
-      return w;
-    });
-
-    const totalContent = contentWidths.reduce((s, w) => s + w, 0);
-    const totalGaps = gap * Math.max(0, links.length - 1);
-
-    if (totalContent + totalPadding + totalGaps <= available + 1 + 10) {
-      links.forEach(l => {
-        const inner = ensureInner(l);
-        inner.style.fontSize = inner.dataset.origFontSize;
-      });
-      if (logo && logo.dataset.origHeight) {
-        logo.style.height = logo.dataset.origHeight;
-        logo.style.transform = '';
-        logo.style.transformOrigin = '';
-      }
-      return;
-    }
-
-    const MIN_SCALE = 0.6;
-    let s = (available - totalPadding - totalGaps) / totalContent;
-    if (!isFinite(s) || s <= 0) s = MIN_SCALE;
-    if (s > 1) s = 1;
-    if (s < MIN_SCALE) s = MIN_SCALE;
-
-    links.forEach(l => {
-      const inner = ensureInner(l);
-      const orig = px(inner.dataset.origFontSize);
-      inner.style.fontSize = (orig * s) + 'px';
-      inner.style.transformOrigin = 'left center';
-    });
-
-    if (logo && logo.dataset.origHeight) {
-      const origH = px(logo.dataset.origHeight);
-      if (origH > 0) {
-        logo.style.height = (origH * s) + 'px';
-        logo.style.transformOrigin = 'left center';
-      }
-    }
-  }
-
-  let raf = null;
-  function scheduleAdjust() {
-    if (raf) cancelAnimationFrame(raf);
-    raf = requestAnimationFrame(() => {
-      try { adjustNavProportional(); }
-      catch(e){ console.error(e); }
-      raf = null;
-    });
-  }
-
-  window.addEventListener('resize', scheduleAdjust);
-  window.addEventListener('orientationchange', scheduleAdjust);
-  document.addEventListener('DOMContentLoaded', scheduleAdjust);
-  window.addEventListener('load', scheduleAdjust);
-  if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(scheduleAdjust).catch(scheduleAdjust);
-  }
-
-  window.adjustNavProportional = scheduleAdjust;
-})();
-
-/* -------------------------
-   Loader / hero init (kept, but schedule fit when ready)
-   ------------------------- */
-function initHeroImage() {
-  if (!heroImg) return;
-  if (heroImg.complete) {
-    heroImg.classList.add('loaded');
-    scheduleFitHeader();
-  } else {
-    heroImg.onload = () => {
-      heroImg.classList.add('loaded');
-      scheduleFitHeader();
+    const resizeStrings = () => {
+      if (!stringsContext || reduceMotion) return;
+      const rect = heroSection.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      stringsWidth = Math.max(1, rect.width);
+      stringsHeight = Math.max(1, heroSection.offsetHeight);
+      stringsCanvas.width = Math.round(stringsWidth * dpr);
+      stringsCanvas.height = Math.round(stringsHeight * dpr);
+      stringsContext.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
-    heroImg.onerror = () => {
-      heroImg.classList.add('loaded');
-      scheduleFitHeader();
-    };
-  }
-}
-const isFirstVisit = !localStorage.getItem('visited');
-if (isFirstVisit) {
-  localStorage.setItem('visited','true');
-  loader.style.display = 'flex';
-} else {
-  loader.style.display = 'none';
-}
-initHeroImage();
 
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    loader.classList.add('hidden');
-    setTimeout(() => {
-      loader.style.display = 'none';
-      const logo = document.querySelector('header img.logo');
-      const navLinks = document.querySelectorAll('nav a');
-      if (logo) logo.classList.add('visible');
-      navLinks.forEach((link, index) => {
-        setTimeout(() => { link.classList.add('visible'); }, index * 100);
+    const drawStrings = now => {
+      stringsFrame = null;
+      if (!stringsContext || reduceMotion) return;
+
+      const elapsed = now - stringsStart;
+      const intro = Math.min(elapsed / 1750, 1);
+      const introEnergy = elapsed > 520 ? Math.max(0, 1 - (elapsed - 520) / 2100) * .58 : 0;
+      const energy = Math.max(stringsEnergy, introEnergy);
+      const mobile = stringsWidth <= 760;
+      let anyPluckActive = false;
+      const heroRect = heroSection.getBoundingClientRect();
+      const imageRect = heroImage.getBoundingClientRect();
+      const imageAspect = 1.5;
+      const renderedImageWidth = Math.max(imageRect.width, imageRect.height * imageAspect);
+      const renderedImageHeight = renderedImageWidth / imageAspect;
+      const positionX = mobile ? .36 : .49;
+      const positionY = mobile ? .5 : .42;
+      const imageOffsetX = imageRect.left - heroRect.left + (imageRect.width - renderedImageWidth) * positionX;
+      const imageOffsetY = imageRect.top - heroRect.top + (imageRect.height - renderedImageHeight) * positionY;
+      const imagePoint = (x, y) => ({
+        x: imageOffsetX + renderedImageWidth * x,
+        y: imageOffsetY + renderedImageHeight * y
       });
-      initScrollAnimations();
-      // основной пересчёт масштаба
-      scheduleFitHeader();
-      // скорректировать пропорционально текст/иконки
-      if (window.adjustNavProportional) window.adjustNavProportional();
-    }, 800);
-  }, 500);
-});
+      const violinStrings = [
+        [[3353, 1100], [3333, 2825]],
+        [[3386, 1100], [3398, 2825]],
+        [[3419, 1100], [3460, 2825]],
+        [[3462, 1100], [3512, 2825]]
+      ].map(string => string.map(([x, y]) => imagePoint(x / 6720, y / 4480)));
 
-/* Parallax & header animation (PIXELS) - unchanged except we compute header height dynamic*/
-function animate() {
-  if (!hero || !heroImg) { requestAnimationFrame(animate); return; }
+      stringsContext.clearRect(0, 0, stringsWidth, stringsHeight);
+      stringsContext.globalCompositeOperation = 'lighter';
+      stringsContext.lineCap = 'round';
+      stringsContext.lineJoin = 'miter';
 
-  const rect = hero.getBoundingClientRect();
-  const windowHeight = window.innerHeight;
-  const scrollY = window.scrollY;
+      for (let index = 0; index < 4; index += 1) {
+        const [start, bridge] = violinStrings[index];
+        const pluckAge = now - stringPluckTimes[index];
+        const pluckActive = pluckAge >= 0 && pluckAge < 1750;
+        const pluckLevel = pluckActive
+          ? stringPluckStrengths[index] * Math.exp(-pluckAge / 610)
+          : 0;
+        const frequency = .054 + index * .0065;
+        const displacement = Math.cos(pluckAge * frequency) * (mobile ? 10.5 : 14) * pluckLevel;
+        const segmentX = bridge.x - start.x;
+        const segmentY = bridge.y - start.y;
+        const segmentLength = Math.hypot(segmentX, segmentY) || 1;
+        const normalX = -segmentY / segmentLength;
+        const normalY = segmentX / segmentLength;
+        anyPluckActive ||= pluckActive;
 
-  let progress = 0;
-  if (rect.bottom > 0 && rect.top < windowHeight) {
-    progress = (windowHeight - rect.top) / (windowHeight + rect.height);
-    progress = Math.min(Math.max(progress, 0), 1);
-  }
-  const targetScale = 1 + progress * (maxScale - 1);
-  currentScale += (targetScale - currentScale) * 0.1;
-  heroImg.style.transform = `scale(${currentScale})`;
-
-  const appearProgress = Math.min(scrollY / 300, 1);
-  const bgOpacity = 0.35 * appearProgress;
-  header.style.background = `rgba(0, 0, 0, ${bgOpacity})`;
-
-  let hideProgress = 0;
-  if (rect.top < 0) hideProgress = Math.min(Math.abs(rect.top) / 250, 1);
-  const headerHeight = header ? header.getBoundingClientRect().height : 0;
-  const translateYpx = -Math.round(headerHeight * hideProgress);
-  const finalOpacity = 1 - hideProgress;
-
-  header.style.transform = `translateY(${translateYpx}px)`;
-  header.style.opacity = finalOpacity;
-
-  requestAnimationFrame(animate);
-}
-requestAnimationFrame(animate);
-
-/* Scroll reveal (unchanged) */
-function initScrollAnimations() {
-  const animatedElements = [
-    ...document.querySelectorAll('.text-reveal'),
-    ...document.querySelectorAll('.socials a'),
-    ...document.querySelectorAll('.bio-photos button'),
-    ...document.querySelectorAll('.cv-actions a.btn'),
-    ...document.querySelectorAll('.cv-block'),
-    ...document.querySelectorAll('.video-wrapper'),
-    ...document.querySelectorAll('.contact-actions a.email-btn')
-  ];
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const delay = entry.target.classList.contains('video-wrapper') ? 150 : 100;
-        setTimeout(() => {
-          entry.target.classList.add('visible');
-          if (entry.target.classList.contains('video-wrapper')) {
-            const iframe = entry.target.querySelector('iframe');
-            if (iframe) {
-              setTimeout(() => { iframe.style.opacity = '1'; }, 100);
-            }
+        const traceString = (motionScale = 1) => {
+          stringsContext.beginPath();
+          stringsContext.moveTo(start.x, start.y);
+          for (let step = 1; step <= 22; step += 1) {
+            const progress = step / 22;
+            const envelope = Math.sin(Math.PI * progress);
+            const vibration = displacement * motionScale * envelope;
+            stringsContext.lineTo(
+              start.x + segmentX * progress + normalX * vibration,
+              start.y + segmentY * progress + normalY * vibration
+            );
           }
-        }, delay);
-        observer.unobserve(entry.target);
+        };
+
+        stringsContext.beginPath();
+        stringsContext.moveTo(start.x, start.y);
+        stringsContext.lineTo(bridge.x, bridge.y);
+        stringsContext.lineWidth = .5;
+        stringsContext.strokeStyle = `rgba(255, 226, 192, ${energy * .065})`;
+        stringsContext.stroke();
+
+        if (pluckLevel > .025) {
+          traceString(-.42);
+          stringsContext.lineWidth = 1.4 + pluckLevel * 1.7;
+          stringsContext.strokeStyle = `rgba(215, 131, 72, ${pluckLevel * .12})`;
+          stringsContext.stroke();
+        }
+
+        traceString();
+        stringsContext.lineWidth = 1.25 + pluckLevel * 2.7;
+        stringsContext.strokeStyle = `rgba(222, 143, 80, ${energy * .024 + pluckLevel * .14})`;
+        stringsContext.stroke();
+
+        traceString();
+        stringsContext.lineWidth = index === 1 || index === 2 ? .9 : .68;
+        stringsContext.strokeStyle = `rgba(255, 238, 214, ${energy * .11 + pluckLevel * .57})`;
+        stringsContext.stroke();
+
+        if (pluckAge >= 0 && pluckAge < 230) {
+          const flashProgress = 1 - pluckAge / 230;
+          const touchPoint = .62;
+          const touchEnvelope = Math.sin(Math.PI * touchPoint);
+          const touchX = start.x + segmentX * touchPoint + normalX * displacement * touchEnvelope;
+          const touchY = start.y + segmentY * touchPoint + normalY * displacement * touchEnvelope;
+          const radius = 2.5 + flashProgress * 7;
+          const flash = stringsContext.createRadialGradient(touchX, touchY, 0, touchX, touchY, radius);
+          flash.addColorStop(0, `rgba(255, 244, 221, ${flashProgress * .72})`);
+          flash.addColorStop(1, 'rgba(222, 143, 80, 0)');
+          stringsContext.fillStyle = flash;
+          stringsContext.beginPath();
+          stringsContext.arc(touchX, touchY, radius, 0, Math.PI * 2);
+          stringsContext.fill();
+        }
+      }
+
+      stringsEnergy *= .92;
+      if (elapsed < 2850 || stringsEnergy > .006 || anyPluckActive) {
+        stringsFrame = window.requestAnimationFrame(drawStrings);
+      }
+    };
+
+    const exciteStrings = amount => {
+      if (!stringsContext || reduceMotion) return;
+      stringsEnergy = Math.min(.82, stringsEnergy + amount);
+      if (stringsFrame === null) stringsFrame = window.requestAnimationFrame(drawStrings);
+    };
+
+    const pluckString = (index, strength = .9) => {
+      if (!stringsContext || reduceMotion) return;
+      const safeIndex = ((index % 4) + 4) % 4;
+      stringPluckTimes[safeIndex] = window.performance.now();
+      stringPluckStrengths[safeIndex] = Math.min(1.15, strength);
+      stringsEnergy = Math.max(stringsEnergy, strength * .36);
+      if (stringsFrame === null) stringsFrame = window.requestAnimationFrame(drawStrings);
+    };
+
+    const pluckNextString = (strength = .9) => {
+      pluckString(nextPluckIndex, strength);
+      nextPluckIndex = (nextPluckIndex + 1) % 4;
+    };
+
+    const updatePageMotion = () => {
+      motionFrame = null;
+      header.classList.toggle('is-scrolled', window.scrollY > 24);
+
+      if (reduceMotion) return;
+      const progress = Math.min(Math.max(window.scrollY / Math.max(heroSection.offsetHeight, 1), 0), 1);
+      heroSection.style.setProperty('--hero-image-scale', (1.025 + progress * .075).toFixed(3));
+      heroSection.style.setProperty('--hero-image-y', `${(progress * 14).toFixed(1)}px`);
+      heroSection.style.setProperty('--hero-copy-y', `${(-progress * 28).toFixed(1)}px`);
+      heroSection.style.setProperty('--hero-copy-opacity', Math.max(0, 1 - progress * 1.45).toFixed(3));
+    };
+
+    const requestMotionUpdate = () => {
+      if (motionFrame === null) motionFrame = window.requestAnimationFrame(updatePageMotion);
+
+      const scrollDelta = Math.abs(window.scrollY - stringsLastScroll);
+      if (scrollDelta > 1) exciteStrings(Math.min(.24, scrollDelta / 220));
+      stringsLastScroll = window.scrollY;
+    };
+
+    const closeMenu = () => {
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.setAttribute('aria-label', 'Open navigation');
+      nav.classList.remove('is-open');
+      header.classList.remove('is-open');
+      document.body.classList.remove('menu-open');
+    };
+
+    toggle.addEventListener('click', () => {
+      const open = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', String(!open));
+      toggle.setAttribute('aria-label', open ? 'Open navigation' : 'Close navigation');
+      nav.classList.toggle('is-open', !open);
+      header.classList.toggle('is-open', !open);
+      document.body.classList.toggle('menu-open', !open);
+    });
+
+    nav.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMenu));
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+        closeMenu();
+        toggle.focus();
       }
     });
-  }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
-  animatedElements.forEach(el => { if (el) observer.observe(el); });
-}
-
-/* Modal + other UI (unchanged) */
-const modal = document.getElementById('modal');
-const modalInner = document.getElementById('modalInner');
-const modalCaption = document.getElementById('modalCaption');
-const modalClose = document.getElementById('modalClose');
-
-function openImage(url, caption=''){
-  modalInner.innerHTML = '';
-  const img = document.createElement('img');
-  img.src = url;
-  img.alt = caption || '';
-  modalInner.appendChild(img);
-  modalCaption.textContent = caption;
-  showModal();
-}
-function openPDF(url, caption=''){
-  modalInner.innerHTML = '';
-  const iframe = document.createElement('iframe');
-  iframe.className = 'pdf-frame';
-  iframe.src = url;
-  iframe.title = caption || 'CV';
-  iframe.setAttribute('aria-label','PDF viewer');
-  modalInner.appendChild(iframe);
-  modalCaption.textContent = caption;
-  showModal();
-}
-function showModal(){ modal.classList.add('visible'); modal.setAttribute('aria-hidden','false'); document.body.style.overflow = 'hidden'; }
-function closeModal(){ modal.classList.remove('visible'); modal.setAttribute('aria-hidden','true'); modalInner.innerHTML = ''; modalCaption.textContent = ''; document.body.style.overflow = ''; }
-
-document.querySelectorAll('.bio-photos button').forEach(btn=>{ btn.addEventListener('click', (e)=>{ const full = btn.getAttribute('data-full'); const caption = btn.getAttribute('data-caption') || ''; if(full) openImage(full, caption); }); });
-const viewPdfBtn = document.getElementById('viewPdfBtn');
-viewPdfBtn && viewPdfBtn.addEventListener('click', (e)=>{ e.preventDefault(); openPDF('Sergei_Mkrtichian_CV.pdf', 'CV — Sergei Mkrtichian'); });
-modalClose && modalClose.addEventListener('click', closeModal);
-modal && modal.addEventListener('click', (e)=>{ if(e.target === modal) closeModal(); });
-document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeModal(); });
-
-window.addEventListener('pageshow', function(event) {
-  if (event.persisted) {
-    heroImg.classList.remove('loaded');
-    setTimeout(() => { heroImg.classList.add('loaded'); }, 50);
-  }
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-  const preloadImages = ['s.JPG', 'logo.jpg'];
-  preloadImages.forEach(src => { const img = new Image(); img.src = src; });
-});
-
-/* touch tweaks */
-document.addEventListener('DOMContentLoaded', function() {
-  function setVH() {
-    let vh = window.innerHeight * 0.01;
-    document.documentElement.style.setProperty('--vh', `${vh}px`);
-  }
-  setVH();
-  window.addEventListener('resize', setVH);
-  window.addEventListener('orientationchange', setVH);
-
-  let lastTouchEnd = 0;
-  document.addEventListener('touchend', function(event) {
-    const now = (new Date()).getTime();
-    if (now - lastTouchEnd <= 300) { event.preventDefault(); }
-    lastTouchEnd = now;
-  }, false);
-
-  document.querySelectorAll('button, a').forEach(el => {
-    el.addEventListener('touchstart', function() {
-      this.style.webkitTapHighlightColor = 'transparent';
+    window.addEventListener('scroll', requestMotionUpdate, { passive: true });
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 760) closeMenu();
+      resizeStrings();
+      exciteStrings(.12);
+      requestMotionUpdate();
     });
-  });
-});
+    heroSection.addEventListener('pointerdown', event => {
+      if (event.target.closest('a, button')) return;
+      pluckNextString(1.08);
+    }, { passive: true });
+    resizeStrings();
+    if (!reduceMotion) {
+      stringsFrame = window.requestAnimationFrame(drawStrings);
+      [0, 1, 2, 3].forEach((stringIndex, order) => {
+        window.setTimeout(() => pluckString(stringIndex, 1 - order * .055), 560 + order * 185);
+      });
+      window.setInterval(() => {
+        if (document.hidden || window.scrollY > heroSection.offsetHeight * .82) return;
+        pluckNextString(.62);
+      }, 4600);
+    }
+    updatePageMotion();
 
-/* ensure we recalc on window resize/orientation */
-window.addEventListener('resize', () => {
-  scheduleFitHeader();
-  if (window.adjustNavProportional) window.adjustNavProportional();
-});
-window.addEventListener('orientationchange', () => {
-  scheduleFitHeader();
-  if (window.adjustNavProportional) window.adjustNavProportional();
-});
-</script>
+    document.querySelectorAll('.video-trigger').forEach(button => {
+      button.addEventListener('click', () => {
+        const id = button.dataset.video;
+        const title = button.getAttribute('aria-label').replace(/^Play /, '');
+        const iframe = document.createElement('iframe');
+        iframe.className = 'video-frame';
+        iframe.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
+        iframe.title = title;
+        iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+        iframe.allowFullscreen = true;
+        button.replaceWith(iframe);
+        iframe.focus();
+      });
+    });
+
+    const concertsSection = document.getElementById('concerts');
+    const concertList = document.getElementById('concertList');
+    const nextConcertTeaser = document.getElementById('nextConcertTeaser');
+    const nextConcertDate = document.getElementById('nextConcertDate');
+    const nextConcertDay = document.getElementById('nextConcertDay');
+    const nextConcertMonth = document.getElementById('nextConcertMonth');
+    const nextConcertLabel = document.getElementById('nextConcertLabel');
+    const nextConcertPlace = document.getElementById('nextConcertPlace');
+    const nextConcertTitle = document.getElementById('nextConcertTitle');
+    const concertsPreviewNote = document.getElementById('concertsPreviewNote');
+
+    const parseConcertDate = value => {
+      const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(value || ''));
+      if (!match) return null;
+      const [, year, month, day] = match.map(Number);
+      const date = new Date(year, month - 1, day, 12);
+      return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day
+        ? date
+        : null;
+    };
+
+    const renderNextConcert = concert => {
+      const date = parseConcertDate(concert.date);
+      const place = [concert.city, concert.country].filter(Boolean).join(', ') || 'Concert';
+      const title = concert.title || 'Live performance';
+      const dateLabel = new Intl.DateTimeFormat('en', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      }).format(date);
+
+      nextConcertDate.dateTime = concert.time ? `${concert.date}T${concert.time}` : concert.date;
+      nextConcertDay.textContent = String(date.getDate()).padStart(2, '0');
+      nextConcertMonth.textContent = new Intl.DateTimeFormat('en', { month: 'short' }).format(date);
+      nextConcertLabel.textContent = concert.admissionShort
+        ? `Next concert · ${concert.admissionShort}`
+        : 'Next concert';
+      nextConcertPlace.textContent = place;
+      nextConcertTitle.textContent = title;
+      nextConcertTeaser.setAttribute('aria-label', `Next concert: ${title}, ${place}, ${dateLabel}`);
+      nextConcertTeaser.hidden = false;
+    };
+
+    const createConcertCard = concert => {
+      const date = parseConcertDate(concert.date);
+      const concertKind = concert.kind === 'hosted' ? 'hosted' : 'external';
+      const article = document.createElement('article');
+      article.className = 'concert-card';
+      article.dataset.concertKind = concertKind;
+      if (concert.id) article.dataset.concertId = String(concert.id);
+
+      const dateBlock = document.createElement('time');
+      dateBlock.className = 'concert-date';
+      dateBlock.dateTime = concert.time ? `${concert.date}T${concert.time}` : concert.date;
+
+      const day = document.createElement('span');
+      day.className = 'concert-day';
+      day.textContent = String(date.getDate()).padStart(2, '0');
+
+      const month = document.createElement('span');
+      month.className = 'concert-month';
+      month.textContent = new Intl.DateTimeFormat('en', { month: 'short' }).format(date);
+
+      const year = document.createElement('span');
+      year.className = 'concert-year';
+      year.textContent = String(date.getFullYear());
+      dateBlock.append(day, month, year);
+
+      const info = document.createElement('div');
+      info.className = 'concert-info';
+
+      const place = document.createElement('p');
+      place.className = 'concert-place';
+      const location = [concert.city, concert.country].filter(Boolean).join(', ') || 'Concert';
+      place.textContent = `${concertKind === 'hosted' ? 'Sergei presents' : 'Guest appearance'} · ${location}`;
+
+      const title = document.createElement('h3');
+      title.className = 'concert-title';
+      title.textContent = concert.title || 'Live performance';
+      info.append(place, title);
+
+      const metaText = [concert.venue, concert.time, concert.admission].filter(Boolean).join(' · ');
+      if (metaText) {
+        const meta = document.createElement('p');
+        meta.className = 'concert-meta';
+        meta.textContent = metaText;
+        info.append(meta);
+      }
+
+      if (concert.description) {
+        const description = document.createElement('p');
+        description.className = 'concert-description';
+        description.textContent = concert.description;
+        info.append(description);
+      }
+
+      const statusLabels = {
+        cancelled: 'Cancelled',
+        'sold-out': 'Sold out',
+        postponed: 'Postponed'
+      };
+      const status = String(concert.status || 'upcoming').toLowerCase();
+      let action;
+
+      const externalActionUrl = concert.registrationUrl || concert.externalUrl || concert.actionUrl;
+      const internalActionUrl = concert.id
+        ? `concert.html?id=${encodeURIComponent(String(concert.id))}${concert._preview ? '&preview=1' : ''}`
+        : '';
+      const actionUrl = concertKind === 'hosted' ? internalActionUrl : externalActionUrl;
+
+      if (actionUrl && !statusLabels[status]) {
+        try {
+          const url = new URL(String(actionUrl), window.location.href);
+          if (!['http:', 'https:'].includes(url.protocol)) throw new Error('Unsupported concert URL');
+          action = document.createElement('a');
+          action.className = 'button concert-action';
+          action.href = url.href;
+          action.textContent = concert.actionLabel
+            || (concertKind === 'hosted' ? 'Concert & registration' : 'Official event page ↗');
+          if (concert.id) action.dataset.concertId = String(concert.id);
+          if (url.origin !== window.location.origin) {
+            action.target = '_blank';
+            action.rel = 'noopener noreferrer';
+          }
+        } catch {
+          action = null;
+        }
+      }
+
+      if (!action) {
+        action = document.createElement('span');
+        action.className = 'concert-status';
+        action.textContent = statusLabels[status] || 'Details soon';
+      }
+
+      article.append(dateBlock, info, action);
+      return article;
+    };
+
+    fetch('concerts.json', { cache: 'no-store' })
+      .then(response => {
+        if (!response.ok) throw new Error('Concert data unavailable');
+        return response.json();
+      })
+      .then(data => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const previewMode = new URLSearchParams(window.location.search).get('concerts') === 'preview';
+        const sourceConcerts = previewMode && data._example
+          ? [{ ...data._example, published: true, status: 'preview', _preview: true }]
+          : data.concerts;
+        const concerts = Array.isArray(sourceConcerts)
+          ? sourceConcerts
+              .filter(concert => concert && concert.published !== false && concert.status !== 'hidden')
+              .map(concert => ({ concert, date: parseConcertDate(concert.date) }))
+              .filter(item => item.date && (previewMode || item.date >= today))
+              .sort((a, b) => a.date - b.date)
+              .map(item => item.concert)
+          : [];
+
+        if (!concerts.length) return;
+        const fragment = document.createDocumentFragment();
+        concerts.forEach(concert => fragment.append(createConcertCard(concert)));
+        concertList.append(fragment);
+        renderNextConcert(concerts[0]);
+        concertsSection.hidden = false;
+        concertsPreviewNote.hidden = !previewMode;
+        document.documentElement.classList.add('has-concerts');
+        document.querySelectorAll('[data-concert-nav]').forEach(link => { link.hidden = false; });
+      })
+      .catch(() => {
+        concertsSection.hidden = true;
+      });
+
+    const revealItems = document.querySelectorAll('.reveal');
+    revealItems.forEach(item => {
+      const revealSiblings = [...item.parentElement.children].filter(child => child.classList.contains('reveal'));
+      const position = revealSiblings.indexOf(item);
+      item.style.setProperty('--reveal-delay', `${Math.min(Math.max(position, 0), 3) * 90}ms`);
+    });
+
+    if ('IntersectionObserver' in window) {
+      const revealObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: .06, rootMargin: '0px 0px -8%' });
+      revealItems.forEach(item => revealObserver.observe(item));
+    } else {
+      revealItems.forEach(item => item.classList.add('is-visible'));
+    }
+
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
-
-
-
-

@@ -1,0 +1,41 @@
+{
+  "concerts": [
+    {
+      "id": "ticino-docg-mendrisio-2026-09-16",
+      "kind": "external",
+      "date": "2026-09-16",
+      "time": "20:30",
+      "city": "Mendrisio",
+      "country": "Switzerland",
+      "venue": "Centro Manifestazioni Mercato Coperto",
+      "title": "Festival musicale Ticino DOCG — Symphonic concert",
+      "description": "With the Orchestra della Svizzera Italiana (OSI). Sergei Mkrtichian performs Saint-Saëns’ Introduction and Rondo Capriccioso.",
+      "organizer": "Associazione Musica nel Mendrisiotto",
+      "admission": "Free entrance",
+      "admissionShort": "Free entrance",
+      "actionLabel": "Official event page ↗",
+      "externalUrl": "https://mendrisio.ch/home/vivere-e-visitare/eventi/agenda-della-citta/2026/settembre/2026-09-16-Concerto-sinfonico.html",
+      "status": "upcoming",
+      "published": true
+    }
+  ],
+  "_example": {
+    "id": "your-concert-2026-10-18",
+    "kind": "hosted",
+    "date": "2026-10-18",
+    "time": "19:30",
+    "city": "Zurich",
+    "country": "Switzerland",
+    "venue": "Concert Hall",
+    "title": "Violin recital",
+    "description": "A short description of the programme and the evening.",
+    "programme": [
+      "Composer — Work",
+      "Composer — Work"
+    ],
+    "registrationLabel": "Register for this concert",
+    "registrationUrl": "",
+    "status": "upcoming",
+    "published": false
+  }
+}
