@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="force-motion">
+<html lang="en" class="force-motion hero-loading concerts-loading">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -16,7 +16,8 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
   <link rel="manifest" href="/site.webmanifest">
-  <link rel="preload" as="image" href="/s.JPG" fetchpriority="high">
+  <link rel="preload" as="image" href="/s-mobile.webp" type="image/webp" media="(max-width: 760px)" fetchpriority="high">
+  <link rel="preload" as="image" href="/s.JPG" media="(min-width: 761px)" fetchpriority="high">
 
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://sergeiviolin.com/">
@@ -52,6 +53,12 @@
     if (new URLSearchParams(window.location.search).get('motion') === 'system') {
       document.documentElement.classList.remove('force-motion');
     }
+    window.setTimeout(() => {
+      const root = document.documentElement;
+      if (!root.classList.contains('hero-loading')) return;
+      root.classList.remove('hero-loading');
+      root.classList.add('hero-ready');
+    }, 2600);
   </script>
 
   <style>
@@ -297,6 +304,7 @@
     }
 
     .hero-media,
+    .hero-media picture,
     .hero-media::after,
     .hero-media img {
       position: absolute;
@@ -307,18 +315,23 @@
 
     .hero-media {
       z-index: -2;
-      will-change: clip-path, transform;
-      animation: stage-reveal 1.45s cubic-bezier(.16,.8,.2,1) backwards;
+      background-color: #090806;
     }
+
+    .hero-media picture { display: block; }
 
     .hero-media img {
       object-fit: cover;
       object-position: 49% 42%;
+      opacity: 0;
       filter: saturate(.96) contrast(1.02) brightness(1.04);
       transform: translate3d(0, var(--hero-image-y, 0px), 0) scale(var(--hero-image-scale, 1.025));
       transform-origin: 50% 44%;
-      will-change: transform;
+      transition: opacity .72s cubic-bezier(.2,.7,.2,1);
+      will-change: transform, opacity;
     }
+
+    html.hero-ready .hero-media img { opacity: 1; }
 
     .hero-media::after {
       z-index: 1;
@@ -335,24 +348,13 @@
       width: 100%;
       height: 100%;
       display: block;
-      opacity: .78;
+      opacity: 0;
       pointer-events: none;
       mix-blend-mode: screen;
+      transition: opacity .5s ease .18s;
     }
 
-    @keyframes stage-reveal {
-      0% {
-        clip-path: inset(7% 19% 7% 19% round 34px);
-        opacity: .35;
-        transform: scale(.965);
-      }
-      35% { opacity: 1; }
-      100% {
-        clip-path: inset(0 round 0);
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
+    html.hero-ready .hero-strings { opacity: .78; }
 
     @keyframes quiet-arrival {
       from { opacity: 0; transform: translateY(-12px); }
@@ -362,11 +364,6 @@
     @keyframes copy-arrival {
       from { opacity: 0; transform: translateY(28px); }
       to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes mobile-stage-reveal {
-      from { opacity: .18; transform: scale(1.045); }
-      to { opacity: 1; transform: scale(1); }
     }
 
     @keyframes soft-appear {
@@ -398,12 +395,13 @@
       will-change: transform, opacity;
     }
 
-    .hero-copy > * { animation: copy-arrival .88s cubic-bezier(.2,.7,.2,1) backwards; }
-    .hero-copy > :nth-child(1) { animation-delay: .4s; }
-    .hero-copy > :nth-child(2) { animation-delay: .5s; }
-    .hero-copy > :nth-child(3) { animation-delay: .61s; }
-    .hero-copy > :nth-child(4) { animation-delay: .72s; }
-    .hero-copy > :nth-child(5) { animation-delay: .82s; }
+    .hero-copy > * { opacity: 0; transform: translateY(28px); }
+    html.hero-ready .hero-copy > * { animation: copy-arrival .88s cubic-bezier(.2,.7,.2,1) both; }
+    html.hero-ready .hero-copy > :nth-child(1) { animation-delay: .12s; }
+    html.hero-ready .hero-copy > :nth-child(2) { animation-delay: .22s; }
+    html.hero-ready .hero-copy > :nth-child(3) { animation-delay: .33s; }
+    html.hero-ready .hero-copy > :nth-child(4) { animation-delay: .44s; }
+    html.hero-ready .hero-copy > :nth-child(5) { animation-delay: .54s; }
 
     .eyebrow {
       display: flex;
@@ -1608,7 +1606,6 @@
       display: flex;
       flex-wrap: wrap;
       gap: 10px 22px;
-      scroll-margin-top: calc(var(--header-h) + 24px);
     }
 
     .social-links a {
@@ -1620,6 +1617,76 @@
     }
 
     .social-links a:hover { color: var(--paper); }
+
+    .socials {
+      background: var(--paper);
+      color: var(--ink);
+      scroll-margin-top: var(--header-h);
+    }
+
+    .socials-grid {
+      display: grid;
+      grid-template-columns: minmax(260px, .8fr) minmax(420px, 1.2fr);
+      align-items: end;
+      gap: clamp(70px, 10vw, 170px);
+    }
+
+    .socials-title {
+      max-width: 480px;
+      margin: 0;
+      font-family: var(--serif);
+      font-size: clamp(58px, 7vw, 104px);
+      font-weight: 400;
+      letter-spacing: -.055em;
+      line-height: .9;
+    }
+
+    .socials-title em {
+      color: var(--amber);
+      font-weight: 400;
+    }
+
+    .social-network-list { border-top: 1px solid rgba(10,10,9,.24); }
+
+    .social-network-list a {
+      min-height: 86px;
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr) 30px;
+      align-items: center;
+      gap: 14px;
+      border-bottom: 1px solid rgba(10,10,9,.24);
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .social-network-index {
+      color: var(--amber);
+      font-family: var(--serif);
+      font-size: 13px;
+      font-style: italic;
+    }
+
+    .social-network-name {
+      font-family: var(--serif);
+      font-size: clamp(28px, 3vw, 42px);
+      font-weight: 400;
+      letter-spacing: -.025em;
+      line-height: 1;
+      transition: transform .28s ease;
+    }
+
+    .social-network-arrow {
+      color: rgba(10,10,9,.55);
+      font-size: 18px;
+      text-align: right;
+      transition: color .28s ease, transform .28s ease;
+    }
+
+    .social-network-list a:hover .social-network-name { transform: translateX(6px); }
+    .social-network-list a:hover .social-network-arrow {
+      color: var(--amber);
+      transform: translate(2px, -2px);
+    }
 
     footer { background: var(--ink); }
 
@@ -1671,6 +1738,7 @@
 
       .contact-grid { grid-template-columns: 1fr; }
       .contact-aside { max-width: 520px; }
+      .socials-grid { grid-template-columns: 1fr; gap: 42px; }
       .concert-card { grid-template-columns: 130px minmax(0, 1fr); }
       .concert-card > :last-child { grid-column: 2; justify-self: start; }
     }
@@ -1946,7 +2014,7 @@
         display: block;
         background:
           linear-gradient(90deg, rgba(214,199,181,.62), transparent 15px),
-          var(--cream);
+          var(--paper);
         pointer-events: none;
         transform: translateX(105%);
         transition: transform .42s cubic-bezier(.76,0,.24,1);
@@ -1962,8 +2030,10 @@
 
       .hero-media {
         clip-path: none;
-        will-change: opacity, transform;
-        animation: mobile-stage-reveal 1.05s cubic-bezier(.2,.7,.2,1) backwards;
+        background-color: #0b0908;
+        background-image: url("data:image/webp;base64,UklGRr4AAABXRUJQVlA4ILIAAACwBwCdASoYADQAPxl+s1QsqCQjLBVbMZAjCUAYQQi9/j6WnigebgBW+uYjEz9VkHewLHEzeyjc5oFMeTrirwIDAdH2AZ1AAP73cxKqiptGHOlE4kqgDSYr1w6oUlQ+6EABd1pg2+u88C7+0QyqwbEe3GGPCGlTTgtNWE4R8y8p6m8dOfgDkSTwY1D2+kZBaCsYBO12Mm+IsU1xhSgpNVAgF0mQFzSpQ1JiKhSWCtTgk8AA");
+        background-position: center;
+        background-size: cover;
       }
 
       .hero-media img {
@@ -1977,7 +2047,7 @@
           linear-gradient(90deg, rgba(17,14,12,0) 0%, rgba(17,14,12,.08) 100%);
       }
 
-      .hero-strings { opacity: .9; }
+      html.hero-ready .hero-strings { opacity: .9; }
 
       .hero-inner {
         display: flex;
@@ -1996,12 +2066,12 @@
         will-change: auto;
       }
 
-      .hero-copy > * { animation-duration: .72s; }
-      .hero-copy > :nth-child(1) { animation-delay: .22s; }
-      .hero-copy > :nth-child(2) { animation-delay: .31s; }
-      .hero-copy > :nth-child(3) { animation-delay: .41s; }
-      .hero-copy > :nth-child(4) { animation-delay: .51s; }
-      .hero-copy > :nth-child(5) { animation-delay: .61s; }
+      html.hero-ready .hero-copy > * { animation-duration: .72s; }
+      html.hero-ready .hero-copy > :nth-child(1) { animation-delay: .08s; }
+      html.hero-ready .hero-copy > :nth-child(2) { animation-delay: .17s; }
+      html.hero-ready .hero-copy > :nth-child(3) { animation-delay: .27s; }
+      html.hero-ready .hero-copy > :nth-child(4) { animation-delay: .37s; }
+      html.hero-ready .hero-copy > :nth-child(5) { animation-delay: .47s; }
 
       .eyebrow {
         margin-bottom: 13px;
@@ -2012,8 +2082,8 @@
       .eyebrow::before { width: 28px; }
 
       h1 {
-        margin-bottom: 17px;
-        font-size: clamp(54px, 17vw, 82px);
+        margin-bottom: 13px;
+        font-size: clamp(51px, 16vw, 76px);
         line-height: .82;
       }
 
@@ -2021,13 +2091,10 @@
 
       .hero-lead {
         max-width: 390px;
-        margin-bottom: 18px;
+        margin-bottom: 12px;
         font-size: 18px;
         line-height: 1.42;
       }
-
-      html.has-concerts h1 { margin-bottom: 13px; font-size: clamp(51px, 16vw, 76px); }
-      html.has-concerts .hero-lead { margin-bottom: 12px; }
 
       .next-concert-teaser {
         min-height: 64px;
@@ -2037,6 +2104,11 @@
         padding: 9px 11px;
         border-radius: 14px;
         background: rgba(13, 11, 9, .78);
+      }
+
+      html.concerts-loading .next-concert-teaser[hidden] {
+        display: grid !important;
+        visibility: hidden;
       }
 
       .next-concert-date { min-width: 0; padding-right: 10px; }
@@ -2270,6 +2342,11 @@
 
       .social-links a { min-height: 44px; display: inline-flex; align-items: center; }
 
+      .socials-grid { gap: 32px; }
+      .socials-title { font-size: clamp(48px, 14vw, 64px); }
+      .social-network-list a { min-height: 74px; grid-template-columns: 34px minmax(0, 1fr) 24px; gap: 10px; }
+      .social-network-name { font-size: clamp(29px, 9vw, 36px); }
+
       .footer-inner {
         min-height: 0;
         flex-direction: column;
@@ -2325,8 +2402,7 @@
         padding: max(39svh, 205px) 0 28px;
       }
 
-      .hero-lead { display: block; margin-bottom: 14px; }
-      html.has-concerts .hero-lead { display: none; }
+      .hero-lead { display: none; }
 
       .eyebrow { margin-bottom: 8px; }
 
@@ -2357,13 +2433,14 @@
       html:not(.force-motion) { scroll-behavior: auto; }
       html:not(.force-motion) .brand,
       html:not(.force-motion) .menu-toggle { animation: soft-appear .4s ease backwards; }
-      html:not(.force-motion) .hero-media { clip-path: none; transform: none; animation: soft-appear .65s ease backwards; }
-      html:not(.force-motion) .hero-copy > * { animation: soft-appear .5s ease backwards; }
-      html:not(.force-motion) .hero-copy > :nth-child(1) { animation-delay: .12s; }
-      html:not(.force-motion) .hero-copy > :nth-child(2) { animation-delay: .2s; }
-      html:not(.force-motion) .hero-copy > :nth-child(3) { animation-delay: .28s; }
-      html:not(.force-motion) .hero-copy > :nth-child(4) { animation-delay: .36s; }
-      html:not(.force-motion) .hero-copy > :nth-child(5) { animation-delay: .44s; }
+      html:not(.force-motion) .hero-media { clip-path: none; transform: none; }
+      html:not(.force-motion) .hero-media img { transition-duration: .3s; }
+      html:not(.force-motion).hero-ready .hero-copy > * { animation: soft-appear .5s ease both; transform: none; }
+      html:not(.force-motion).hero-ready .hero-copy > :nth-child(1) { animation-delay: .06s; }
+      html:not(.force-motion).hero-ready .hero-copy > :nth-child(2) { animation-delay: .12s; }
+      html:not(.force-motion).hero-ready .hero-copy > :nth-child(3) { animation-delay: .18s; }
+      html:not(.force-motion).hero-ready .hero-copy > :nth-child(4) { animation-delay: .24s; }
+      html:not(.force-motion).hero-ready .hero-copy > :nth-child(5) { animation-delay: .3s; }
       html:not(.force-motion) .button-arrow { animation: none; }
       html:not(.force-motion) .concert-reminder,
       html:not(.force-motion) .concert-reminder::after { animation: none; }
@@ -2427,9 +2504,9 @@
               <span class="movement-copy"><small>Selected performances</small><strong>Listen</strong></span>
               <span class="movement-arrow" aria-hidden="true">↘</span>
             </a>
-            <a class="movement-link" data-movement="IV" href="#about">
+            <a class="movement-link" data-movement="IV" href="#curriculum">
               <span class="movement-number">IV</span>
-              <span class="movement-copy"><small>Biography &amp; curriculum</small><strong>About &amp; CV</strong></span>
+              <span class="movement-copy"><small>Biography &amp; repertoire</small><strong>Curriculum vitae</strong></span>
               <span class="movement-arrow" aria-hidden="true">↘</span>
             </a>
           </div>
@@ -2443,7 +2520,10 @@
   <main id="main">
     <section class="hero" id="top" aria-labelledby="hero-title">
       <div class="hero-media" aria-hidden="true">
-        <img src="s.JPG" width="6720" height="4480" alt="" fetchpriority="high">
+        <picture>
+          <source media="(max-width: 760px)" type="image/webp" srcset="s-mobile.webp">
+          <img src="s.JPG" width="6720" height="4480" alt="" fetchpriority="high" decoding="async">
+        </picture>
       </div>
       <canvas class="hero-strings" id="heroStrings" aria-hidden="true"></canvas>
 
@@ -2602,7 +2682,33 @@
       </div>
     </section>
 
-    <section class="cv-band" aria-labelledby="cv-title">
+    <section class="section socials" id="socials" aria-labelledby="socials-title">
+      <div class="section-shell socials-grid">
+        <div class="reveal">
+          <p class="section-kicker">Social networks</p>
+          <h2 class="socials-title" id="socials-title">Follow the<br><em>music.</em></h2>
+        </div>
+        <nav class="social-network-list reveal" aria-label="Social networks">
+          <a href="https://www.instagram.com/sergeiviolin/" target="_blank" rel="noopener noreferrer">
+            <span class="social-network-index">I</span>
+            <span class="social-network-name">Instagram</span>
+            <span class="social-network-arrow" aria-hidden="true">↗</span>
+          </a>
+          <a href="https://www.youtube.com/@sergeiviolin" target="_blank" rel="noopener noreferrer">
+            <span class="social-network-index">II</span>
+            <span class="social-network-name">YouTube</span>
+            <span class="social-network-arrow" aria-hidden="true">↗</span>
+          </a>
+          <a href="https://www.facebook.com/profile.php?id=100095484424565" target="_blank" rel="noopener noreferrer">
+            <span class="social-network-index">III</span>
+            <span class="social-network-name">Facebook</span>
+            <span class="social-network-arrow" aria-hidden="true">↗</span>
+          </a>
+        </nav>
+      </div>
+    </section>
+
+    <section class="cv-band" id="curriculum" aria-labelledby="cv-title">
       <div class="cv-band-inner reveal">
         <div>
           <h2 id="cv-title">My curriculum vitae</h2>
@@ -2635,11 +2741,6 @@
         <div class="contact-aside reveal">
           <p>For concerts, festivals, masterclasses, collaborations — or simply to say hello:</p>
           <a class="email-link" href="mailto:concerts@sergeiviolin.com"><span class="email-action-label">Write to me</span><span>concerts@sergeiviolin.com</span></a>
-          <div class="social-links" id="socials" aria-label="Social media">
-            <a href="https://www.instagram.com/sergeiviolin/" target="_blank" rel="noopener noreferrer">Instagram ↗</a>
-            <a href="https://www.youtube.com/@sergeiviolin" target="_blank" rel="noopener noreferrer">YouTube ↗</a>
-            <a href="https://www.facebook.com/profile.php?id=100095484424565" target="_blank" rel="noopener noreferrer">Facebook ↗</a>
-          </div>
         </div>
       </div>
     </section>
@@ -2717,9 +2818,10 @@
     let nextPluckIndex = 0;
     let menuNavigationTimer = null;
     let menuCleanupTimer = null;
+    let heroExperienceStarted = false;
     const stringPluckTimes = [-Infinity, -Infinity, -Infinity, -Infinity];
     const stringPluckStrengths = [0, 0, 0, 0];
-    const stringsStart = window.performance.now();
+    let stringsStart = 0;
 
     const resizeStrings = () => {
       if (!stringsContext || reduceMotion) return;
@@ -2734,8 +2836,9 @@
 
     const drawStrings = now => {
       stringsFrame = null;
-      if (!stringsContext || reduceMotion) return;
+      if (!heroExperienceStarted || !stringsContext || reduceMotion) return;
 
+      if (!stringsStart) stringsStart = now;
       const elapsed = now - stringsStart;
       const intro = Math.min(elapsed / 1750, 1);
       const introEnergy = elapsed > 520 ? Math.max(0, 1 - (elapsed - 520) / 2100) * .58 : 0;
@@ -2744,17 +2847,21 @@
       let anyPluckActive = false;
       const heroRect = heroSection.getBoundingClientRect();
       const imageRect = heroImage.getBoundingClientRect();
-      const imageAspect = 1.5;
+      const usesMobileCrop = heroImage.currentSrc.includes('s-mobile.webp');
+      const imageAspect = usesMobileCrop ? 1170 / 2536 : 1.5;
       const renderedImageWidth = Math.max(imageRect.width, imageRect.height * imageAspect);
       const renderedImageHeight = renderedImageWidth / imageAspect;
       const positionX = mobile ? .36 : .49;
       const positionY = mobile ? .5 : .42;
       const imageOffsetX = imageRect.left - heroRect.left + (imageRect.width - renderedImageWidth) * positionX;
       const imageOffsetY = imageRect.top - heroRect.top + (imageRect.height - renderedImageHeight) * positionY;
-      const imagePoint = (x, y) => ({
-        x: imageOffsetX + renderedImageWidth * x,
-        y: imageOffsetY + renderedImageHeight * y
-      });
+      const imagePoint = (x, y) => {
+        const sourceX = usesMobileCrop ? (x * 6720 - 1700) / 2067 : x;
+        return {
+          x: imageOffsetX + renderedImageWidth * sourceX,
+          y: imageOffsetY + renderedImageHeight * y
+        };
+      };
       const violinStrings = [
         [[3353, 1100], [3333, 2825]],
         [[3386, 1100], [3398, 2825]],
@@ -2845,13 +2952,13 @@
     };
 
     const exciteStrings = amount => {
-      if (!stringsContext || reduceMotion) return;
+      if (!heroExperienceStarted || !stringsContext || reduceMotion) return;
       stringsEnergy = Math.min(.82, stringsEnergy + amount);
       if (stringsFrame === null) stringsFrame = window.requestAnimationFrame(drawStrings);
     };
 
     const pluckString = (index, strength = .9) => {
-      if (!stringsContext || reduceMotion) return;
+      if (!heroExperienceStarted || !stringsContext || reduceMotion) return;
       const safeIndex = ((index % 4) + 4) % 4;
       stringPluckTimes[safeIndex] = window.performance.now();
       stringPluckStrengths[safeIndex] = Math.min(1.15, strength);
@@ -2990,17 +3097,35 @@
       if (event.target.closest('a, button')) return;
       pluckNextString(1.08);
     }, { passive: true });
-    resizeStrings();
-    if (!reduceMotion) {
+    const startHeroExperience = () => {
+      if (heroExperienceStarted) return;
+      heroExperienceStarted = true;
+      document.documentElement.classList.remove('hero-loading');
+      document.documentElement.classList.add('hero-ready');
+      resizeStrings();
+      if (reduceMotion) return;
+      stringsStart = window.performance.now();
       stringsFrame = window.requestAnimationFrame(drawStrings);
       [0, 1, 2, 3].forEach((stringIndex, order) => {
-        window.setTimeout(() => pluckString(stringIndex, 1 - order * .055), 560 + order * 185);
+        window.setTimeout(() => pluckString(stringIndex, 1 - order * .055), 620 + order * 185);
       });
       window.setInterval(() => {
         if (document.hidden || window.scrollY > heroSection.offsetHeight * .82) return;
         pluckNextString(.62);
       }, 4600);
+    };
+
+    const revealDecodedHero = () => {
+      const decoded = typeof heroImage.decode === 'function' ? heroImage.decode() : Promise.resolve();
+      decoded.catch(() => {}).finally(startHeroExperience);
+    };
+
+    if (heroImage.complete && heroImage.naturalWidth) revealDecodedHero();
+    else {
+      heroImage.addEventListener('load', revealDecodedHero, { once: true });
+      heroImage.addEventListener('error', startHeroExperience, { once: true });
     }
+    window.setTimeout(startHeroExperience, 2600);
     updatePageMotion();
 
     document.querySelectorAll('.video-trigger').forEach(button => {
@@ -3469,6 +3594,7 @@
         concertsSection.hidden = true;
       })
       .finally(() => {
+        document.documentElement.classList.remove('concerts-loading');
         if (new URLSearchParams(window.location.search).get('subscription') !== 'confirmed') return;
         window.setTimeout(() => {
           openSubscriptionSheet('letters', null, document.querySelector('[data-open-subscribe]'));
