@@ -3,6 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-src https://www.youtube-nocookie.com; img-src 'self' data: https://i.ytimg.com; connect-src 'self' https://sergei-concert-subscribe.blacksirius481.workers.dev; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'">
   <meta name="theme-color" content="#0a0a09">
   <meta name="description" content="Welcome to the official website of concert violinist Sergei Mkrtichian — music, performances, personal story and upcoming work.">
   <meta name="author" content="Sergei Mkrtichian">
@@ -95,7 +97,6 @@
     body.subscribe-open { overflow: hidden; }
 
     [hidden] { display: none !important; }
-    main > section { scroll-margin-top: var(--header-h); }
 
     a { color: inherit; }
     img { max-width: 100%; }
@@ -199,6 +200,21 @@
       display: flex;
       align-items: center;
       gap: clamp(20px, 2.5vw, 42px);
+    }
+
+    .menu-program,
+    .movement-list { display: contents; }
+
+    .menu-program-head,
+    .menu-program-ghost,
+    .menu-page-wipe,
+    .movement-number,
+    .movement-copy small,
+    .movement-arrow { display: none; }
+
+    .movement-copy strong {
+      font: inherit;
+      font-weight: inherit;
     }
 
     .nav-links a {
@@ -546,6 +562,7 @@
     .button-primary:hover { background: var(--amber-bright); }
     .button-ghost { border-color: rgba(255,253,248,.34); color: var(--white); }
     .button-ghost:hover { border-color: rgba(255,253,248,.7); background: rgba(255,253,248,.1); }
+    .hero-instagram { margin-left: auto; }
     .button-secondary { border-color: rgba(255,253,248,.34); color: var(--white); }
     .button-secondary:hover { border-color: var(--white); background: var(--white); color: var(--ink); }
     .button-arrow {
@@ -827,12 +844,29 @@
       letter-spacing: -.02em;
     }
 
-    .about-copy > p:not(.lead) {
+    .about-copy > p:not(.lead),
+    .about-details-body > p {
       max-width: 680px;
       color: var(--muted-dark);
       font-size: 16px;
       line-height: 1.82;
     }
+
+    .about-details > summary { display: none; }
+
+    .about-details-icon {
+      display: inline-grid;
+      width: 26px;
+      height: 26px;
+      place-items: center;
+      border: 1px solid var(--line-light);
+      border-radius: 50%;
+      font-size: 17px;
+      font-weight: 400;
+      transition: transform .25s ease;
+    }
+
+    .about-details[open] .about-details-icon { transform: rotate(45deg); }
 
     .about-copy .signature {
       margin: 8px 0 42px;
@@ -1501,7 +1535,6 @@
     }
 
     .subscribe-success-close { max-width: 330px; }
-    }
 
     .contact {
       position: relative;
@@ -1575,6 +1608,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 10px 22px;
+      scroll-margin-top: calc(var(--header-h) + 24px);
     }
 
     .social-links a {
@@ -1714,12 +1748,13 @@
         min-height: calc(100svh - var(--header-h));
         display: flex;
         flex-direction: column;
-        align-items: flex-start;
-        justify-content: center;
+        align-items: stretch;
+        justify-content: flex-start;
         gap: 0;
+        overflow-x: hidden;
         overflow-y: auto;
         overscroll-behavior: contain;
-        padding: 30px 24px calc(30px + env(safe-area-inset-bottom));
+        padding: 24px 18px calc(22px + env(safe-area-inset-bottom));
         background:
           radial-gradient(circle at 82% 16%, rgba(189,117,76,.12), transparent 34%),
           rgba(17,14,12,.985);
@@ -1731,29 +1766,193 @@
 
       .nav-links.is-open { visibility: visible; opacity: 1; transform: translateY(0); }
 
-      .nav-links a,
-      .nav-links .nav-cta {
-        width: 100%;
-        padding: clamp(14px, 3.2vh, 25px) 0;
-        border: 0;
-        border-bottom: 1px solid var(--line-dark);
-        border-radius: 0;
-        font-family: var(--serif);
-        font-size: clamp(32px, 10vw, 48px);
-        font-weight: 400;
-        letter-spacing: -.02em;
-        text-transform: none;
-        opacity: 0;
-        transform: translateY(18px);
-        transition: opacity .45s ease, transform .55s cubic-bezier(.2,.7,.2,1), color .2s ease;
+      .menu-program {
+        position: relative;
+        isolation: isolate;
+        width: min(100%, 520px);
+        min-height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-self: center;
+        overflow: hidden;
       }
 
-      .nav-links.is-open a { opacity: 1; transform: translateY(0); }
-      .nav-links.is-open a:nth-child(1) { transition-delay: .06s; }
-      .nav-links.is-open a:nth-child(2) { transition-delay: .12s; }
-      .nav-links.is-open a:nth-child(3) { transition-delay: .18s; }
-      .nav-links.is-open a:nth-child(4) { transition-delay: .24s; }
-      .nav-links.is-open a:nth-child(5) { transition-delay: .3s; }
+      .menu-program-head {
+        position: relative;
+        z-index: 1;
+        display: block;
+        margin: 0 0 22px;
+        opacity: 0;
+        transform: translateY(12px);
+        transition: opacity .42s .06s ease, transform .55s .06s cubic-bezier(.2,.7,.2,1);
+      }
+
+      .nav-links.is-open .menu-program-head { opacity: 1; transform: translateY(0); }
+
+      .menu-program-kicker {
+        margin: 0 0 7px;
+        color: var(--amber-bright);
+        font-size: 9px;
+        font-weight: 750;
+        letter-spacing: .2em;
+        text-transform: uppercase;
+      }
+
+      .menu-program-title {
+        margin: 0;
+        color: var(--white);
+        font-family: var(--serif);
+        font-size: clamp(38px, 12vw, 55px);
+        font-weight: 400;
+        letter-spacing: -.035em;
+        line-height: .98;
+      }
+
+      .menu-program-note {
+        margin: 8px 0 0;
+        color: rgba(255,253,248,.48);
+        font-size: 11px;
+        letter-spacing: .02em;
+      }
+
+      .menu-program-ghost {
+        position: absolute;
+        z-index: -1;
+        top: 18px;
+        right: -8px;
+        display: block;
+        color: rgba(255,253,248,.035);
+        font-family: var(--serif);
+        font-size: clamp(150px, 48vw, 220px);
+        line-height: .72;
+        pointer-events: none;
+        transform-origin: 100% 50%;
+      }
+
+      .menu-program-ghost.is-changing { animation: movement-ghost .42s cubic-bezier(.2,.7,.2,1); }
+
+      @keyframes movement-ghost {
+        0% { opacity: 0; transform: translateX(18px) scale(.96); }
+        100% { opacity: 1; transform: translateX(0) scale(1); }
+      }
+
+      .movement-list {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        margin-top: auto;
+        border-top: 1px solid rgba(255,253,248,.16);
+      }
+
+      .nav-links .movement-link {
+        position: relative;
+        width: 100%;
+        min-height: 88px;
+        display: grid;
+        grid-template-columns: 35px minmax(0, 1fr) 28px;
+        align-items: center;
+        gap: 9px;
+        padding: 11px 1px;
+        border-bottom: 1px solid rgba(255,253,248,.16);
+        color: rgba(255,253,248,.7);
+        text-decoration: none;
+        opacity: 0;
+        transform: translateY(16px);
+        transition:
+          opacity .45s ease,
+          transform .55s cubic-bezier(.2,.7,.2,1),
+          color .28s ease;
+      }
+
+      .nav-links .movement-link::after { display: none; }
+      .nav-links.is-open .movement-link { opacity: 1; transform: translateY(0); }
+      .nav-links.is-open .movement-link:nth-child(1) { transition-delay: .11s; }
+      .nav-links.is-open .movement-link:nth-child(2) { transition-delay: .16s; }
+      .nav-links.is-open .movement-link:nth-child(3) { transition-delay: .21s; }
+      .nav-links.is-open .movement-link:nth-child(4) { transition-delay: .26s; }
+
+      .movement-number {
+        display: block;
+        align-self: start;
+        padding-top: 8px;
+        color: var(--amber-bright);
+        font-family: var(--serif);
+        font-size: 13px;
+        font-style: italic;
+        line-height: 1;
+      }
+
+      .movement-copy {
+        min-width: 0;
+        display: grid;
+        gap: 3px;
+        transition: transform .32s cubic-bezier(.2,.7,.2,1);
+      }
+
+      .movement-copy small {
+        display: block;
+        color: rgba(255,253,248,.42);
+        font-size: 8px;
+        font-weight: 750;
+        letter-spacing: .16em;
+        line-height: 1.2;
+        text-transform: uppercase;
+      }
+
+      .movement-copy strong {
+        color: inherit;
+        font-family: var(--serif);
+        font-size: clamp(27px, 8.6vw, 38px);
+        font-weight: 400;
+        letter-spacing: -.025em;
+        line-height: 1;
+      }
+
+      .movement-arrow {
+        display: block;
+        color: rgba(255,253,248,.38);
+        font-size: 18px;
+        line-height: 1;
+        text-align: center;
+        transition: color .28s ease, transform .32s cubic-bezier(.2,.7,.2,1);
+      }
+
+      .movement-link.is-active { color: var(--white); }
+      .movement-link.is-active .movement-copy { transform: translateX(5px); }
+      .movement-link.is-active .movement-arrow {
+        color: var(--amber-bright);
+        transform: translate(2px, 2px);
+      }
+
+      .nav-links.is-leaving .movement-link:not(.is-selected) {
+        opacity: 0;
+        transform: translateX(-18px);
+        transition-delay: 0s;
+      }
+
+      .nav-links.is-leaving .movement-link.is-selected {
+        color: var(--amber-bright);
+        transform: translateX(8px);
+        transition-delay: 0s;
+      }
+
+      .menu-page-wipe {
+        position: fixed;
+        z-index: 8;
+        top: var(--header-h);
+        right: 0;
+        bottom: 0;
+        left: 0;
+        display: block;
+        background:
+          linear-gradient(90deg, rgba(214,199,181,.62), transparent 15px),
+          var(--cream);
+        pointer-events: none;
+        transform: translateX(105%);
+        transition: transform .42s cubic-bezier(.76,0,.24,1);
+      }
+
+      .nav-links.is-leaving .menu-page-wipe { transform: translateX(0); }
 
       .hero {
         min-height: 100svh;
@@ -1849,6 +2048,9 @@
 
       .button-row {
         display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
       }
 
       .hero-copy .button {
@@ -1865,35 +2067,43 @@
         letter-spacing: .02em;
       }
 
-      .section { padding: 74px 0; }
-      .section-kicker { margin-bottom: 20px; }
-      .display-title { font-size: clamp(46px, 14vw, 67px); }
+      .hero-instagram {
+        flex: 0 0 auto;
+        margin-left: auto;
+        color: var(--amber-bright) !important;
+      }
+
+      .section { padding: 58px 0; }
+      .section-kicker { margin-bottom: 13px; }
+      .display-title { font-size: clamp(42px, 12.5vw, 58px); line-height: .98; }
 
       .concerts-head {
         grid-template-columns: 1fr;
-        gap: 22px;
-        margin-bottom: 40px;
+        gap: 10px;
+        margin-bottom: 24px;
       }
 
       .concerts-intro {
         justify-self: start;
-        max-width: 330px;
-        font-size: 18px;
+        max-width: 310px;
+        font-size: 15px;
+        line-height: 1.5;
       }
 
       .concerts-preview-note { margin-top: -18px; }
 
       .concert-card {
-        grid-template-columns: 70px minmax(0, 1fr);
-        gap: 18px;
+        grid-template-columns: 62px minmax(0, 1fr);
+        gap: 15px;
         align-items: start;
-        padding: 25px 0;
+        padding: 21px 0 6px;
       }
 
-      .concert-day { font-size: 46px; }
+      .concert-day { font-size: 40px; }
       .concert-date { gap: 3px 7px; }
-      .concert-title { font-size: 25px; }
-      .concert-card > :last-child { grid-column: 2; width: 100%; }
+      .concert-title { font-size: 22px; line-height: 1.08; }
+      .concert-description { font-size: 13px; line-height: 1.55; }
+      .concert-card > :last-child { grid-column: 1 / -1; width: 100%; margin-top: 8px; }
       .concert-actions { gap: 9px; }
       .concert-action { width: 100%; min-height: 48px; }
       .concert-reminder { min-height: 54px; font-size: 14px; }
@@ -1911,8 +2121,8 @@
       }
 
       .about-copy .lead {
-        margin-bottom: 26px;
-        font-size: 27px;
+        margin-bottom: 18px;
+        font-size: 24px;
         line-height: 1.25;
       }
 
@@ -1922,32 +2132,57 @@
       }
 
       .about-copy .signature {
-        margin-bottom: 38px;
-        font-size: 25px;
+        margin-bottom: 0;
+        font-size: 22px;
         line-height: 1.3;
       }
 
-      .about-meta { margin-top: 38px; }
+      .about-details {
+        margin-top: 28px;
+        border-top: 1px solid var(--line-light);
+        border-bottom: 1px solid var(--line-light);
+      }
+
+      .about-details > summary {
+        min-height: 58px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        color: var(--ink);
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: .025em;
+        list-style: none;
+      }
+
+      .about-details > summary::-webkit-details-marker { display: none; }
+      .about-details-body { padding: 4px 0 22px; }
+      .about-details-body .story-label { margin-top: 4px; }
+
+      .about-meta { margin-top: 28px; }
       .about-meta { grid-template-columns: 1fr; }
       .meta-card { min-height: auto; }
 
       .highlights-head { grid-template-columns: 1fr; }
-      .highlights-note { justify-self: start; }
+      .highlights-head { gap: 13px; margin-bottom: 30px; }
+      .highlights-note { justify-self: start; font-size: 16px; line-height: 1.5; }
 
       .timeline-item {
         min-height: auto;
-        grid-template-columns: 78px 1fr;
-        gap: 8px 16px;
-        padding: 22px 0;
+        grid-template-columns: 64px 1fr;
+        gap: 5px 13px;
+        padding: 16px 0;
       }
 
-      .timeline-year { font-size: 35px; }
-      .timeline-item h3 { font-size: 24px; }
-      .timeline-item p { grid-column: 2; justify-self: start; font-size: 13px; line-height: 1.6; }
+      .timeline-year { font-size: 29px; }
+      .timeline-item h3 { font-size: 21px; }
+      .timeline-item p { grid-column: 2; justify-self: start; font-size: 12px; line-height: 1.5; }
 
-      .performances-head { display: block; }
-      .performances-head .text-link { margin-top: 28px; }
-      .video-grid { grid-template-columns: minmax(0, 1fr); gap: 34px; }
+      .performances-head { display: flex; align-items: end; }
+      .performances-head .text-link { margin: 0 0 5px; }
+      .video-grid { grid-template-columns: minmax(0, 1fr); gap: 13px; }
       .video-card, .video-card:first-child, .video-card:last-child { grid-column: 1; }
       .video-card {
         overflow: hidden;
@@ -1959,19 +2194,46 @@
       .video-caption { padding: 17px 16px 19px; border-bottom: 0; }
       .play { width: 58px; height: 58px; }
 
+      .video-card:not(:first-child) {
+        display: grid;
+        grid-template-columns: 116px minmax(0, 1fr);
+        align-items: stretch;
+      }
+
+      .video-card:not(:first-child) .video-trigger {
+        height: 100%;
+        min-height: 106px;
+        aspect-ratio: auto;
+      }
+
+      .video-card:not(:first-child) .video-caption {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 13px 14px;
+      }
+
+      .video-card:not(:first-child) .video-caption span { margin-bottom: 5px; font-size: 8px; }
+      .video-card:not(:first-child) .video-caption h3 { font-size: 16px; line-height: 1.25; }
+      .video-card:not(:first-child) .play { width: 42px; height: 42px; font-size: 13px; }
+
       .cv-band-inner { grid-template-columns: 1fr; }
-      .cv-band { padding: 58px 0; }
+      .cv-band { padding: 44px 0; }
+      .cv-band h2 { font-size: 34px; }
+      .cv-band p { font-size: 14px; line-height: 1.5; }
       .cv-band .button { width: 100%; justify-self: stretch; }
 
-      .letters-grid { grid-template-columns: 1fr; gap: 42px; }
+      .letters-grid { grid-template-columns: 1fr; gap: 24px; }
       .letters::before,
       .letters::after { left: 25%; }
       .letters-copy { max-width: none; }
-      .letters-title { font-size: clamp(50px, 15vw, 75px); }
+      .letters-title { font-size: clamp(44px, 13vw, 60px); }
+      .letters-copy { padding-top: 18px; }
+      .letters-copy p { margin-bottom: 18px; font-size: 17px; line-height: 1.45; }
 
       .subscribe-sheet { width: 100%; max-height: calc(100dvh - 10px); }
 
-      .contact-title { font-size: clamp(50px, 15vw, 78px); }
+      .contact-title { font-size: clamp(44px, 13vw, 62px); }
 
       .contact-aside { max-width: none; }
 
@@ -2009,11 +2271,31 @@
       .social-links a { min-height: 44px; display: inline-flex; align-items: center; }
 
       .footer-inner {
-        min-height: 210px;
+        min-height: 0;
         flex-direction: column;
-        justify-content: center;
-        padding-bottom: calc(28px + env(safe-area-inset-bottom));
+        justify-content: flex-start;
+        gap: 8px;
+        padding: 31px 0 calc(30px + env(safe-area-inset-bottom));
         text-align: center;
+      }
+
+      .footer-inner a {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 18px;
+        border: 1px solid rgba(255,253,248,.16);
+        border-radius: 999px;
+      }
+
+      .footer-thanks { margin-top: 8px; }
+
+      .footer-copyright {
+        width: 100%;
+        margin-top: 16px;
+        padding-top: 22px;
+        border-top: 1px solid rgba(255,253,248,.1);
       }
     }
 
@@ -2021,7 +2303,7 @@
       .hero { min-height: 100svh; }
       .hero-inner { padding-top: max(48svh, 320px); padding-bottom: 36px; }
       .hero-lead { max-width: 330px; }
-      .timeline-item { grid-template-columns: 72px 1fr; }
+      .timeline-item { grid-template-columns: 60px 1fr; }
     }
 
     @media (max-width: 360px) {
@@ -2029,7 +2311,7 @@
       .brand-name { font-size: 8px; letter-spacing: .1em; }
       h1 { font-size: 52px; }
       .hero-lead { font-size: 15px; }
-      .timeline-item { grid-template-columns: 66px 1fr; }
+      .timeline-item { grid-template-columns: 56px 1fr; }
     }
 
     @media (max-width: 430px) and (max-height: 650px) {
@@ -2055,6 +2337,13 @@
 
       .hero-copy .button { min-height: 44px; }
       .next-concert-teaser { min-height: 56px; padding-top: 6px; padding-bottom: 6px; }
+      .nav-links { padding-top: 13px; }
+      .menu-program-head { margin-bottom: 12px; }
+      .menu-program-title { font-size: 31px; }
+      .menu-program-note { margin-top: 5px; }
+      .nav-links .movement-link { min-height: 69px; padding: 7px 1px; }
+      .movement-copy strong { font-size: 25px; }
+      .movement-number { padding-top: 6px; }
     }
 
     @media (orientation: landscape) and (max-height: 600px) and (min-width: 761px) {
@@ -2082,6 +2371,9 @@
       html:not(.force-motion) .subscribe-sheet { transition: none; }
       html:not(.force-motion) .subscribe-sheet.is-sent .subscribe-string,
       html:not(.force-motion) .subscribe-success-mark { animation: none; }
+      html:not(.force-motion) .menu-program-ghost { animation: none; }
+      html:not(.force-motion) .menu-page-wipe,
+      html:not(.force-motion) .movement-link { transition-duration: .01ms; }
       html:not(.force-motion) .hero-strings { display: none; }
       html:not(.force-motion) .reveal {
         opacity: 0;
@@ -2110,11 +2402,40 @@
       </button>
 
       <nav class="nav-links" id="primaryNav" aria-label="Primary navigation">
-        <a href="#concerts" data-concert-nav hidden>Concerts</a>
-        <a href="#about">About me</a>
-        <a href="#highlights">Highlights</a>
-        <a href="#performances">Listen</a>
-        <a class="nav-cta" href="#contact">Contact</a>
+        <section class="menu-program" aria-labelledby="menuProgramTitle">
+          <div class="menu-program-head">
+            <p class="menu-program-kicker">Programme</p>
+            <h2 class="menu-program-title" id="menuProgramTitle">Four movements.</h2>
+            <p class="menu-program-note">Choose where to begin.</p>
+          </div>
+
+          <span class="menu-program-ghost" id="menuProgramGhost" aria-hidden="true">I</span>
+
+          <div class="movement-list">
+            <a class="movement-link is-active" data-movement="I" href="#concerts">
+              <span class="movement-number">I</span>
+              <span class="movement-copy"><small>Live calendar</small><strong>Concerts</strong></span>
+              <span class="movement-arrow" aria-hidden="true">↘</span>
+            </a>
+            <a class="movement-link" data-movement="II" href="#socials">
+              <span class="movement-number">II</span>
+              <span class="movement-copy"><small>Follow along</small><strong>Social networks</strong></span>
+              <span class="movement-arrow" aria-hidden="true">↘</span>
+            </a>
+            <a class="movement-link" data-movement="III" href="#performances">
+              <span class="movement-number">III</span>
+              <span class="movement-copy"><small>Selected performances</small><strong>Listen</strong></span>
+              <span class="movement-arrow" aria-hidden="true">↘</span>
+            </a>
+            <a class="movement-link" data-movement="IV" href="#about">
+              <span class="movement-number">IV</span>
+              <span class="movement-copy"><small>Biography &amp; curriculum</small><strong>About &amp; CV</strong></span>
+              <span class="movement-arrow" aria-hidden="true">↘</span>
+            </a>
+          </div>
+
+          <span class="menu-page-wipe" aria-hidden="true"></span>
+        </section>
       </nav>
     </div>
   </header>
@@ -2145,6 +2466,7 @@
           </a>
           <div class="button-row">
             <a class="button button-primary" href="#about"><span>A little about me</span> <span class="button-arrow" aria-hidden="true">↓</span></a>
+            <a class="button button-ghost hero-instagram" href="https://www.instagram.com/sergeiviolin/" target="_blank" rel="noopener noreferrer">Instagram <span aria-hidden="true">↗</span></a>
           </div>
         </div>
       </div>
@@ -2154,10 +2476,10 @@
       <div class="section-shell">
         <div class="concerts-head">
           <div class="reveal">
-            <p class="section-kicker">Upcoming concerts</p>
-            <h2 class="display-title" id="concerts-title">Let’s meet<br>in music.</h2>
+            <p class="section-kicker">Live calendar</p>
+            <h2 class="display-title" id="concerts-title">Upcoming concerts.</h2>
           </div>
-          <p class="concerts-intro reveal">I would be very happy to see you at one of my next performances.</p>
+          <p class="concerts-intro reveal">Dates, details and reminders — all in one place.</p>
         </div>
         <p class="concerts-preview-note" id="concertsPreviewNote" hidden>Preview only — add a real date to concerts.json to publish this section.</p>
         <div class="concert-list" id="concertList" aria-live="polite"></div>
@@ -2175,20 +2497,25 @@
           <p>I look forward to connecting with you at my concerts.</p>
           <p class="signature">— Sergei Mkrtichian</p>
 
-          <p class="story-label">A little about me</p>
-          <p>I’m a concert violinist, and my playing brings together virtuosity, clarity and emotional directness. My musical path has taken me to the Conservatorio della Svizzera Italiana with Pavel Berman and Accademia Stauffer with Salvatore Accardo, following my studies at the Academic Music College of the Moscow State Conservatory and guidance from Suren Haknazarian.</p>
-          <p>I’ve been fortunate to perform in major halls across Europe, including the Grand Hall of the Moscow Conservatory, the Tchaikovsky Concert Hall, the State Kremlin Palace, Villa Bernasconi in Como and the Concert House in Vienna.</p>
+          <details class="about-details" id="aboutDetails" open>
+            <summary>My story and background <span class="about-details-icon" aria-hidden="true">+</span></summary>
+            <div class="about-details-body">
+              <p class="story-label">A little about me</p>
+              <p>I’m a concert violinist, and my playing brings together virtuosity, clarity and emotional directness. My musical path has taken me to the Conservatorio della Svizzera Italiana with Pavel Berman and Accademia Stauffer with Salvatore Accardo, following my studies at the Academic Music College of the Moscow State Conservatory and guidance from Suren Haknazarian.</p>
+              <p>I’ve been fortunate to perform in major halls across Europe, including the Grand Hall of the Moscow Conservatory, the Tchaikovsky Concert Hall, the State Kremlin Palace, Villa Bernasconi in Como and the Concert House in Vienna.</p>
 
-          <div class="about-meta" aria-label="Education and artistic guidance">
-            <div class="meta-card">
-              <span>Studies</span>
-              <p>Conservatorio della Svizzera Italiana<br>Accademia Stauffer</p>
+              <div class="about-meta" aria-label="Education and artistic guidance">
+                <div class="meta-card">
+                  <span>Studies</span>
+                  <p>Conservatorio della Svizzera Italiana<br>Accademia Stauffer</p>
+                </div>
+                <div class="meta-card">
+                  <span>Professors</span>
+                  <p>Pavel Berman<br>Salvatore Accardo<br>Suren Haknazarian</p>
+                </div>
+              </div>
             </div>
-            <div class="meta-card">
-              <span>Professors</span>
-              <p>Pavel Berman<br>Salvatore Accardo<br>Suren Haknazarian</p>
-            </div>
-          </div>
+          </details>
         </div>
       </div>
     </section>
@@ -2198,7 +2525,7 @@
         <div class="highlights-head">
           <div class="reveal">
             <p class="section-kicker">Selected distinctions</p>
-            <h2 class="display-title" id="highlights-title">Milestones.</h2>
+            <h2 class="display-title" id="highlights-title">Selected awards.</h2>
           </div>
           <p class="highlights-note reveal">Each of these moments is part of my journey — and a reason to keep listening, learning and growing.</p>
         </div>
@@ -2233,7 +2560,7 @@
         <div class="performances-head reveal">
           <div>
             <p class="section-kicker">Listen &amp; watch</p>
-            <h2 class="display-title" id="performances-title">Performances.</h2>
+            <h2 class="display-title" id="performances-title">Listen.</h2>
           </div>
           <a class="text-link" href="https://www.youtube.com/@sergeiviolin" target="_blank" rel="noopener noreferrer">YouTube channel <span aria-hidden="true">↗</span></a>
         </div>
@@ -2288,11 +2615,11 @@
     <section class="section letters" id="letters" aria-labelledby="letters-title">
       <div class="section-shell letters-grid">
         <div class="reveal">
-          <p class="section-kicker">Concert updates</p>
-          <h2 class="letters-title" id="letters-title">Never miss<br>the <em>music.</em></h2>
+          <p class="section-kicker">Stay in touch</p>
+          <h2 class="letters-title" id="letters-title">Concert<br><em>reminders.</em></h2>
         </div>
         <div class="letters-copy reveal">
-          <p>Leave your email and I’ll let you know when a new concert is coming up.</p>
+          <p>One quiet email when a new concert is announced.</p>
           <button class="button letters-button" type="button" data-open-subscribe>Upcoming concert reminders <span aria-hidden="true">→</span></button>
           <span class="letters-promise">Only concert updates. No spam. Unsubscribe anytime.</span>
         </div>
@@ -2308,7 +2635,7 @@
         <div class="contact-aside reveal">
           <p>For concerts, festivals, masterclasses, collaborations — or simply to say hello:</p>
           <a class="email-link" href="mailto:concerts@sergeiviolin.com"><span class="email-action-label">Write to me</span><span>concerts@sergeiviolin.com</span></a>
-          <div class="social-links" aria-label="Social media">
+          <div class="social-links" id="socials" aria-label="Social media">
             <a href="https://www.instagram.com/sergeiviolin/" target="_blank" rel="noopener noreferrer">Instagram ↗</a>
             <a href="https://www.youtube.com/@sergeiviolin" target="_blank" rel="noopener noreferrer">YouTube ↗</a>
             <a href="https://www.facebook.com/profile.php?id=100095484424565" target="_blank" rel="noopener noreferrer">Facebook ↗</a>
@@ -2320,9 +2647,9 @@
 
   <footer>
     <div class="footer-inner">
-      <span>© <span id="year">2026</span> Sergei Mkrtichian</span>
-      <a href="#top">Back to top ↑</a>
-      <span>Thank you for visiting</span>
+      <a class="footer-top-link" href="#top">Back to top ↑</a>
+      <span class="footer-thanks">Thank you for visiting</span>
+      <span class="footer-copyright">© <span id="year">2026</span> Sergei Mkrtichian</span>
     </div>
   </footer>
 
@@ -2339,7 +2666,7 @@
 
       <form class="subscribe-form" id="subscribeForm" novalidate>
         <label class="subscribe-label" for="subscribeEmail">Enter your email address to subscribe<span class="subscribe-required" aria-hidden="true">*</span></label>
-        <input class="subscribe-email" id="subscribeEmail" name="email" type="email" inputmode="email" autocomplete="email" placeholder="Email address" required>
+        <input class="subscribe-email" id="subscribeEmail" name="email" type="email" inputmode="email" autocomplete="email" maxlength="254" placeholder="Email address" required>
         <small class="subscribe-helper">Provide your email address to subscribe. For e.g abc@xyz.com</small>
 
         <div class="subscribe-trap" aria-hidden="true">
@@ -2375,6 +2702,8 @@
     const nav = document.getElementById('primaryNav');
     const heroSection = document.querySelector('.hero');
     const heroImage = document.querySelector('.hero-media img');
+    const movementLinks = [...document.querySelectorAll('[data-movement]')];
+    const menuProgramGhost = document.getElementById('menuProgramGhost');
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
       && !document.documentElement.classList.contains('force-motion');
     const stringsCanvas = document.getElementById('heroStrings');
@@ -2386,6 +2715,8 @@
     let stringsEnergy = 0;
     let stringsLastScroll = window.scrollY;
     let nextPluckIndex = 0;
+    let menuNavigationTimer = null;
+    let menuCleanupTimer = null;
     const stringPluckTimes = [-Infinity, -Infinity, -Infinity, -Infinity];
     const stringPluckStrengths = [0, 0, 0, 0];
     const stringsStart = window.performance.now();
@@ -2553,13 +2884,82 @@
       stringsLastScroll = window.scrollY;
     };
 
-    const closeMenu = () => {
+    const resetMenuTransition = () => {
+      nav.classList.remove('is-leaving');
+      movementLinks.forEach(link => link.classList.remove('is-selected'));
+    };
+
+    const closeMenu = (preserveTransition = false) => {
       toggle.setAttribute('aria-expanded', 'false');
       toggle.setAttribute('aria-label', 'Open navigation');
       nav.classList.remove('is-open');
       header.classList.remove('is-open');
       document.body.classList.remove('menu-open');
+      window.clearTimeout(menuNavigationTimer);
+      if (!preserveTransition) resetMenuTransition();
     };
+
+    const setActiveMovement = link => {
+      if (!link) return;
+      movementLinks.forEach(item => {
+        item.classList.toggle('is-active', item === link);
+        if (item === link) item.setAttribute('aria-current', 'location');
+        else item.removeAttribute('aria-current');
+      });
+
+      if (menuProgramGhost) {
+        menuProgramGhost.classList.remove('is-changing');
+        void menuProgramGhost.offsetWidth;
+        menuProgramGhost.textContent = link.dataset.movement;
+        if (!reduceMotion) menuProgramGhost.classList.add('is-changing');
+      }
+    };
+
+    const currentMovementLink = () => {
+      const marker = Math.min(window.innerHeight * .42, 360);
+      let bestLink = movementLinks[0];
+      let bestDistance = Infinity;
+
+      movementLinks.forEach(link => {
+        const target = document.querySelector(link.getAttribute('href'));
+        if (!target || target.hidden) return;
+        const distance = Math.abs(target.getBoundingClientRect().top - marker);
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          bestLink = link;
+        }
+      });
+
+      return bestLink;
+    };
+
+    movementLinks.forEach((link, index) => {
+      link.addEventListener('pointerenter', () => setActiveMovement(link));
+      link.addEventListener('focus', () => setActiveMovement(link));
+      link.addEventListener('click', event => {
+        if (window.innerWidth > 760) {
+          closeMenu();
+          return;
+        }
+
+        const target = document.querySelector(link.getAttribute('href'));
+        if (!target || target.hidden) return;
+        event.preventDefault();
+        window.clearTimeout(menuNavigationTimer);
+        window.clearTimeout(menuCleanupTimer);
+        setActiveMovement(link);
+        link.classList.add('is-selected');
+        nav.classList.add('is-leaving');
+        pluckString(index, .58);
+
+        menuNavigationTimer = window.setTimeout(() => {
+          target.scrollIntoView({ behavior: 'auto', block: 'start' });
+          window.history.pushState(null, '', link.getAttribute('href'));
+          closeMenu(true);
+          menuCleanupTimer = window.setTimeout(resetMenuTransition, reduceMotion ? 0 : 360);
+        }, reduceMotion ? 0 : 420);
+      });
+    });
 
     toggle.addEventListener('click', () => {
       const open = toggle.getAttribute('aria-expanded') === 'true';
@@ -2568,9 +2968,11 @@
       nav.classList.toggle('is-open', !open);
       header.classList.toggle('is-open', !open);
       document.body.classList.toggle('menu-open', !open);
+      window.clearTimeout(menuCleanupTimer);
+      resetMenuTransition();
+      if (!open) setActiveMovement(currentMovementLink());
     });
 
-    nav.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMenu));
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
         closeMenu();
@@ -2603,13 +3005,16 @@
 
     document.querySelectorAll('.video-trigger').forEach(button => {
       button.addEventListener('click', () => {
-        const id = button.dataset.video;
-        const title = button.getAttribute('aria-label').replace(/^Play /, '');
+        const id = String(button.dataset.video || '').trim();
+        if (!/^[A-Za-z0-9_-]{11}$/.test(id)) return;
+        const title = String(button.getAttribute('aria-label') || 'Performance').replace(/^Play /, '');
         const iframe = document.createElement('iframe');
         iframe.className = 'video-frame';
         iframe.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
         iframe.title = title;
-        iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+        iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
+        iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+        iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation');
         iframe.allowFullscreen = true;
         button.replaceWith(iframe);
         iframe.focus();
@@ -2645,6 +3050,9 @@
       subscriptionEndpoint: '',
       fallbackEmail: 'concerts@sergeiviolin.com'
     };
+    const allowedSubscriptionEndpoints = new Set([
+      'https://sergei-concert-subscribe.blacksirius481.workers.dev'
+    ]);
     let lastSubscribeTrigger = null;
 
     const parseConcertDate = value => {
@@ -2684,7 +3092,9 @@
       if (!raw) return '';
       try {
         const url = new URL(raw, window.location.href);
-        return ['http:', 'https:'].includes(url.protocol) ? url.href : '';
+        if (!['http:', 'https:'].includes(url.protocol)) return '';
+        if (key === 'subscriptionEndpoint' && !allowedSubscriptionEndpoints.has(url.origin)) return '';
+        return url.href;
       } catch {
         return '';
       }
@@ -2756,7 +3166,7 @@
       event.preventDefault();
       const subscriberEmail = subscribeEmail.value.trim();
 
-      if (!subscribeEmail.checkValidity()) {
+      if (subscriberEmail.length > 254 || !subscribeEmail.checkValidity()) {
         subscribeStatus.textContent = 'Please enter a valid email address.';
         subscribeEmail.focus();
         return;
@@ -2779,6 +3189,8 @@
           const response = await fetch(subscriptionEndpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'omit',
+            referrerPolicy: 'no-referrer',
             body: JSON.stringify({
               email: subscriberEmail,
               website: subscribeWebsite.value
@@ -3052,7 +3464,6 @@
         concertsSection.hidden = false;
         concertsPreviewNote.hidden = !previewMode;
         document.documentElement.classList.add('has-concerts');
-        document.querySelectorAll('[data-concert-nav]').forEach(link => { link.hidden = false; });
       })
       .catch(() => {
         concertsSection.hidden = true;
@@ -3066,6 +3477,10 @@
       });
 
     const revealItems = document.querySelectorAll('.reveal');
+    const aboutDetails = document.getElementById('aboutDetails');
+    if (aboutDetails && window.matchMedia('(max-width: 760px)').matches) {
+      aboutDetails.removeAttribute('open');
+    }
     revealItems.forEach(item => {
       const revealSiblings = [...item.parentElement.children].filter(child => child.classList.contains('reveal'));
       const position = revealSiblings.indexOf(item);
