@@ -31,7 +31,7 @@
 
 /* All layers share the photograph's coordinates, including during zoom. */
 .art-window { position: relative; }
-.art-scene { animation: camera-drift 9s ease-in-out infinite alternate; animation-play-state: running; transform-origin: 49.3% 30%; }
+.art-scene { animation: camera-drift 7s -1.1s ease-in-out infinite alternate; animation-play-state: running; transform-origin: 49.3% 30%; -webkit-backface-visibility: hidden; backface-visibility: hidden; }
 .heart-light { left: 31%; top: 1%; width: 37%; height: 53%; mix-blend-mode: normal; background: radial-gradient(ellipse,#fff5d285 0%,#ffd68b6e 20%,#eaa45735 46%,transparent 70%); animation: living-light 4.6s ease-in-out infinite; }
 .reflection-light { left: 29%; top: 48%; width: 41%; height: 44%; mix-blend-mode: normal; background: radial-gradient(ellipse,#fff0b875 0%,#efa54b2c 38%,transparent 70%); animation: living-light 4.6s .45s ease-in-out infinite; }
 .light-wash { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(112deg,transparent 23%,#f8d99d22 42%,#fff0c238 50%,transparent 67%); animation: light-travel 8s ease-in-out infinite; opacity: 0; }
@@ -39,28 +39,32 @@
 .is-entering .art-arrival { animation: photo-open 1.65s cubic-bezier(.16,.65,.18,1) both; }
 .is-entering .heart-light { animation: opening-light 1.65s ease-out both; }
 .is-touched .heart-light { animation: touch-light 1.6s ease-out; }
-.art-scene, .heart-light, .reflection-light, .light-wash, .mote { animation-play-state: paused; }
+/* The photograph animates even if its controller has not loaded yet. Only an
+   explicit offscreen/background state pauses it, never a missing ready class. */
+.art-scene, .heart-light, .reflection-light, .light-wash, .mote { animation-play-state: running; }
+.is-alive .art-scene { will-change: transform; }
 .is-alive .art-scene, .is-alive .heart-light, .is-alive .reflection-light,
 .is-alive .light-wash, .is-alive .mote { animation-play-state: running; }
 .is-dormant .art-scene, .is-dormant .heart-light, .is-dormant .reflection-light,
 .is-dormant .light-wash, .is-dormant .mote { animation-play-state: paused; }
 .image-unavailable .heart-light, .image-unavailable .reflection-light,
 .image-unavailable .light-wash, .image-unavailable .mote { display: none; }
-.motion-toggle { min-height: 44px; padding: 10px 15px; border-color: #fff6dc70; background: #21150dd9; font-size: 11px; }
-@keyframes camera-drift { from { transform: scale(1.01) translate3d(0,0,0); } to { transform: scale(1.12) translate3d(-.7%,1.1%,0); } }
+@keyframes camera-drift { from { transform: translate3d(0,0,0) scale(1.02); } to { transform: translate3d(-.7%,1.1%,0) scale(1.14); } }
 @keyframes living-light { 0%,100% { opacity: .1; } 48% { opacity: .95; } }
 @keyframes light-travel { 0%,100% { opacity: 0; transform: translateX(-45%); } 42% { opacity: .8; } 78% { opacity: 0; transform: translateX(45%); } }
-@keyframes photo-open { from { clip-path: inset(10% 42% 10% 42%); opacity: .5; transform: scale(1.13); } to { clip-path: inset(0); opacity: 1; transform: scale(1); } }
+/* Opacity + transform keep the opening on Safari's compositor: no animated
+   clip-path mask around another continuously transformed layer. */
+@keyframes photo-open { from { opacity: .15; transform: translate3d(0,16px,0) scale(1.06); } to { opacity: 1; transform: translate3d(0,0,0) scale(1); } }
 @keyframes opening-light { 0% { opacity: 1; } 70% { opacity: .75; } 100% { opacity: .1; } }
 @keyframes touch-light { 0%,100% { opacity: .2; } 35% { opacity: 1; } }
 @keyframes soft-arrive { from { opacity: .3; } to { opacity: 1; } }
 @media(max-width:640px) {
   .art-window { aspect-ratio: 1.27; }
   .art-arrival { width: 144%; margin-left: -22%; }
-  .motion-toggle { right: 14px; bottom: 14px; }
+  .art-scene { animation-duration: 6s; }
 }
 
-/* Autoplay uses a slow light effect when the visitor requests reduced movement. */
+/* Explicit gentle/system mode keeps the light, without zoom or travelling layers. */
 html[data-motion="gentle"] { scroll-behavior: auto; }
 html[data-motion="gentle"] .art-scene { animation: none; transform: none; }
 html[data-motion="gentle"] .light-wash, html[data-motion="gentle"] .mote { display: none; }
