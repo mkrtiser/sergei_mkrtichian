@@ -1,0 +1,102 @@
+/* A quieter, mobile-first front page. The portrait and personal copy stay intact. */
+.home-shortcuts { background: var(--paper); color: var(--ink); border-bottom: 1px solid var(--line-light); }
+.home-shortcuts .section-shell { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.home-shortcuts a { min-height: 84px; display: flex; align-items: center; gap: 14px; padding: 16px 22px; text-decoration: none; font-size: 14px; transition: background .2s; }
+.home-shortcuts a + a { border-left: 1px solid var(--line-light); }
+.home-shortcuts a > span:first-child { font-size: 10px; color: var(--amber); }
+.home-shortcuts a > span:last-child { margin-left: auto; color: var(--amber); }
+.home-shortcuts a:hover { background: var(--paper-deep); }
+.concerts { background: var(--paper); }
+.concerts::before, .concerts::after { display: none; }
+.concerts-head { margin-bottom: 36px; }
+.concerts-intro { max-width: 350px; }
+.concert-list { border-top: 0; }
+.concert-card-featured { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0; padding: 0; overflow: hidden; border: 1px solid var(--line-light); border-radius: 20px; background: var(--white); }
+.concert-artwork { display: block; position: relative; min-height: 100%; overflow: hidden; background: #352115; }
+.concert-artwork img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 49% center; transition: transform 1s cubic-bezier(.2,.7,.2,1); }
+.concert-artwork:hover img { transform: scale(1.035); }
+.concert-card-featured > .concert-card-content { grid-column: auto; width: auto; margin: 0; padding: clamp(26px, 3.5vw, 48px); display: grid; gap: 25px; }
+.concert-card-featured .concert-date { display: flex; align-items: baseline; gap: 8px; width: auto; }
+.concert-card-featured .concert-day { font-size: 42px; }
+.concert-card-featured .concert-place { color: #8b5435; letter-spacing: .1em; line-height: 1.5; }
+.concert-card-featured .concert-title { font-size: clamp(30px, 3vw, 42px); line-height: 1.07; text-wrap: balance; }
+.concert-card-featured .concert-meta { color: var(--ink); font-size: 13px; margin: 14px 0 10px; }
+.concert-card-featured .concert-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 22px; min-width: 0; }
+.concert-card-featured .concert-action { width: auto; min-height: 50px; padding-inline: 24px; font-size: 13px; }
+.concert-card-featured .concert-calendar { margin: 0; }
+.concert-archive-link { margin: 18px 0 8px; }
+.concert-invitation { display: flex; gap: 20px; justify-content: space-between; align-items: center; margin-top: 24px; padding-top: 26px; border-top: 1px solid var(--line-light); }
+.concert-invitation p { margin: 0; font-family: var(--serif); font-size: 25px; }
+.concert-invitation p span { display: block; margin-top: 5px; color: var(--muted-dark); font-family: var(--sans); font-size: 13px; line-height: 1.5; }
+.concert-invitation button { display: flex; justify-content: space-between; align-items: center; gap: 25px; min-height: 48px; padding: 0 0 3px; border: 0; border-bottom: 1px solid var(--ink); background: none; color: var(--ink); font: inherit; font-size: 13px; cursor: pointer; }
+.concert-invitation button span { color: var(--amber); }
+.socials { scroll-margin-top: 12px; }
+.social-network-list { gap: 0; border-top: 1px solid var(--line-light); }
+.social-network-list a { min-height: 104px; border: 0; border-bottom: 1px solid var(--line-light); border-radius: 0; padding: 20px 0; box-shadow: none; background: none; }
+.social-network-list a:hover { background: none; box-shadow: none; transform: none; }
+.social-network-icon { border: 0; background: none; color: var(--amber); }
+.social-network-name { font-size: 32px; }
+.social-network-note { font-size: 11px; font-weight: 400; letter-spacing: 0; }
+.social-network-arrow { border: 0; background: none; color: var(--ink); }
+.social-network-list a:hover .social-network-icon { background: none; color: var(--amber); transform: none; }
+.social-network-list a:hover .social-network-arrow { background: none; color: var(--amber); }
+.reveal.is-visible { transform: none; }
+.subscribe-sheet { outline: none; }
+.subscribe-label { font-size: 11px; letter-spacing: .045em; line-height: 1.5; }
+.subscribe-email { min-height: 52px; border-radius: 10px; }
+.subscribe-email[aria-invalid="true"] { border-color: #a44028; }
+.subscribe-helper { font-size: 11px; }
+.subscribe-choice small { font-size: 11px; }
+.subscribe-status { font-size: 12px; line-height: 1.5; text-align: left; }
+.subscribe-status:empty { display: none; }
+.subscribe-choice { margin-bottom: 4px; }
+@media (max-width: 900px) {
+  .home-shortcuts a { padding-inline: 12px; gap: 8px; font-size: 12px; }
+  .concert-card-featured { grid-template-columns: minmax(0, .9fr) minmax(0, 1fr); }
+}
+@media (max-width: 760px) {
+  .home-shortcuts .section-shell { grid-template-columns: repeat(2, minmax(0, 1fr)); padding-block: 10px; }
+  .home-shortcuts a { min-height: 56px; padding: 8px 8px; font-size: 12px; gap: 8px; }
+  .home-shortcuts a + a { border-left: 0; }
+  .home-shortcuts a:nth-child(even) { border-left: 1px solid var(--line-light); padding-left: 15px; }
+  .home-shortcuts a:nth-child(n+3) { border-top: 1px solid var(--line-light); }
+  .home-shortcuts a > span:first-child { font-size: 9px; }
+  .concerts .display-title { font-size: clamp(42px, 12vw, 56px); max-width: 340px; }
+  .concerts-head { gap: 16px; margin-bottom: 26px; }
+  .concerts-intro { max-width: 320px; font-size: 17px; }
+  .concert-card-featured { grid-template-columns: minmax(0, 1fr); border-radius: 16px; }
+  .concert-artwork { min-height: 0; aspect-ratio: 1.75; }
+  .concert-card-featured > .concert-card-content { padding: 23px 20px 17px; gap: 19px; }
+  .concert-card-featured .concert-place { margin-top: 0; font-size: 9px; }
+  .concert-card-featured .concert-title { font-size: 31px; margin: 0; }
+  .concert-card-featured .concert-meta { line-height: 1.6; }
+  .concert-card-featured .concert-actions { display: grid; gap: 5px; }
+  .concert-card-featured .concert-action { width: 100%; }
+  .concert-card-featured .concert-calendar { justify-self: center; min-height: 44px; }
+  .concert-invitation { display: grid; gap: 16px; margin-top: 12px; padding-top: 24px; }
+  .concert-invitation button { justify-self: start; min-width: 170px; }
+  .about-copy .lead { font-size: 23px; line-height: 1.4; }
+  .socials-grid { gap: 28px; }
+  .social-network-list a { min-height: 88px; padding: 16px 0; grid-template-columns: 32px minmax(0, 1fr) 32px; }
+  .social-network-icon { width: 30px; }
+  .social-network-name { font-size: 29px; }
+  .social-network-note { font-size: 10px; line-height: 1.5; }
+  .subscribe-sheet { padding: 14px 20px calc(20px + env(safe-area-inset-bottom)); }
+  .subscribe-handle { margin-bottom: 14px; }
+  .subscribe-title { font-size: clamp(32px, 9.3vw, 39px); line-height: 1.05; }
+  .subscribe-intro { margin-bottom: 18px; }
+  .subscribe-form { gap: 9px; }
+  .subscribe-kicker { margin-top: 32px; font-size: 9px; letter-spacing: .1em; }
+  .subscribe-string { top: 50px; }
+  .subscribe-choice { padding: 11px; }
+  .subscribe-close { width: 44px; height: 44px; }
+}
+@media (max-width: 359px) {
+  .home-shortcuts a { gap: 6px; font-size: 11px; }
+  .home-shortcuts a:nth-child(even) { padding-left: 9px; }
+  .concert-card-featured > .concert-card-content { padding-inline: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-shortcuts a, .concert-artwork img { transition: none; }
+  .concert-artwork:hover img { transform: none; }
+}

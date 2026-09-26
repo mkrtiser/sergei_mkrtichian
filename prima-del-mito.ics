@@ -1,0 +1,17 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Sergei Mkrtichian//Prima del mito//IT
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:prima-del-mito-2026-10-30@sergeiviolin.com
+DTSTAMP:20260925T000000Z
+DTSTART:20261030T180000Z
+SUMMARY:1720–1820: Prima del mito — Sergei Mkrtichian
+LOCATION:Basilica del Sacro Cuore\, Via Giuseppe Buffi 2\, Lugano
+DESCRIPTION:Violino solo. Bach\, Telemann\, Locatelli\, Paganini.
+ \nIngresso libero. Ore 19:00 (Lugano).
+URL:https://sergeiviolin.com/prima-del-mito.html
+STATUS:CONFIRMED
+END:VEVENT
+END:VCALENDAR

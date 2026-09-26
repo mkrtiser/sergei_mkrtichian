@@ -6,6 +6,35 @@
   },
   "concerts": [
     {
+      "id": "prima-del-mito-2026-10-30",
+      "kind": "hosted",
+      "date": "2026-10-30",
+      "time": "19:00",
+      "city": "Lugano",
+      "country": "Switzerland",
+      "venue": "Basilica del Sacro Cuore",
+      "address": "Via Giuseppe Buffi 2, Lugano",
+      "title": "1720–1820: Prima del mito",
+      "description": "One violin. A hundred years of history. A solo recital with music by Bach, Telemann, Locatelli and Paganini.",
+      "programme": [
+        "J. S. Bach — Sonata n. 1 in sol minore, BWV 1001",
+        "G. P. Telemann — Fantasia n. 5 in la maggiore, TWV 40:18",
+        "P. A. Locatelli — Capriccio n. 23, Il Laberinto armonico",
+        "N. Paganini — Capriccio n. 1, Op. 1",
+        "N. Paganini — Capriccio n. 24, Op. 1"
+      ],
+      "admission": "Free entrance",
+      "admissionShort": "Free entrance",
+      "pageUrl": "prima-del-mito.html",
+      "image": "prima-del-mito-bridge-800.webp",
+      "imageAlt": "A heart of light in the bridge of a violin — Prima del mito",
+      "calendarUrl": "prima-del-mito.ics",
+      "actionLabel": "Discover the concert →",
+      "reminderEnabled": false,
+      "status": "upcoming",
+      "published": true
+    },
+    {
       "id": "ticino-docg-mendrisio-2026-09-16",
       "kind": "external",
       "date": "2026-09-16",
@@ -18,14 +47,14 @@
       "organizer": "Associazione Musica nel Mendrisiotto",
       "admission": "Free entrance",
       "admissionShort": "Free entrance",
-      "reminderEnabled": true,
+      "reminderEnabled": false,
       "reminderLabel": "Upcoming concert reminders",
       "reminderFormUrl": "",
       "reminderEmail": "concerts@sergeiviolin.com",
       "durationMinutes": 120,
       "actionLabel": "Official event page ↗",
       "externalUrl": "https://mendrisio.ch/home/vivere-e-visitare/eventi/agenda-della-citta/2026/settembre/2026-09-16-Concerto-sinfonico.html",
-      "status": "upcoming",
+      "status": "archived",
       "published": true
     }
   ],

@@ -235,6 +235,7 @@
     };
 
     const safeUrl = value => {
+      if (typeof value !== 'string' || !value.trim()) return null;
       try {
         const url = new URL(String(value), window.location.href);
         return ['http:', 'https:'].includes(url.protocol) ? url : null;
@@ -299,6 +300,12 @@
         const concert = concerts.find(item => item && String(item.id) === String(eventId));
         if (!concert || concert.kind !== 'hosted' || (concert.published === false && !previewMode)) {
           showError();
+          return;
+        }
+        const dedicatedPage = safeUrl(concert.pageUrl);
+        if (dedicatedPage && dedicatedPage.origin === window.location.origin
+            && dedicatedPage.pathname.endsWith('.html') && dedicatedPage.pathname !== window.location.pathname) {
+          window.location.replace(dedicatedPage.href);
           return;
         }
         renderConcert(concert);

@@ -53,6 +53,9 @@
     if (new URLSearchParams(window.location.search).get('motion') === 'system') {
       document.documentElement.classList.remove('force-motion');
     }
+    if (['#concerts', '#letters', '#socials', '#curriculum', '#performances', '#about'].includes(window.location.hash)) {
+      document.documentElement.classList.add('skip-intro');
+    }
     window.setTimeout(() => {
       const root = document.documentElement;
       if (!root.classList.contains('hero-loading')) return;
@@ -62,6 +65,12 @@
   </script>
 
   <style>
+    @view-transition { navigation: auto; }
+    ::view-transition-old(root) { animation: concert-page-out .35s ease both; }
+    ::view-transition-new(root) { animation: concert-page-in .55s ease both; }
+    @keyframes concert-page-out { to { opacity: 0; } }
+    @keyframes concert-page-in { from { opacity: 0; } to { opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) { @view-transition { navigation: none; } }
     :root {
       --ink: #110e0c;
       --ink-soft: #1c1713;
@@ -251,6 +260,9 @@
     .intro-strings span:nth-child(4) { animation-delay: -.81s; }
 
     html.hero-ready .site-intro { visibility: hidden; }
+    html.skip-intro .site-intro { display: none; }
+    html.skip-intro .brand,
+    html.skip-intro .menu-toggle { opacity: 1; transform: none; animation: none !important; }
     html.hero-ready .intro-panel-top { transform: translateY(-102%); }
     html.hero-ready .intro-panel-bottom { transform: translateY(102%); }
     html.hero-ready .intro-lockup { opacity: 0; transform: scale(.94); }
@@ -762,6 +774,19 @@
     }
 
     .concert-list { border-top: 1px solid var(--line-light); }
+
+    .concert-archive-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 20px;
+      min-height: 48px;
+      margin-top: 18px;
+      color: var(--muted-dark);
+      font-size: 12px;
+      text-decoration: underline;
+      text-underline-offset: 5px;
+    }
+    .concert-empty { padding: 25px 0; color: var(--muted-dark); font-size: 15px; }
 
     .concert-card {
       display: grid;
@@ -2691,6 +2716,7 @@
       html:not(.force-motion) .video-card.reveal { clip-path: none; }
     }
   </style>
+  <link rel="stylesheet" href="home-refinements.css?v=20260926-2">
 </head>
 
 <body>
@@ -2794,6 +2820,15 @@
       </div>
     </section>
 
+    <nav class="home-shortcuts" aria-label="Explore the website">
+      <div class="section-shell">
+        <a href="#concerts"><span aria-hidden="true">01</span> Concerts <span aria-hidden="true">↘</span></a>
+        <a href="#performances"><span aria-hidden="true">02</span> Listen <span aria-hidden="true">↘</span></a>
+        <a href="#socials"><span aria-hidden="true">03</span> Social networks <span aria-hidden="true">↘</span></a>
+        <a href="#curriculum"><span aria-hidden="true">04</span> Curriculum vitae <span aria-hidden="true">↘</span></a>
+      </div>
+    </nav>
+
     <section class="section concerts" id="concerts" aria-labelledby="concerts-title" hidden>
       <div class="section-shell">
         <div class="concerts-head">
@@ -2801,10 +2836,17 @@
             <p class="section-kicker">Live calendar</p>
             <h2 class="display-title" id="concerts-title">Upcoming concerts.</h2>
           </div>
-          <p class="concerts-intro reveal">Dates, details and reminders — all in one place.</p>
+          <p class="concerts-intro reveal">There’s nothing quite like sharing music in person. I’d love to see you there.</p>
         </div>
         <p class="concerts-preview-note" id="concertsPreviewNote" hidden>Preview only — add a real date to concerts.json to publish this section.</p>
         <div class="concert-list" id="concertList" aria-live="polite"></div>
+        <p class="concert-empty" id="concertEmpty" hidden>New dates are on their way. <a href="#letters">Stay in touch for the next concert.</a></p>
+        <a class="concert-archive-link" href="concerts-archive.html">Past concerts <span aria-hidden="true">↗</span></a>
+        <div class="concert-invitation">
+          <p>Can’t make this one?<span>I’ll let you know about the next concert.</span></p>
+          <button type="button" data-open-subscribe>Keep me posted <span aria-hidden="true">↗</span></button>
+        </div>
+        <noscript><p><a href="prima-del-mito.html">30 October 2026 · Prima del mito · Lugano · Free entrance →</a></p></noscript>
       </div>
     </section>
 
@@ -3022,7 +3064,7 @@
 
   <div class="subscribe-layer" id="subscribeLayer" hidden>
     <button class="subscribe-backdrop" type="button" data-close-subscribe aria-label="Close subscription form"></button>
-    <section class="subscribe-sheet" id="subscribeSheet" role="dialog" aria-modal="true" aria-labelledby="subscribeTitle">
+    <section class="subscribe-sheet" id="subscribeSheet" role="dialog" aria-modal="true" aria-labelledby="subscribeTitle" tabindex="-1">
       <div class="subscribe-handle" aria-hidden="true"></div>
       <span class="subscribe-string" aria-hidden="true"></span>
       <button class="subscribe-close" type="button" data-close-subscribe aria-label="Close">×</button>
@@ -3032,8 +3074,10 @@
       <p class="subscribe-event" id="subscribeEvent"></p>
 
       <form class="subscribe-form" id="subscribeForm" novalidate>
+        <label class="subscribe-label" for="subscribeName">Your first name<span class="subscribe-required" aria-hidden="true">*</span></label>
+        <input class="subscribe-email" id="subscribeName" name="firstName" type="text" autocomplete="given-name" autocapitalize="words" maxlength="80" placeholder="First name" aria-describedby="subscribeStatus" required>
         <label class="subscribe-label" for="subscribeEmail">Enter your email address to subscribe<span class="subscribe-required" aria-hidden="true">*</span></label>
-        <input class="subscribe-email" id="subscribeEmail" name="email" type="email" inputmode="email" autocomplete="email" maxlength="254" placeholder="Email address" required>
+        <input class="subscribe-email" id="subscribeEmail" name="email" type="email" inputmode="email" autocomplete="email" maxlength="254" placeholder="Email address" aria-describedby="subscribeStatus" required>
         <small class="subscribe-helper">Provide your email address to subscribe. For e.g abc@xyz.com</small>
 
         <div class="subscribe-trap" aria-hidden="true">
@@ -3063,6 +3107,7 @@
     </section>
   </div>
 
+  <script src="concert-data.js"></script>
   <script>
     const header = document.getElementById('siteHeader');
     const toggle = document.querySelector('.menu-toggle');
@@ -3442,6 +3487,7 @@
     const subscribeIntro = document.getElementById('subscribeIntro');
     const subscribeEvent = document.getElementById('subscribeEvent');
     const subscribeForm = document.getElementById('subscribeForm');
+    const subscribeName = document.getElementById('subscribeName');
     const subscribeEmail = document.getElementById('subscribeEmail');
     const subscribeWebsite = document.getElementById('subscribeWebsite');
     const subscribeConsent = document.getElementById('subscribeConsent');
@@ -3458,6 +3504,10 @@
       'https://sergei-concert-subscribe.blacksirius481.workers.dev'
     ]);
     let lastSubscribeTrigger = null;
+    let subscriptionRequestId = 0;
+    let subscriptionAbortController = null;
+    let subscriptionCloseTimer = null;
+    const subscriptionBackground = [...document.querySelectorAll('body > header, body > main, body > footer')];
 
     const parseConcertDate = value => {
       const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(value || ''));
@@ -3487,6 +3537,9 @@
         : 'Next concert';
       nextConcertPlace.textContent = place;
       nextConcertTitle.textContent = title;
+      if (concert.kind === 'hosted' && concert.pageUrl) {
+        nextConcertTeaser.href = ConcertData.detailUrl(concert, window.location.href);
+      }
       nextConcertTeaser.setAttribute('aria-label', `Next concert: ${title}, ${place}, ${dateLabel}`);
       nextConcertTeaser.hidden = false;
     };
@@ -3506,9 +3559,12 @@
 
     const closeSubscriptionSheet = () => {
       if (subscribeLayer.hidden) return;
+      subscriptionRequestId += 1;
+      subscriptionAbortController?.abort();
       subscribeLayer.classList.remove('is-open');
       document.body.classList.remove('subscribe-open');
-      window.setTimeout(() => {
+      subscriptionBackground.forEach(element => { element.inert = false; });
+      subscriptionCloseTimer = window.setTimeout(() => {
         subscribeLayer.hidden = true;
         subscribeForm.hidden = false;
         subscribeSuccess.hidden = true;
@@ -3517,9 +3573,14 @@
     };
 
     const openSubscriptionSheet = (mode, concert, trigger) => {
+      window.clearTimeout(subscriptionCloseTimer);
+      subscriptionRequestId += 1;
+      subscriptionAbortController?.abort();
       lastSubscribeTrigger = trigger || document.activeElement;
       subscribeSheet.classList.remove('is-sent');
       subscribeStatus.textContent = '';
+      subscribeName.value = '';
+      [subscribeName, subscribeEmail, subscribeConsent].forEach(input => input.removeAttribute('aria-invalid'));
       subscribeEmail.value = '';
       subscribeWebsite.value = '';
       subscribeConsent.checked = false;
@@ -3536,9 +3597,10 @@
 
       subscribeLayer.hidden = false;
       document.body.classList.add('subscribe-open');
+      subscriptionBackground.forEach(element => { element.inert = true; });
       window.requestAnimationFrame(() => {
         subscribeLayer.classList.add('is-open');
-        subscribeEmail.focus({ preventScroll: true });
+        subscribeSheet.focus({ preventScroll: true });
       });
     };
 
@@ -3564,20 +3626,42 @@
 
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && !subscribeLayer.hidden) closeSubscriptionSheet();
+      if (event.key !== 'Tab' || subscribeLayer.hidden) return;
+      const focusable = [...subscribeSheet.querySelectorAll('button, input, a[href]')]
+        .filter(element => !element.disabled && element.tabIndex >= 0 && element.getClientRects().length);
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && (document.activeElement === first || document.activeElement === subscribeSheet)) {
+        event.preventDefault(); last?.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault(); first?.focus();
+      }
     });
 
     subscribeForm.addEventListener('submit', async event => {
       event.preventDefault();
+      if (subscribeSubmit.disabled) return;
+      const subscriberName = subscribeName.value.trim().replace(/ +/g, ' ');
       const subscriberEmail = subscribeEmail.value.trim();
+      [subscribeName, subscribeEmail, subscribeConsent].forEach(input => input.removeAttribute('aria-invalid'));
+
+      if (!subscriberName || subscriberName.length > 80 || /[\u0000-\u001f\u007f<>]/.test(subscriberName)) {
+        subscribeStatus.textContent = 'Please enter your first name (up to 80 characters).';
+        subscribeName.setAttribute('aria-invalid', 'true');
+        subscribeName.focus();
+        return;
+      }
 
       if (subscriberEmail.length > 254 || !subscribeEmail.checkValidity()) {
         subscribeStatus.textContent = 'Please enter a valid email address.';
+        subscribeEmail.setAttribute('aria-invalid', 'true');
         subscribeEmail.focus();
         return;
       }
 
       if (!subscribeConsent.checked) {
         subscribeStatus.textContent = 'Please confirm that you’d like to receive concert updates.';
+        subscribeConsent.setAttribute('aria-invalid', 'true');
         subscribeConsent.focus();
         return;
       }
@@ -3588,6 +3672,10 @@
         subscribeSubmit.textContent = 'Joining…';
         subscribeForm.setAttribute('aria-busy', 'true');
         subscribeStatus.textContent = '';
+        const requestId = ++subscriptionRequestId;
+        const controller = new AbortController();
+        subscriptionAbortController = controller;
+        const timeout = window.setTimeout(() => controller.abort(), 15000);
 
         try {
           const response = await fetch(subscriptionEndpoint, {
@@ -3595,20 +3683,33 @@
             headers: { 'Content-Type': 'application/json' },
             credentials: 'omit',
             referrerPolicy: 'no-referrer',
+            signal: controller.signal,
             body: JSON.stringify({
+              firstName: subscriberName,
               email: subscriberEmail,
               website: subscribeWebsite.value
             })
           });
           const result = await response.json().catch(() => ({}));
+          if (requestId !== subscriptionRequestId) return;
+          if (response.status === 429) {
+            subscribeStatus.textContent = 'Please wait a few minutes before trying again. If you just subscribed, check your inbox and spam folder.';
+            return;
+          }
           if (!response.ok || !result.ok) throw new Error(result.message || 'Subscription failed');
           showSubscriptionSuccess(false);
-        } catch {
-          subscribeStatus.textContent = 'Something went wrong. Please try again in a moment.';
+        } catch (error) {
+          if (requestId !== subscriptionRequestId) return;
+          subscribeStatus.textContent = error.name === 'AbortError'
+            ? 'The connection took too long. Please try again.'
+            : 'Something went wrong. Please try again in a moment.';
         } finally {
-          subscribeSubmit.disabled = false;
-          subscribeSubmit.textContent = 'SUBSCRIBE';
-          subscribeForm.removeAttribute('aria-busy');
+          window.clearTimeout(timeout);
+          if (requestId === subscriptionRequestId) {
+            subscribeSubmit.disabled = false;
+            subscribeSubmit.textContent = 'SUBSCRIBE';
+            subscribeForm.removeAttribute('aria-busy');
+          }
         }
         return;
       }
@@ -3626,6 +3727,7 @@
       const body = [
         'Hello,',
         '',
+        `Subscriber name: ${subscriberName}`,
         `Subscriber email: ${subscriberEmail}`,
         'Subscription: Future concert updates',
         '',
@@ -3790,9 +3892,7 @@
       }
 
       const externalActionUrl = concert.registrationUrl || concert.externalUrl || concert.actionUrl;
-      const internalActionUrl = concert.id
-        ? `concert.html?id=${encodeURIComponent(String(concert.id))}${concert._preview ? '&preview=1' : ''}`
-        : '';
+      const internalActionUrl = ConcertData.detailUrl(concert, window.location.href);
       const actionUrl = concertKind === 'hosted' ? internalActionUrl : externalActionUrl;
 
       if (actionUrl && !statusLabels[status]) {
@@ -3823,16 +3923,44 @@
       actions.append(action);
 
       if (!statusLabels[status] && concert.date && concert.time) {
-        const calendar = document.createElement('button');
+        const calendarUrl = ConcertData.calendarUrl(concert, window.location.href);
+        const calendar = document.createElement(calendarUrl ? 'a' : 'button');
         calendar.className = 'concert-calendar';
-        calendar.type = 'button';
         calendar.textContent = 'Add to calendar +';
         calendar.setAttribute('aria-label', `Add ${concert.title || 'this concert'} to your calendar`);
-        calendar.addEventListener('click', () => downloadCalendarInvite(concert));
+        if (calendarUrl) {
+          calendar.href = calendarUrl;
+          calendar.download = '';
+        } else {
+          calendar.type = 'button';
+          calendar.addEventListener('click', () => downloadCalendarInvite(concert));
+        }
         actions.append(calendar);
       }
 
-      article.append(dateBlock, info, actions);
+      if (concertKind === 'hosted' && concert.image && !statusLabels[status]) {
+        try {
+          const imageUrl = new URL(String(concert.image), window.location.href);
+          if (imageUrl.origin !== window.location.origin || !/\.(webp|png|jpe?g)$/i.test(imageUrl.pathname)) throw new Error('Unsupported concert image');
+          const artworkLink = document.createElement('a');
+          artworkLink.className = 'concert-artwork';
+          artworkLink.href = internalActionUrl;
+          artworkLink.setAttribute('aria-label', `Discover ${concert.title || 'the concert'}`);
+          const image = document.createElement('img');
+          image.src = imageUrl.href;
+          image.alt = String(concert.imageAlt || '');
+          image.width = 1634;
+          image.height = 962;
+          image.loading = 'lazy';
+          image.decoding = 'async';
+          artworkLink.append(image);
+          const content = document.createElement('div');
+          content.className = 'concert-card-content';
+          content.append(dateBlock, info, actions);
+          article.classList.add('concert-card-featured');
+          article.append(artworkLink, content);
+        } catch { article.append(dateBlock, info, actions); }
+      } else article.append(dateBlock, info, actions);
       return article;
     };
 
@@ -3845,35 +3973,36 @@
         if (data && typeof data.mailing === 'object') {
           mailingConfig = { ...mailingConfig, ...data.mailing };
         }
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
         const previewMode = new URLSearchParams(window.location.search).get('concerts') === 'preview';
         const sourceConcerts = previewMode && data._example
           ? [{ ...data._example, published: true, status: 'preview', _preview: true }]
           : data.concerts;
-        const concerts = Array.isArray(sourceConcerts)
-          ? sourceConcerts
-              .filter(concert => concert && concert.published !== false && concert.status !== 'hidden')
-              .map(concert => ({ concert, date: parseConcertDate(concert.date) }))
-              .filter(item => item.date && (previewMode || item.date >= today))
-              .sort((a, b) => a.date - b.date)
-              .map(item => item.concert)
-          : [];
-
-        if (!concerts.length) return;
+        const concerts = previewMode
+          ? (Array.isArray(sourceConcerts) ? sourceConcerts.filter(concert => ConcertData.validDate(concert.date)) : [])
+          : ConcertData.split(sourceConcerts).upcoming;
         const fragment = document.createDocumentFragment();
         concerts.forEach(concert => fragment.append(createConcertCard(concert)));
         concertList.append(fragment);
-        renderNextConcert(concerts[0]);
+        document.getElementById('concertEmpty').hidden = concerts.length > 0;
+        const nextPlayable = concerts.find(concert => !['cancelled', 'postponed'].includes(concert.status));
+        if (nextPlayable) renderNextConcert(nextPlayable);
         concertsSection.hidden = false;
         concertsPreviewNote.hidden = !previewMode;
-        document.documentElement.classList.add('has-concerts');
+        document.documentElement.classList.toggle('has-concerts', Boolean(nextPlayable));
       })
       .catch(() => {
         concertsSection.hidden = true;
       })
       .finally(() => {
         document.documentElement.classList.remove('concerts-loading');
+        // Settle incoming concert-page links after asynchronous concert layout.
+        // The calendar starts hidden; its insertion also shifts the newsletter.
+        if (['#concerts', '#letters'].includes(window.location.hash)) {
+          const destination = document.getElementById(window.location.hash.slice(1));
+          if (destination && !destination.hidden) {
+            window.requestAnimationFrame(() => destination.scrollIntoView({ behavior: 'instant', block: 'start' }));
+          }
+        }
         if (new URLSearchParams(window.location.search).get('subscription') !== 'confirmed') return;
         window.setTimeout(() => {
           openSubscriptionSheet('letters', null, document.querySelector('[data-open-subscribe]'));
